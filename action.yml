@@ -1,0 +1,55 @@
+name: push-gha-metrics-action
+description:
+  Push metrics collected from the currently executing job to as loki logs
+inputs:
+  # See https://github.com/actions/github-script/blob/00e1b58cd9e040d944127e75b3d9df586e4b0479/action.yml#L13
+  # You can access github action context within default values
+  github-token:
+    required: true
+    description:
+      "The github token used to make API requests to gather metrics data"
+    default: ${{ github.token }}
+  this-job-name:
+    required: false
+    description:
+      The name of the currently running job, needed when the `job[job_id].name`
+      key is specified, and when matrices are used.
+  basic-auth:
+    required: false
+    description:
+      Basic auth to use to sending requests to loki, such as "bobsmith:hunter2"
+  hostname:
+    required: true
+    description:
+      The hostname of the loki instance to connect to, such as
+      "my-logs.grafana.net"
+  protocol:
+    required: true
+    default: https
+    description:
+      The protocol to use when sending requests to loki such as "http" or
+      "https"
+  port:
+    required: true
+    default: "443"
+    description: The port to use when sending requests to loki such as "443"
+  path:
+    required: true
+    default: "/loki/api/v1/push"
+    description: The endpoint path to /loki/api/v1/push
+  dry-run:
+    required: true
+    default: "false"
+    description:
+      "Execute the action till the point of sending a loki request, but don't
+      actually send the request"
+  timeout:
+    required: true
+    default: "3000"
+    description:
+      The timeout in milliseconds to use when sending requests to loki
+
+runs:
+  using: "node16"
+  main: "dist/index.js"
+  post: "dist/index.js"

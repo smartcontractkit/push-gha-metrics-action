@@ -1,0 +1,52 @@
+name: CI
+on:
+  workflow_dispatch:
+  push:
+  pull_request:
+
+jobs:
+  unit-tests:
+    name: Unit tests
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action@883117809c4875d07fd913841c37550535c8e56e
+        with:
+          basic-auth: ${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: ${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: Unit tests
+
+      - name: Checkout source
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b #v3.0.2
+        with:
+          fetch-depth: 0
+
+      - name: Install node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@10693b3829bf86eb2572aef5f3571dcf5ca9287d #v2.2.2
+        with:
+          version: ^6.32.2
+          run_install: false
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: |
+          echo "::set-output name=pnpm_cache_dir::$(pnpm store path)"
+
+      - name: Cache npm artifacts
+        uses: actions/cache@c3f1317a9e7b1ef106c153ac8c0f00fed3ddbc0d #v3.0.4
+        with:
+          key: ${{ runner.os }}-pnpm-cache
+          path: |
+            ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
+
+      - name: Install npm dependencies
+        run: pnpm install
+
+      - name: Run unit tests
+        run: pnpm test -- unit

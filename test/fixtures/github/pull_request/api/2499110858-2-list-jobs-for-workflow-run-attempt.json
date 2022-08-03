@@ -1,0 +1,290 @@
+{
+  "total_count": 3,
+  "jobs": [
+    {
+      "id": 6942977557,
+      "run_id": 2499110858,
+      "run_url": "https://api.github.com/repos/smartcontractkit/push-gha-metrics-action/actions/runs/2499110858",
+      "run_attempt": 2,
+      "node_id": "CR_kwDOHFP6W88AAAABndVuFQ",
+      "head_sha": "4b0d511441abf77644725c38046efc15af866469",
+      "url": "https://api.github.com/repos/smartcontractkit/push-gha-metrics-action/actions/jobs/6942977557",
+      "html_url": "https://github.com/smartcontractkit/push-gha-metrics-action/runs/6942977557?check_suite_focus=true",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2022-06-17T21:19:16Z",
+      "completed_at": "2022-06-17T21:19:20Z",
+      "name": "my dummy job",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2022-06-17T21:19:16.000Z",
+          "completed_at": "2022-06-17T21:19:17.000Z"
+        },
+        {
+          "name": "Dummy step 1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2022-06-17T21:19:17.000Z",
+          "completed_at": "2022-06-17T21:19:18.000Z"
+        },
+        {
+          "name": "Dummy step 2",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2022-06-17T21:19:20.000Z",
+          "completed_at": "2022-06-17T21:19:20.000Z"
+        },
+        {
+          "name": "Post Dummy step 1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2022-06-17T21:19:20.000Z",
+          "completed_at": "2022-06-17T21:19:20.000Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2022-06-17T21:19:18.000Z",
+          "completed_at": "2022-06-17T21:19:18.000Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/smartcontractkit/push-gha-metrics-action/check-runs/6942977557",
+      "labels": ["ubuntu-18.04"],
+      "runner_id": 8,
+      "runner_name": "GitHub Actions 8",
+      "runner_group_id": 2,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 6942977656,
+      "run_id": 2499110858,
+      "run_url": "https://api.github.com/repos/smartcontractkit/push-gha-metrics-action/actions/runs/2499110858",
+      "run_attempt": 2,
+      "node_id": "CR_kwDOHFP6W88AAAABndVueA",
+      "head_sha": "4b0d511441abf77644725c38046efc15af866469",
+      "url": "https://api.github.com/repos/smartcontractkit/push-gha-metrics-action/actions/jobs/6942977656",
+      "html_url": "https://github.com/smartcontractkit/push-gha-metrics-action/runs/6942977656?check_suite_focus=true",
+      "status": "in_progress",
+      "conclusion": null,
+      "started_at": "2022-06-17T21:19:17Z",
+      "completed_at": null,
+      "name": "generate-fixtures-name-1",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2022-06-17T21:19:17.000Z",
+          "completed_at": "2022-06-17T21:19:18.000Z"
+        },
+        {
+          "name": "Dummy step 1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2022-06-17T21:19:18.000Z",
+          "completed_at": "2022-06-17T21:19:19.000Z"
+        },
+        {
+          "name": "Remove old fixtures",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2022-06-17T21:19:19.000Z",
+          "completed_at": "2022-06-17T21:19:19.000Z"
+        },
+        {
+          "name": "Create required directories",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2022-06-17T21:19:19.000Z",
+          "completed_at": "2022-06-17T21:19:19.000Z"
+        },
+        {
+          "name": "Dummy step 2",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2022-06-17T21:19:19.000Z",
+          "completed_at": "2022-06-17T21:19:19.000Z"
+        },
+        {
+          "name": "Gather API fixtures",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2022-06-17T21:19:19.000Z",
+          "completed_at": "2022-06-17T21:19:20.000Z"
+        },
+        {
+          "name": "Dummy step 2",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2022-06-17T21:19:20.000Z",
+          "completed_at": "2022-06-17T21:19:20.000Z"
+        },
+        {
+          "name": "Dump context",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2022-06-17T21:19:20.000Z",
+          "completed_at": "2022-06-17T21:19:20.000Z"
+        },
+        {
+          "name": "Rename event JSON",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2022-06-17T21:19:20.000Z",
+          "completed_at": "2022-06-17T21:19:20.000Z"
+        },
+        {
+          "name": "Upload fixtures",
+          "status": "in_progress",
+          "conclusion": null,
+          "number": 10,
+          "started_at": "2022-06-17T21:19:20.000Z",
+          "completed_at": null
+        },
+        {
+          "name": "Post Dummy step 1",
+          "status": "queued",
+          "conclusion": null,
+          "number": 20,
+          "started_at": null,
+          "completed_at": null
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/smartcontractkit/push-gha-metrics-action/check-runs/6942977656",
+      "labels": ["ubuntu-latest"],
+      "runner_id": 7,
+      "runner_name": "GitHub Actions 7",
+      "runner_group_id": 2,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 6942977735,
+      "run_id": 2499110858,
+      "run_url": "https://api.github.com/repos/smartcontractkit/push-gha-metrics-action/actions/runs/2499110858",
+      "run_attempt": 2,
+      "node_id": "CR_kwDOHFP6W88AAAABndVuxw",
+      "head_sha": "4b0d511441abf77644725c38046efc15af866469",
+      "url": "https://api.github.com/repos/smartcontractkit/push-gha-metrics-action/actions/jobs/6942977735",
+      "html_url": "https://github.com/smartcontractkit/push-gha-metrics-action/runs/6942977735?check_suite_focus=true",
+      "status": "in_progress",
+      "conclusion": null,
+      "started_at": "2022-06-17T21:19:19Z",
+      "completed_at": null,
+      "name": "generate-fixtures-name-2",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2022-06-17T21:19:18.000Z",
+          "completed_at": "2022-06-17T21:19:20.000Z"
+        },
+        {
+          "name": "Dummy step 1",
+          "status": "in_progress",
+          "conclusion": null,
+          "number": 2,
+          "started_at": "2022-06-17T21:19:20.000Z",
+          "completed_at": null
+        },
+        {
+          "name": "Remove old fixtures",
+          "status": "queued",
+          "conclusion": null,
+          "number": 3,
+          "started_at": null,
+          "completed_at": null
+        },
+        {
+          "name": "Create required directories",
+          "status": "queued",
+          "conclusion": null,
+          "number": 4,
+          "started_at": null,
+          "completed_at": null
+        },
+        {
+          "name": "Dummy step 2",
+          "status": "queued",
+          "conclusion": null,
+          "number": 5,
+          "started_at": null,
+          "completed_at": null
+        },
+        {
+          "name": "Gather API fixtures",
+          "status": "queued",
+          "conclusion": null,
+          "number": 6,
+          "started_at": null,
+          "completed_at": null
+        },
+        {
+          "name": "Dummy step 2",
+          "status": "queued",
+          "conclusion": null,
+          "number": 7,
+          "started_at": null,
+          "completed_at": null
+        },
+        {
+          "name": "Dump context",
+          "status": "queued",
+          "conclusion": null,
+          "number": 8,
+          "started_at": null,
+          "completed_at": null
+        },
+        {
+          "name": "Rename event JSON",
+          "status": "queued",
+          "conclusion": null,
+          "number": 9,
+          "started_at": null,
+          "completed_at": null
+        },
+        {
+          "name": "Upload fixtures",
+          "status": "queued",
+          "conclusion": null,
+          "number": 10,
+          "started_at": null,
+          "completed_at": null
+        },
+        {
+          "name": "Post Dummy step 1",
+          "status": "queued",
+          "conclusion": null,
+          "number": 20,
+          "started_at": null,
+          "completed_at": null
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/smartcontractkit/push-gha-metrics-action/check-runs/6942977735",
+      "labels": ["ubuntu-latest"],
+      "runner_id": 6,
+      "runner_name": "GitHub Actions 6",
+      "runner_group_id": 2,
+      "runner_group_name": "GitHub Actions"
+    }
+  ]
+}

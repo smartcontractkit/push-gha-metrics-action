@@ -1,0 +1,100 @@
+name: Generate Fixtures
+on:
+  workflow_dispatch:
+  push:
+  pull_request:
+
+jobs:
+  dummy-job:
+    name: my dummy job
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Dummy step 1
+        uses: actions/checkout@v3
+      - name: Collect Metrics
+        uses: ./
+        with:
+          basic-auth: ${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: ${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: my dummy job
+
+      - name: Dummy step 2
+        id: dummy-step-2
+        run: echo "test test test"
+
+  dummy-job-dep:
+    name: my dummy job
+    needs: [dummy-job]
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Dummy step 1
+        uses: actions/checkout@v3
+
+      - name: Collect Metrics
+        uses: ./
+        with:
+          basic-auth: ${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: ${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: my dummy job
+
+      - name: Dummy step 2
+        id: dummy-step-2
+        run: echo "test test test"
+
+  generate-fixtures:
+    name: generate-fixtures-name-${{ matrix.name }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        name: ["1", "2"]
+    env:
+      test-dir: ./test/
+      payload-name:
+        ${{ github.run_id }}-${{ github.run_attempt }}-${{ github.event_name }}
+      # This should be the same as payload name above, unfortunately env vars cannot reference each other :/
+      fixture-path:
+        fixtures/github/${{ github.run_id }}-${{ github.run_attempt }}-${{
+        github.event_name }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Collect Metrics
+        uses: ./
+        with:
+          basic-auth: ${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: ${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: generate-fixtures-name-${{ matrix.name }}
+
+      - name: Create required directories
+        shell: bash
+        run: mkdir -p ${{ env.test-dir }}${{ env.fixture-path }}/{api,context}
+
+      - name: Gather API fixtures
+        env:
+          FIXTURE_PATH: ${{ env.fixture-path }}
+          GH_TOKEN: ${{ github.token }}
+          ATTEMPT_NUMBER: ${{ github.run_attempt }}
+          RUN_ID: ${{ github.run_id }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: ./scripts/generate-fixtures.sh
+        working-directory: ${{ env.test-dir }}
+        shell: bash
+
+      - name: Dump context
+        uses: actions/github-script@v6
+        env:
+          dumpPath: ${{ env.test-dir }}${{ env.fixture-path }}/context/
+        with:
+          script: |
+            const fs = require('fs')
+            const path = require('path')
+            fs.writeFileSync(path.join(process.env.dumpPath, 'context.json'), JSON.stringify(context))
+
+      - name: Upload fixtures
+        uses: actions/upload-artifact@v3.1.0
+        with:
+          name: ${{ env.payload-name }}
+          path: ${{ env.test-dir }}${{ env.fixture-path }}
+          retention-days: 1

@@ -1,0 +1,5 @@
+{
+  "markdown.extension.toc.omittedFromToc": {
+    "README.md": ["# push-gha-metrics-action", "# Table of Contents"]
+  }
+}
