@@ -49,7 +49,7 @@ export function extractStreamFromContext(
 
   const staticLabels = {
     host: "github.com",
-    application: "push-gha-metrics",
+    application: "push-gha-metrics-action",
   } as const;
 
   const dynamicLabels = {

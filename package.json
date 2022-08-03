@@ -1,8 +1,8 @@
 {
-  "name": "push-metrics",
+  "name": "push-gha-metrics-action",
   "version": "0.0.1",
-  "description": "A github action for pushing github actions metrics",
-  "main": "push-metrics.js",
+  "description": "A github action for pushing github actions metrics as loki logs",
+  "main": "dist/index.js",
   "scripts": {
     "prepare": "esbuild src/index.ts --bundle --platform=node --target=node16 --tsconfig=./tsconfig.build.json --outfile=dist/index.js",
     "format": "npx prettier --write .",

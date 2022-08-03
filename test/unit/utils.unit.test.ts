@@ -3,7 +3,7 @@ import {
   unixTimeSecondsToIso8601,
 } from "../../src/utils";
 import { Context } from "../../src/context.types";
-import mockContext from "../__mocks__/fetchContext1.json";
+import mockContext from "./__mocks__/fetchContext1.json";
 describe("Util tests", () => {
   // Taken from context.test.ts snapshots
   const context: Context = mockContext;

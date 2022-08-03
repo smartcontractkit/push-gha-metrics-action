@@ -1,4 +1,4 @@
-name: Loki github actions
+name: push-gha-metrics-action
 description:
   Push metrics collected from the currently executing job to as loki logs
 inputs:

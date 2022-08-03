@@ -7,7 +7,7 @@ import {
 import { Context } from "../../src/context.types";
 import { LokiRequestOptions } from "../../src/loki.types";
 import nock from "nock";
-import mockContext from "../__mocks__/fetchContext1.json";
+import mockContext from "./__mocks__/fetchContext1.json";
 
 describe("Loki", () => {
   // Taken from context.test.ts snapshots
@@ -63,7 +63,7 @@ Object {
       expect(stream).toMatchInlineSnapshot(`
 Object {
   "actor": "HenryNguyen5",
-  "application": "push-gha-metrics",
+  "application": "push-gha-metrics-action",
   "eventName": "pull_request",
   "host": "github.com",
   "jobName": "generate-fixtures-name-1",
@@ -128,7 +128,7 @@ Object {
       expect(stream).toMatchInlineSnapshot(`
 Object {
   "actor": "HenryNguyen5",
-  "application": "push-gha-metrics",
+  "application": "push-gha-metrics-action",
   "eventName": "pull_request",
   "host": "github.com",
   "jobName": "generate-fixtures-name-1",
@@ -167,7 +167,7 @@ Object {
             {
               stream: {
                 host: "github.com",
-                application: "push-gha-metrics",
+                application: "push-gha-metrics-action",
                 eventName: "pull_request",
                 repo: "mockRepo",
                 owner: "mockOwner",
@@ -222,7 +222,7 @@ Object {
             {
               stream: {
                 host: "github.com",
-                application: "push-gha-metrics",
+                application: "push-gha-metrics-action",
                 eventName: "pull_request",
                 repo: "mockRepo",
                 owner: "mockOwner",

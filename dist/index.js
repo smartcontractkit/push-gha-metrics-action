@@ -7054,7 +7054,7 @@ function extractStreamFromContext(context2) {
   const { workflowName } = workflowRun;
   const staticLabels = {
     host: "github.com",
-    application: "push-gha-metrics"
+    application: "push-gha-metrics-action"
   };
   const dynamicLabels = {
     eventName,

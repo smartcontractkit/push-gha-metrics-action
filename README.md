@@ -1,4 +1,4 @@
-# push-metrics
+# push-gha-metrics-action
 
 Github actions' insights for github actions is lacking in easily actionable
 information that someone would want if they are looking to optimize their CI/CD
