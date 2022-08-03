@@ -1,0 +1,282 @@
+{
+  "total_count": 3,
+  "jobs": [
+    {
+      "id": 6891428272,
+      "run_id": 2499110858,
+      "run_url": "https://api.github.com/repos/smartcontractkit/releng/actions/runs/2499110858",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOHFP6W88AAAABmsLZsA",
+      "head_sha": "4b0d511441abf77644725c38046efc15af866469",
+      "url": "https://api.github.com/repos/smartcontractkit/releng/actions/jobs/6891428272",
+      "html_url": "https://github.com/smartcontractkit/releng/runs/6891428272?check_suite_focus=true",
+      "status": "in_progress",
+      "conclusion": null,
+      "started_at": "2022-06-15T01:01:14Z",
+      "completed_at": null,
+      "name": "my dummy job",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2022-06-15T01:01:13.000Z",
+          "completed_at": "2022-06-15T01:01:15.000Z"
+        },
+        {
+          "name": "Dummy step 1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2022-06-15T01:01:15.000Z",
+          "completed_at": "2022-06-15T01:01:17.000Z"
+        },
+        {
+          "name": "Dummy step 2",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2022-06-15T01:01:17.000Z",
+          "completed_at": "2022-06-15T01:01:17.000Z"
+        },
+        {
+          "name": "Post Dummy step 1",
+          "status": "in_progress",
+          "conclusion": null,
+          "number": 6,
+          "started_at": "2022-06-15T01:01:17.000Z",
+          "completed_at": null
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/smartcontractkit/releng/check-runs/6891428272",
+      "labels": ["ubuntu-18.04"],
+      "runner_id": 273,
+      "runner_name": "GitHub Actions 113",
+      "runner_group_id": 2,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 6891428337,
+      "run_id": 2499110858,
+      "run_url": "https://api.github.com/repos/smartcontractkit/releng/actions/runs/2499110858",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOHFP6W88AAAABmsLZ8Q",
+      "head_sha": "4b0d511441abf77644725c38046efc15af866469",
+      "url": "https://api.github.com/repos/smartcontractkit/releng/actions/jobs/6891428337",
+      "html_url": "https://github.com/smartcontractkit/releng/runs/6891428337?check_suite_focus=true",
+      "status": "in_progress",
+      "conclusion": null,
+      "started_at": "2022-06-15T01:01:13Z",
+      "completed_at": null,
+      "name": "generate-fixtures-name-1",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2022-06-15T01:01:13.000Z",
+          "completed_at": "2022-06-15T01:01:14.000Z"
+        },
+        {
+          "name": "Dummy step 1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2022-06-15T01:01:14.000Z",
+          "completed_at": "2022-06-15T01:01:16.000Z"
+        },
+        {
+          "name": "Remove old fixtures",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2022-06-15T01:01:17.000Z",
+          "completed_at": "2022-06-15T01:01:16.000Z"
+        },
+        {
+          "name": "Create required directories",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2022-06-15T01:01:17.000Z",
+          "completed_at": "2022-06-15T01:01:16.000Z"
+        },
+        {
+          "name": "Dummy step 2",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2022-06-15T01:01:17.000Z",
+          "completed_at": "2022-06-15T01:01:16.000Z"
+        },
+        {
+          "name": "Gather API fixtures",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2022-06-15T01:01:17.000Z",
+          "completed_at": "2022-06-15T01:01:18.000Z"
+        },
+        {
+          "name": "Dummy step 2",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2022-06-15T01:01:19.000Z",
+          "completed_at": "2022-06-15T01:01:18.000Z"
+        },
+        {
+          "name": "Dump context",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2022-06-15T01:01:19.000Z",
+          "completed_at": "2022-06-15T01:01:18.000Z"
+        },
+        {
+          "name": "Rename event JSON",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2022-06-15T01:01:19.000Z",
+          "completed_at": "2022-06-15T01:01:18.000Z"
+        },
+        {
+          "name": "Upload fixtures",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2022-06-15T01:01:19.000Z",
+          "completed_at": "2022-06-15T01:01:19.000Z"
+        },
+        {
+          "name": "Post Dummy step 1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 20,
+          "started_at": "2022-06-15T01:01:19.000Z",
+          "completed_at": "2022-06-15T01:01:19.000Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/smartcontractkit/releng/check-runs/6891428337",
+      "labels": ["ubuntu-latest"],
+      "runner_id": 275,
+      "runner_name": "GitHub Actions 115",
+      "runner_group_id": 2,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 6891428403,
+      "run_id": 2499110858,
+      "run_url": "https://api.github.com/repos/smartcontractkit/releng/actions/runs/2499110858",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOHFP6W88AAAABmsLaMw",
+      "head_sha": "4b0d511441abf77644725c38046efc15af866469",
+      "url": "https://api.github.com/repos/smartcontractkit/releng/actions/jobs/6891428403",
+      "html_url": "https://github.com/smartcontractkit/releng/runs/6891428403?check_suite_focus=true",
+      "status": "in_progress",
+      "conclusion": null,
+      "started_at": "2022-06-15T01:01:16Z",
+      "completed_at": null,
+      "name": "generate-fixtures-name-2",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2022-06-15T01:01:16.000Z",
+          "completed_at": "2022-06-15T01:01:18.000Z"
+        },
+        {
+          "name": "Dummy step 1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2022-06-15T01:01:18.000Z",
+          "completed_at": "2022-06-15T01:01:19.000Z"
+        },
+        {
+          "name": "Remove old fixtures",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2022-06-15T01:01:19.000Z",
+          "completed_at": "2022-06-15T01:01:19.000Z"
+        },
+        {
+          "name": "Create required directories",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2022-06-15T01:01:19.000Z",
+          "completed_at": "2022-06-15T01:01:19.000Z"
+        },
+        {
+          "name": "Dummy step 2",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2022-06-15T01:01:19.000Z",
+          "completed_at": "2022-06-15T01:01:19.000Z"
+        },
+        {
+          "name": "Gather API fixtures",
+          "status": "in_progress",
+          "conclusion": null,
+          "number": 6,
+          "started_at": "2022-06-15T01:01:19.000Z",
+          "completed_at": null
+        },
+        {
+          "name": "Dummy step 2",
+          "status": "queued",
+          "conclusion": null,
+          "number": 7,
+          "started_at": null,
+          "completed_at": null
+        },
+        {
+          "name": "Dump context",
+          "status": "queued",
+          "conclusion": null,
+          "number": 8,
+          "started_at": null,
+          "completed_at": null
+        },
+        {
+          "name": "Rename event JSON",
+          "status": "queued",
+          "conclusion": null,
+          "number": 9,
+          "started_at": null,
+          "completed_at": null
+        },
+        {
+          "name": "Upload fixtures",
+          "status": "queued",
+          "conclusion": null,
+          "number": 10,
+          "started_at": null,
+          "completed_at": null
+        },
+        {
+          "name": "Post Dummy step 1",
+          "status": "queued",
+          "conclusion": null,
+          "number": 20,
+          "started_at": null,
+          "completed_at": null
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/smartcontractkit/releng/check-runs/6891428403",
+      "labels": ["ubuntu-latest"],
+      "runner_id": 277,
+      "runner_name": "GitHub Actions 117",
+      "runner_group_id": 2,
+      "runner_group_name": "GitHub Actions"
+    }
+  ]
+}
