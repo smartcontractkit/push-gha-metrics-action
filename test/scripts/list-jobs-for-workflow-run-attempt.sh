@@ -5,7 +5,7 @@
 # https://cli.github.com/manual/gh_api
 
 OWNER=smartcontractkit
-REPO=releng
+REPO=push-gha-metrics-action
 
 gh api \
   -H "Accept: application/vnd.github.v3+json" \

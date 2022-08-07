@@ -4,12 +4,12 @@
     {
       "id": 6942977557,
       "run_id": 2499110858,
-      "run_url": "https://api.github.com/repos/smartcontractkit/releng/actions/runs/2499110858",
+      "run_url": "https://api.github.com/repos/smartcontractkit/push-gha-metrics-action/actions/runs/2499110858",
       "run_attempt": 2,
       "node_id": "CR_kwDOHFP6W88AAAABndVuFQ",
       "head_sha": "4b0d511441abf77644725c38046efc15af866469",
-      "url": "https://api.github.com/repos/smartcontractkit/releng/actions/jobs/6942977557",
-      "html_url": "https://github.com/smartcontractkit/releng/runs/6942977557?check_suite_focus=true",
+      "url": "https://api.github.com/repos/smartcontractkit/push-gha-metrics-action/actions/jobs/6942977557",
+      "html_url": "https://github.com/smartcontractkit/push-gha-metrics-action/runs/6942977557?check_suite_focus=true",
       "status": "completed",
       "conclusion": "success",
       "started_at": "2022-06-17T21:19:16Z",
@@ -57,7 +57,7 @@
           "completed_at": "2022-06-17T21:19:18.000Z"
         }
       ],
-      "check_run_url": "https://api.github.com/repos/smartcontractkit/releng/check-runs/6942977557",
+      "check_run_url": "https://api.github.com/repos/smartcontractkit/push-gha-metrics-action/check-runs/6942977557",
       "labels": ["ubuntu-18.04"],
       "runner_id": 8,
       "runner_name": "GitHub Actions 8",
@@ -67,12 +67,12 @@
     {
       "id": 6942977656,
       "run_id": 2499110858,
-      "run_url": "https://api.github.com/repos/smartcontractkit/releng/actions/runs/2499110858",
+      "run_url": "https://api.github.com/repos/smartcontractkit/push-gha-metrics-action/actions/runs/2499110858",
       "run_attempt": 2,
       "node_id": "CR_kwDOHFP6W88AAAABndVueA",
       "head_sha": "4b0d511441abf77644725c38046efc15af866469",
-      "url": "https://api.github.com/repos/smartcontractkit/releng/actions/jobs/6942977656",
-      "html_url": "https://github.com/smartcontractkit/releng/runs/6942977656?check_suite_focus=true",
+      "url": "https://api.github.com/repos/smartcontractkit/push-gha-metrics-action/actions/jobs/6942977656",
+      "html_url": "https://github.com/smartcontractkit/push-gha-metrics-action/runs/6942977656?check_suite_focus=true",
       "status": "in_progress",
       "conclusion": null,
       "started_at": "2022-06-17T21:19:17Z",
@@ -168,7 +168,7 @@
           "completed_at": null
         }
       ],
-      "check_run_url": "https://api.github.com/repos/smartcontractkit/releng/check-runs/6942977656",
+      "check_run_url": "https://api.github.com/repos/smartcontractkit/push-gha-metrics-action/check-runs/6942977656",
       "labels": ["ubuntu-latest"],
       "runner_id": 7,
       "runner_name": "GitHub Actions 7",
@@ -178,12 +178,12 @@
     {
       "id": 6942977735,
       "run_id": 2499110858,
-      "run_url": "https://api.github.com/repos/smartcontractkit/releng/actions/runs/2499110858",
+      "run_url": "https://api.github.com/repos/smartcontractkit/push-gha-metrics-action/actions/runs/2499110858",
       "run_attempt": 2,
       "node_id": "CR_kwDOHFP6W88AAAABndVuxw",
       "head_sha": "4b0d511441abf77644725c38046efc15af866469",
-      "url": "https://api.github.com/repos/smartcontractkit/releng/actions/jobs/6942977735",
-      "html_url": "https://github.com/smartcontractkit/releng/runs/6942977735?check_suite_focus=true",
+      "url": "https://api.github.com/repos/smartcontractkit/push-gha-metrics-action/actions/jobs/6942977735",
+      "html_url": "https://github.com/smartcontractkit/push-gha-metrics-action/runs/6942977735?check_suite_focus=true",
       "status": "in_progress",
       "conclusion": null,
       "started_at": "2022-06-17T21:19:19Z",
@@ -279,7 +279,7 @@
           "completed_at": null
         }
       ],
-      "check_run_url": "https://api.github.com/repos/smartcontractkit/releng/check-runs/6942977735",
+      "check_run_url": "https://api.github.com/repos/smartcontractkit/push-gha-metrics-action/check-runs/6942977735",
       "labels": ["ubuntu-latest"],
       "runner_id": 6,
       "runner_name": "GitHub Actions 6",

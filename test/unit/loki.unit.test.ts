@@ -42,7 +42,7 @@ Object {
     "name": "generate-fixtures-name-1",
     "startedAt": "2022-06-15T01:01:13Z",
     "startedAtUnixSeconds": 1655254873,
-    "url": "https://api.github.com/repos/smartcontractkit/releng/actions/jobs/6891428337",
+    "url": "https://api.github.com/repos/smartcontractkit/push-gha-metrics-action/actions/jobs/6891428337",
   },
   "workflowRun": Object {
     "createdAt": "2022-06-15T01:01:00Z",
@@ -54,9 +54,9 @@ Object {
     "runStartedAtUnixSeconds": 1655254860,
     "updatedAt": "2022-06-15T01:01:17Z",
     "updatedAtUnixSeconds": 1655254877,
-    "url": "https://api.github.com/repos/smartcontractkit/releng/actions/runs/2499110858",
+    "url": "https://api.github.com/repos/smartcontractkit/push-gha-metrics-action/actions/runs/2499110858",
     "workflowName": "Push Metrics CI",
-    "workflowUrl": "https://api.github.com/repos/smartcontractkit/releng/actions/workflows/28123629",
+    "workflowUrl": "https://api.github.com/repos/smartcontractkit/push-gha-metrics-action/actions/workflows/28123629",
   },
 }
 `);
@@ -101,7 +101,7 @@ Object {
     "name": "generate-fixtures-name-1",
     "startedAt": "2022-06-15T01:01:13Z",
     "startedAtUnixSeconds": 1655254873,
-    "url": "https://api.github.com/repos/smartcontractkit/releng/actions/jobs/6891428337",
+    "url": "https://api.github.com/repos/smartcontractkit/push-gha-metrics-action/actions/jobs/6891428337",
   },
   "workflowRun": Object {
     "createdAt": "2022-06-15T01:01:00Z",
@@ -113,9 +113,9 @@ Object {
     "runStartedAtUnixSeconds": 1655254860,
     "updatedAt": "2022-06-15T01:01:17Z",
     "updatedAtUnixSeconds": 1655254877,
-    "url": "https://api.github.com/repos/smartcontractkit/releng/actions/runs/2499110858",
+    "url": "https://api.github.com/repos/smartcontractkit/push-gha-metrics-action/actions/runs/2499110858",
     "workflowName": "Push Metrics CI",
-    "workflowUrl": "https://api.github.com/repos/smartcontractkit/releng/actions/workflows/28123629",
+    "workflowUrl": "https://api.github.com/repos/smartcontractkit/push-gha-metrics-action/actions/workflows/28123629",
   },
 }
 `);
