@@ -4,7 +4,7 @@
   "description": "A github action for pushing github actions metrics as loki logs",
   "main": "dist/index.js",
   "scripts": {
-    "prepare": "esbuild src/index.ts --bundle --platform=node --target=node16 --tsconfig=./tsconfig.build.json --outfile=dist/index.js",
+    "build": "esbuild src/index.ts --bundle --platform=node --target=node16 --tsconfig=./tsconfig.build.json --outfile=dist/index.js",
     "format": "npx prettier --write .",
     "test": "jest"
   },
