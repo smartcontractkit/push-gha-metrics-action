@@ -1,0 +1,107 @@
+name: create automated stage/prod promotion pull request
+on:
+  pull_request:
+    branches:
+      - sand
+    types: [closed]
+jobs:
+  createStagePromotionPr:
+    concurrency:
+      group: combo-promotion
+    env:
+      NUM_COMMITS: ${{ github.event.pull_request.commits }}
+      BASE_ENV: ${{ github.event.pull_request.base.ref }}
+      RELEASE_ENV: stage
+      GH_USER_NAME: chainlink-k8s
+      GH_USER_EMAIL: 8700084+chainlink-k8s@users.noreply.github.com
+    runs-on: ubuntu-latest
+    steps:
+      - name: determine release env
+        if: github.event.pull_request.merged == true
+        run: |
+          set -x
+          echo "release_env=$RELEASE_ENV" >> $GITHUB_ENV
+      - if: github.event.pull_request.merged == true
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
+        with:
+          ref: ${{ env.release_env }}
+      - name: check for promotion pins to update
+        if: github.event.pull_request.merged == true
+        run: |
+          set -x
+          git config user.name $GH_USER_NAME
+          git config user.email $GH_USER_EMAIL
+          git fetch origin $BASE_ENV:$BASE_ENV
+          git merge $BASE_ENV -X theirs --allow-unrelated-histories # --message
+          DIFF_PROJECTS=$(git diff --name-only $BASE_ENV~1..$BASE_ENV | grep "^helmfile.d/projects" | cut -f1,2,3 -d'/' | uniq | xargs)
+          echo "Pinning projects: $DIFF_PROJECTS"
+          for dir in $DIFF_PROJECTS; do
+            printf '%s\n' > "$dir/files/shared/.revision" \
+              $(git rev-parse $BASE_ENV)
+          done
+          echo "base_rev=$(git rev-parse --short $BASE_ENV)" >> $GITHUB_ENV
+      - name: hacky-string-truncate
+        run: |
+          PR_TITLE="[STAGE] ${{ github.event.pull_request.title }}"
+          echo "pr_title=$PR_TITLE" >> $GITHUB_ENV
+      - if: github.event.pull_request.merged == true
+        id: cprStage
+        name: create pull request
+        uses: peter-evans/create-pull-request@9825ae65b1cb54b543b938503728b432a0176d29 # v3.10.0
+        with:
+          branch: "promote/pr-${{ github.event.pull_request.number }}-to-${{ env.release_env }}"
+          commit-message: "Pinning projects to revision: ${{ env.base_rev }}"
+          token: ${{ secrets.PR_BOT_TOKEN }}
+          title: ${{ env.pr_title }}
+          labels: "automerge-stage"
+          delete-branch: true
+  createProdPromotionPr:
+    needs: ["createStagePromotionPr"]
+    concurrency:
+      group: combo-promotion
+    env:
+      NUM_COMMITS: ${{ github.event.pull_request.commits }}
+      BASE_ENV: ${{ github.event.pull_request.base.ref }}
+      RELEASE_ENV: prod
+      GH_USER_NAME: chainlink-k8s
+      GH_USER_EMAIL: 8700084+chainlink-k8s@users.noreply.github.com
+    runs-on: ubuntu-latest
+    steps:
+      - name: determine release env
+        if: github.event.pull_request.merged == true
+        run: |
+          set -x
+          echo "release_env=$RELEASE_ENV" >> $GITHUB_ENV
+      - if: github.event.pull_request.merged == true
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
+        with:
+          ref: ${{ env.release_env }}
+      - name: check for promotion pins to update
+        if: github.event.pull_request.merged == true
+        run: |
+          set -x
+          git config user.name $GH_USER_NAME
+          git config user.email $GH_USER_EMAIL
+          git fetch origin $BASE_ENV:$BASE_ENV
+          git merge $BASE_ENV -X theirs --allow-unrelated-histories # --message
+          DIFF_PROJECTS=$(git diff --name-only $BASE_ENV~1..$BASE_ENV | grep "^helmfile.d/projects" | cut -f1,2,3 -d'/' | uniq | xargs)
+          echo "Pinning projects: $DIFF_PROJECTS"
+          for dir in $DIFF_PROJECTS; do
+            printf '%s\n' > "$dir/files/shared/.revision" \
+              $(git rev-parse $BASE_ENV)
+          done
+          echo "base_rev=$(git rev-parse --short $BASE_ENV)" >> $GITHUB_ENV
+      - name: hacky-string-truncate
+        run: |
+          PR_TITLE="[PROD] ${{ github.event.pull_request.title }}"
+          echo "pr_title=$PR_TITLE" >> $GITHUB_ENV
+      - if: github.event.pull_request.merged == true
+        id: cprProd
+        name: create pull request
+        uses: peter-evans/create-pull-request@9825ae65b1cb54b543b938503728b432a0176d29 # v3.1.0
+        with:
+          branch: "promote/pr-${{ github.event.pull_request.number }}-to-${{ env.release_env }}"
+          commit-message: "Pinning projects to revision: ${{ env.base_rev }}"
+          token: ${{ secrets.PR_BOT_TOKEN }}
+          title: ${{ env.pr_title }}
+          delete-branch: true

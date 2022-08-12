@@ -1,0 +1,41 @@
+name: check prod promotion pull requests
+on:
+  pull_request:
+    branches:
+      - prod
+concurrency:
+  group: prod-promotion-check
+jobs:
+  checkProdPromotionPrs:
+    env:
+      RELEASE_ENV: prod
+      GH_USER_NAME: chainlink-k8s
+      GH_USER_EMAIL: 8700084+chainlink-k8s@users.noreply.github.com
+    runs-on: ubuntu-latest
+    steps:
+      - name: determine release env
+        run: |
+          set -x
+          echo "release_env=$RELEASE_ENV" >> $GITHUB_ENV
+      - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
+        with:
+          ref: sand
+          fetch-depth: 0
+      - name: pr checker
+        env:
+          GITHUB_TOKEN: ${{ secrets.PR_BOT_TOKEN }}
+        run: |
+          set -x
+          git config user.name $GH_USER_NAME
+          git config user.email $GH_USER_EMAIL
+
+          git fetch origin stage:stage
+          git checkout stage
+
+          commits_on_stage=false
+          pr_branch=${{ github.event.pull_request.head.ref }}
+          echo "pr_branch: $pr_branch"
+          git fetch origin $pr_branch:$pr_branch
+          git checkout $pr_branch
+          git rev-list stage..$pr_branch --oneline --no-merges --invert-grep --grep="Pinning projects to revision:" | grep . > /dev/null 2>&1 && commits_on_stage=false || commits_on_stage=true
+          [[ "${commits_on_stage}" == "true" ]] && exit 0 || exit 1

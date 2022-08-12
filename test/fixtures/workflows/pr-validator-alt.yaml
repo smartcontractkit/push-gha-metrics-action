@@ -1,0 +1,73 @@
+# this will be the default pr validator for the new promotion model
+# need to uncomment the existing jobs once we are fully migrated (captured in the original workflow)
+name: validate pull requests
+# on: pull_request
+on:
+  pull_request:
+    branches:
+      - sand
+      - stage
+      - prod
+jobs:
+  helmfile:
+    name: helmfile-pr-check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
+      - name: Setup helmfile
+        uses: mamezou-tech/setup-helmfile@961091a6d469cdf12701ad29c357448abe2bcb95 # v0.9.0
+      - name: Helmfile root app render
+        run: |
+          helmfile --version
+          cd helmfile.d
+          clusters=$(find clusters -type f -name "*.yaml" -exec basename {} ".yaml" \;)
+          for cluster in ${clusters}; do
+            echo "Rendering helmfile root app for cluster: ${cluster}"
+            helmfile \
+              --file 01-app.yaml \
+              --state-values-set cluster="${cluster}",app.project=argocd,app.name=helmfile-argocd \
+              --debug=false template --skip-deps 1> /dev/null
+          done
+  # prettier:
+  #   name: formatting-pr-check
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout the repo
+  #       uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
+  #     - name: Run Shellcheck
+  #       uses: ludeeus/action-shellcheck@94e0aab03ca135d11a35e5bfc14e6746dc56e7e9 # pin@master
+  #     - name: Run Prettier
+  #       uses: creyD/prettier_action@394fa2de3b2acce9f63808b958c54aa823a43b71 # pin@v3.1
+  #       with:
+  #         dry: true
+  #         prettier_options: --write **/*.{yaml,yml,json}
+  # helmlint:
+  #   name: helm-lint-pr-check
+  #   runs-on: ubuntu-latest
+  #   env:
+  #     CT_TARGET_BRANCH: ${{ github.event.pull_request.base.ref }}
+  #   steps:
+  #     - name: Checkout the repo
+  #       uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
+  #       with:
+  #         fetch-depth: "0"
+  #     - name: Set up chart-testing
+  #       uses: helm/chart-testing-action@b0d4458c71155b54fcf33e11dd465dc923550009 # pin@v2.0.1
+  #     - name: Run chart-testing (list-changed)
+  #       id: list-changed
+  #       run: |
+  #         changed=$(ct list-changed --config .ct.yaml)
+  #         if [[ -n "$changed" ]]; then
+  #           echo "::set-output name=changed::true"
+  #         fi
+  #     - name: Run chart-testing (lint)
+  #       run: ct lint --config .ct.yaml --excluded-charts astronomer-wrapper,cluster-bootstrap,cluster-calico,homu # Excluding these since ct fails to lint/install them.
+  # sops:
+  #   name: sops-pr-check
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Check
+  #       uses: AndresJulia/sops-gh@1f2fc77c307fac41f211e641583dbaac44a05497 # pin@v1
+  #       with:
+  #         filename_pattern: secrets

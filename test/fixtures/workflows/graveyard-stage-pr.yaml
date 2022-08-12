@@ -1,0 +1,35 @@
+name: Create staging promotion pull request
+on:
+  push:
+    branches:
+      - develop-nomatch
+jobs:
+  stagingPromotion:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f #v2.3.4
+        with:
+          ref: staging
+      - name: Reset promotion branch
+        run: |
+          git fetch origin develop:develop
+          git reset --hard develop
+      - name: hacky-string-truncate
+        run: |
+          PR_TITLE=$(echo "${{ github.event.commits[0].message }}" | head -n 1 | head -c 256)
+          echo "PR_TITLE=$PR_TITLE" >> $GITHUB_ENV
+      - id: cpr
+        name: Create Pull Request
+        uses: peter-evans/create-pull-request@9825ae65b1cb54b543b938503728b432a0176d29 # v3.1.0
+        with:
+          branch: promote/staging
+          token: ${{ secrets.PR_BOT_TOKEN }}
+          title: "Promote `${{ env.PR_TITLE }}` to Staging"
+          labels: automerge
+      - if: steps.cpr.outputs.pull-request-operation == 'created'
+        name: Enable Pull Request Automerge
+        uses: peter-evans/enable-pull-request-automerge@cb41a1ef95d7852916a3b0893903d53e7b4218f8
+        with:
+          token: ${{ secrets.PR_BOT_TOKEN }}
+          pull-request-number: ${{ steps.cpr.outputs.pull-request-number}}
+          merge-method: merge

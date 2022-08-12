@@ -1,0 +1,65 @@
+name: Create automated promotion pull request
+on:
+  pull_request:
+    branches:
+      - sand-nomatch
+      - stage-nomatch
+    types: [closed]
+jobs:
+  createPromotion:
+    env:
+      NUM_COMMITS: ${{ github.event.pull_request.commits}}
+      PROMOTE_ENV: ${{ github.event.pull_request.head.ref }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Determine Release Env
+        if: github.event.pull_request.merged == true
+        run: |
+          if [[ $PROMOTE_ENV == 'sand' ]]; then
+            echo "release_env=stage" >> $GITHUB_ENV
+          elif [[ $PROMOTE_ENV == 'stage' ]]; then
+            echo "release_env=prod" >> $GITHUB_ENV
+          else
+            echo "Unexpected promote env: $PROMOTE_ENV"
+            exit 1
+          fi
+      - if: github.event.pull_request.merged == true
+        uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f #v2.3.4
+        with:
+          ref: "${{ env.release_env }}"
+      - name: Reset promotion branch
+        if: github.event.pull_request.merged == true
+        run: |
+          git fetch origin ${{ github.event.pull_request.head.ref }}:${{ github.event.pull_request.head.ref }}
+          git reset --hard ${{ github.event.pull_request.head.ref }}
+      - name: Check for promotion pins to update
+        if: github.event.pull_request.merged == true
+        run: |
+          git config user.name chainlink-k8s
+          git config user.email 8700084+chainlink-k8s@users.noreply.github.com
+          export DIFF_FILES=$(git diff --name-only ${{ github.event.pull_request.base.ref}}~$NUM_COMMITS..${{ github.event.pull_request.base.ref}} | grep "^helmfile.d/projects" | cut -f1,2,3 -d'/' | uniq | xargs)
+          echo "Pinning helm apps: $DIFF_FILES"
+          for dir in $DIFF_FILES; do
+            printf '%s\n' > "$dir/files/shared/.revision" \
+              '${{ github.event.pull_request.head.sha}}'
+          done
+          git status
+          if ! git diff-index --quiet HEAD; then
+            echo "No pins to commit"
+          fi
+      - if: github.event.pull_request.merged == true
+        id: cpr
+        name: Create pull request
+        uses: peter-evans/create-pull-request@9825ae65b1cb54b543b938503728b432a0176d29 # v3.1.0
+        with:
+          branch: "promote/pr-${{ github.event.pull_request.number }}-to-${{ env.RELEASE_ENV }}"
+          commit-message: "Pinning apps to revision: ${{ github.event.pull_request.head.sha}}"
+          token: ${{ secrets.PR_BOT_TOKEN }}
+          title: "[${{ env.RELEASE_ENV_UPPER }}] ${{ github.event.pull_request.title }}"
+          labels: automerge
+      - if: github.event.pull_request.merged == true && steps.cpr.outputs.pull-request-operation == 'created'
+        name: Enable pull request automerge
+        uses: peter-evans/enable-pull-request-automerge@cb41a1ef95d7852916a3b0893903d53e7b4218f8
+        with:
+          token: ${{ secrets.PR_BOT_TOKEN }}
+          pull-request-number: ${{ steps.cpr.outputs.pull-request-number}}

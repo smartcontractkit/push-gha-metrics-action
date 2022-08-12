@@ -1,0 +1,38 @@
+name: Image Updater Squash Merge
+on:
+  push:
+    branches:
+      - "image-updater/*"
+      - "!image-updater/adapters"
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  mergeImageUpdates:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sleep for 120 seconds
+        run: sleep 120s
+        shell: bash
+      - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f #v2.3.4
+        with:
+          ref: develop
+      - name: Reset image squash branch
+        run: |
+          git config --local user.email "78700084+chainlink-k8s@users.noreply.github.com"
+          git config --local user.name "Koo-beer-net-ees"
+          git fetch origin ${{ github.event.ref }}:${{ github.event.ref }}
+          git reset --hard ${{ github.event.ref }}
+      - name: hacky-string-replace
+        run: |
+          BRANCH_REF="${{ github.event.ref }}"
+          BRANCH_SUBJECT=$(echo $BRANCH_REF | sed 's/refs\/heads\/image-updater\///')
+          echo "BRANCH_SUBJECT=$BRANCH_SUBJECT" >> $GITHUB_ENV
+      - id: cpr
+        name: Create Pull Request
+        uses: peter-evans/create-pull-request@9825ae65b1cb54b543b938503728b432a0176d29 # v3.1.0
+        with:
+          branch: "image-cd/${{ env.BRANCH_SUBJECT}}"
+          token: ${{ secrets.PR_BOT_TOKEN }}
+          title: "[Images] ${{ env.BRANCH_SUBJECT }}"
+          labels: automerge

@@ -1,0 +1,14 @@
+name: Atlantis
+on: push
+jobs:
+  terragrunt_atlantis_config:
+    runs-on: ubuntu-latest
+    name: validate atlantis.yaml
+    steps:
+      - uses: actions/checkout@v2
+      - name: Ensure atlantis.yaml is up to date using terragrunt-atlantis-config
+        id: atlantis_validator
+        uses: transcend-io/terragrunt-atlantis-config-github-action@778f15b289f1124008a4d32dd60de2970aad8a80 # pin@v0.0.4
+        with:
+          version: v1.14.2
+          extra_args: "--autoplan --parallel --create-workspace --ignore-parent-terragrunt"
