@@ -2,6 +2,18 @@ import fs from "node:fs/promises"
 import * as yaml from "yaml"
 import { join } from "node:path"
 
+/**
+ * Given a directory that contains workflow files, update the workflows with our metrics action.
+ *
+ * @usage
+ * ```sh
+ * # In the root of this repository
+ * pnpm update-workflow ~/src/cl/chainlink/.github/workflows
+ *
+ * # You can supply the DRY_RUN environment variable to see what workflows would be updated
+ * DRY_RUN=true pnpm update-workflow ~/src/cl/chainlink/.github/workflows
+ * ```
+ */
 export async function main() {
   const workflowDirPath = process.argv[2]
   const workflowFilePaths = await getWorkflowFilePathsFrom(workflowDirPath)
