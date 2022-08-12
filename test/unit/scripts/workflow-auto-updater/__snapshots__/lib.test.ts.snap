@@ -1,0 +1,3080 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`updateWorkflow loads workflow file paths then updates them 1`] = `
+"name: Adapter changes accompanied by a changeset
+
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - develop
+
+jobs:
+  # Changeset check
+  adapter-change-has-changeset:
+    name: Adapter changes accompanied by a changeset
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: Adapter changes accompanied by a changeset
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+
+      - name: Check whether adapter change also has a changeset
+        id: adapter_change_has_changeset
+        run: ./.github/isvalidadapterchange.sh
+"
+`;
+
+exports[`updateWorkflow loads workflow file paths then updates them 2`] = `
+"name: Airtable Master List Generation
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  airtable-generation:
+    name: Airtable Master List Generation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: Airtable Master List Generation
+
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+      - name: Setup Node.js 16.x
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16.x
+      - name: Install Dependencies
+        run: yarn
+
+      - name: Airtable generation
+        run: |
+          yarn generate:master-list -v -o airtable
+          echo \\"Airtable Master List generated successfully.\\"
+        env:
+          AIRTABLE_API_KEY: \${{ secrets.AIRTABLE_API_KEY }}
+          AIRTABLE_BASE_ID: \${{ secrets.AIRTABLE_BASE_ID }}
+"
+`;
+
+exports[`updateWorkflow loads workflow file paths then updates them 3`] = `
+"name: Atlantis
+on: push
+jobs:
+  terragrunt_atlantis_config:
+    runs-on: ubuntu-latest
+    name: validate atlantis.yaml
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: validate atlantis.yaml
+
+      - uses: actions/checkout@v2
+      - name: Ensure atlantis.yaml is up to date using terragrunt-atlantis-config
+        id: atlantis_validator
+        uses: transcend-io/terragrunt-atlantis-config-github-action@778f15b289f1124008a4d32dd60de2970aad8a80 # pin@v0.0.4
+        with:
+          version: v1.14.2
+          extra_args: \\"--autoplan --parallel --create-workspace --ignore-parent-terragrunt\\"
+"
+`;
+
+exports[`updateWorkflow loads workflow file paths then updates them 4`] = `
+"name: Auto update open PRs
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  autoupdate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: autoupdate
+
+      - name: Automatically update PR
+        uses: smartcontractkit/update-pr-branch@master
+        with:
+          token: \${{ secrets.AUTOREBASE_TOKEN }}
+          base: 'develop'
+          required_approval_count: 1
+          require_passed_checks: false
+"
+`;
+
+exports[`updateWorkflow loads workflow file paths then updates them 5`] = `
+"name: 'Push develop to private ECR'
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  push-chainlink-develop:
+    runs-on: ubuntu-20.04
+    environment: build-develop
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: push-chainlink-develop
+
+      - name: Checkout repository
+        uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
+
+      - name: Build, sign and publish chainlink image
+        uses: ./.github/actions/build-sign-publish-chainlink
+        with:
+          publish: true
+          aws-role-to-assume: \${{ secrets.AWS_OIDC_IAM_ROLE_ARN }}
+          aws-role-duration-seconds: \${{ secrets.AWS_ROLE_DURATION_SECONDS }}
+          aws-region: \${{ secrets.AWS_REGION }}
+          ecr-hostname: \${{ secrets.AWS_DEVELOP_ECR_HOSTNAME }}
+          ecr-image-name: chainlink
+"
+`;
+
+exports[`updateWorkflow loads workflow file paths then updates them 6`] = `
+"##
+# This workflow needs to be ran because \`build-sign-publish-chainlink\` is 
+# a required check but we do not want our release branches to build and
+# publish images. Instead we use tags.
+# If the workflow does not run, the required check will never pass.
+##
+
+name: 'Build Chainlink and Publish'
+
+on:
+  push:
+    branches:
+      - release/*
+
+jobs:
+  build-sign-publish-chainlink:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: build-sign-publish-chainlink
+
+      - run: 'echo \\"No job required\\"'
+"
+`;
+
+exports[`updateWorkflow loads workflow file paths then updates them 7`] = `
+"name: 'Build Chainlink and Publish'
+
+on:
+  # Mimics old circleci behaviour
+  push:
+    tags:
+      - 'v*'
+    branches:
+      - master
+
+jobs:
+  build-sign-publish-chainlink:
+    runs-on: ubuntu-20.04
+    environment: build-publish
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: build-sign-publish-chainlink
+
+      - name: Checkout repository
+        uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
+
+      - name: Build, sign and publish chainlink image
+        uses: ./.github/actions/build-sign-publish-chainlink
+        with:
+          publish: true
+          aws-role-to-assume: \${{ secrets.AWS_OIDC_IAM_ROLE_ARN }}
+          aws-role-duration-seconds: \${{ secrets.AWS_ROLE_DURATION_SECONDS }}
+          aws-region: \${{ secrets.AWS_REGION }}
+          sign-images: true
+          sign-method: 'keypair'
+          cosign-private-key: \${{ secrets.COSIGN_PRIVATE_KEY }}
+          cosign-public-key: \${{ secrets.COSIGN_PUBLIC_KEY }}
+          cosign-password: \${{ secrets.COSIGN_PASSWORD }}
+          verify-signature: true
+"
+`;
+
+exports[`updateWorkflow loads workflow file paths then updates them 8`] = `
+"name: 'Build Chainlink'
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+
+  build-chainlink:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: build-chainlink
+
+      - name: Checkout repository
+        uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
+
+      - name: Build chainlink image
+        uses: ./.github/actions/build-sign-publish-chainlink
+        with:
+          publish: false
+          sign-images: false
+"
+`;
+
+exports[`updateWorkflow loads workflow file paths then updates them 9`] = `
+"#
+# This action checks PRs to see if any CHANGELOG* files were updated.
+# If none were, it will add a message to the PR asking if it would make sense to do so.
+#
+name: Changelog
+
+on: pull_request
+
+jobs:
+  changelog:
+    # For security reasons, GITHUB_TOKEN is read-only on forks, so we cannot leave comments on PRs.
+    # This check skips the job if it is detected we are running on a fork.
+    if: \${{ github.event.pull_request.head.repo.full_name == 'smartcontractkit/chainlink' }}
+    name: Changelog checker
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: Changelog checker
+
+      - name: Check for changed files
+        id: changedfiles
+        uses: umani/changed-files@1d252c611c64289d35243fc37ece7323ea5e93e1 # Version 3.3.0
+        with:
+          repo-token: \${{ secrets.GITHUB_TOKEN }}
+          pattern: '^docs/CHANGELOG.*$'
+      - name: Make a comment
+        uses: unsplash/comment-on-pr@ffe8f97ccc63ce12c3c23c6885b169db67958d3b # Version v1.2.0
+        env:
+          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
+        if: contains(steps.changedfiles.outputs.files_updated, 'CHANGELOG') != true && contains(steps.changedfiles.outputs.files_created, 'CHANGELOG') != true
+        with:
+          msg: \\"I see that you haven't updated any CHANGELOG files. Would it make sense to do so?\\"
+          check_for_duplicate_msg: true
+"
+`;
+
+exports[`updateWorkflow loads workflow file paths then updates them 10`] = `
+"name: CI Core
+
+on:
+  push:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  core:
+    strategy:
+      fail-fast: false
+      matrix:
+        cmd: [ \\"go_core_tests\\", \\"go_core_race_tests\\" ]
+    name: Core Tests
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/chainlink_test?sslmode=disable
+      LOG_LEVEL: debug
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: chainlink_test
+          POSTGRES_HOST_AUTH_METHOD: trust
+        # Set health checks to wait until postgres has started
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: Core Tests
+
+      - name: Checkout the repo
+        uses: actions/checkout@v2
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version-file: 'go.mod'
+          cache: true
+      - name: Touching core/web/assets/index.html
+        run: mkdir -p core/web/assets && touch core/web/assets/index.html
+      - name: Download Go vendor packages
+        run: go mod download
+      - name: Yarn cache
+        uses: actions/cache@v2
+        env:
+          cache-name: yarn-cache
+        with:
+          path: |
+            ~/.npm
+            ~/.cache
+            **/node_modules
+          key: \${{ runner.os }}-build-\${{ env.cache-name }}-\${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            \${{ runner.os }}-build-\${{ env.cache-name }}-
+            \${{ runner.os }}-build-
+            \${{ runner.os }}-
+      - run: yarn install --frozen-lockfile
+      #      - name: Install terrad
+      #        run: ./tools/ci/install_terrad
+      - name: Install solana cli
+        run: ./tools/ci/install_solana
+      - name: Setup DB
+        run: go run ./core local db preparetest
+      - name: Increase Race Timeout
+        if: github.event.schedule != ''
+        run: echo \\"TIMEOUT=5m\\" >> $GITHUB_ENV
+      - name: Run tests
+        run: ./tools/bin/\${{ matrix.cmd }}
+      - name: Store logs artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v2.3.0
+        with:
+          name: \${{ matrix.cmd }}_logs
+          path: |
+            ./output.txt
+            ./race.*
+      - name: Print postgres logs
+        if: always()
+        uses: docker://docker:latest
+        with:
+          args: logs \${{ job.services.postgres.id }}
+"
+`;
+
+exports[`updateWorkflow loads workflow file paths then updates them 11`] = `
+"name: Formatting checks
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  fmt:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: fmt
+
+      - name: Checkout the repo
+        uses: actions/checkout@v2
+      - name: asdf install
+        uses: asdf-vm/actions/install@707e84f3ee349548310aeabdad0dd3bfcb9b69fa # pin@v1.1.0
+      - name: Run Terraform fmt
+        run: terraform fmt -recursive -check
+  hclfmt:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: hclfmt
+
+      - name: Checkout the repo
+        uses: actions/checkout@v2
+      - name: asdf install
+        uses: asdf-vm/actions/install@707e84f3ee349548310aeabdad0dd3bfcb9b69fa # pin@v1.1.0
+      - name: Run Terragrunt hclfmt
+        run: terragrunt hclfmt --terragrunt-check
+  prettier:
+    name: prettier (yaml)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: prettier (yaml)
+
+      - name: Checkout the repo
+        uses: actions/checkout@v2
+      - name: Run Prettier for YAML
+        uses: creyD/prettier_action@394fa2de3b2acce9f63808b958c54aa823a43b71 # pin@v3.1
+        with:
+          dry: true
+          prettier_options: --check **/*.{yaml,yml}
+"
+`;
+
+exports[`updateWorkflow loads workflow file paths then updates them 12`] = `
+"name: Clean up on PR close
+
+on:
+  pull_request:
+    types: [ closed ]
+jobs:
+  cleanup-ephemeral-adapters-on-pr-close:
+    name: Cleanup Ephemeral Adapters used for testing
+    runs-on: ubuntu-latest
+    environment: QA
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: Cleanup Ephemeral Adapters used for testing
+
+      - uses: actions/checkout@v2
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: \${{ secrets.QA_SDLC_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: \${{ secrets.QA_SDLC_AWS_SECRET_KEY }}
+          aws-region: \${{ secrets.QA_SDLC_AWS_REGION }}
+          role-to-assume: \${{ secrets.QA_SDLC_AWS_ROLE_TO_ASSUME }}
+          role-duration-seconds: 3600
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+      - name: Set Kubernetes Context
+        uses: azure/k8s-set-context@v1
+        with:
+          method: kubeconfig
+          kubeconfig: \${{ secrets.QA_SDLC_KUBECONFIG }}
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16.x'
+      - name: Install Yarn and setup project
+        run: |
+          npm install -g yarn
+          yarn install
+          yarn setup
+      - name: cleaning up adapters
+        env:
+          PR_NUMBER: \${{ github.event.number }}
+        run: |
+          # Build the list of adapters using the PR number
+          ADAPTER_NAMES=$(kubectl get deployments --namespace adapters | awk '{print $1;}' | grep \\"\${PR_NUMBER}$\\" | awk -F'-' '{print $3;}')
+          for adapter in \${ADAPTER_NAMES}; do
+            # stop the k6 pod 
+            NAME=k6-\${PR_NUMBER}-\${adapter} yarn qa:adapter stop k6 \${PR_NUMBER} || true
+            # stop the adapter pod
+            yarn qa:adapter stop \${adapter} \${PR_NUMBER} || true
+          done
+"
+`;
+
+exports[`updateWorkflow loads workflow file paths then updates them 13`] = `
+"name: Code Quality
+
+on:
+  push:
+    branches:
+      - staging
+      - trying
+      - rollup
+  pull_request:
+
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: Lint
+
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: \\"16\\"
+      - name: Checkout the repo
+        uses: actions/checkout@v2
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        env:
+          cache-name: yarn-cache
+        with:
+          path: |
+            ~/.npm
+            ~/.cache
+            **/node_modules
+          key: \${{ runner.os }}-build-\${{ env.cache-name }}-\${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            \${{ runner.os }}-build-\${{ env.cache-name }}-
+            \${{ runner.os }}-build-
+            \${{ runner.os }}-
+      - name: Run yarn install
+        run: yarn install --frozen-lockfile
+      - name: Run yarn lint
+        run: yarn lint
+  prettier:
+    name: Prettier Formatting
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: Prettier Formatting
+
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: \\"16\\"
+      - name: Checkout the repo
+        uses: actions/checkout@v2
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        env:
+          cache-name: yarn-cache
+        with:
+          path: |
+            ~/.npm
+            ~/.cache
+            **/node_modules
+          key: \${{ runner.os }}-build-\${{ env.cache-name }}-\${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            \${{ runner.os }}-build-\${{ env.cache-name }}-
+            \${{ runner.os }}-build-
+            \${{ runner.os }}-
+      - name: Run yarn install
+        run: yarn install --frozen-lockfile
+      - name: Run prettier check
+        run: yarn prettier:check
+"
+`;
+
+exports[`updateWorkflow loads workflow file paths then updates them 14`] = `
+"name: 'CodeQL'
+
+on:
+  push:
+    branches:
+      - develop
+      - staging
+      - trying
+      - rollup
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [ develop ]
+  schedule:
+    - cron: '23 19 * * 4'
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'go', 'javascript' ]
+        # CodeQL supports [ 'cpp', 'csharp', 'go', 'java', 'javascript', 'python' ]
+        # Learn more:
+        # https://docs.github.com/en/free-pro-team@latest/github/finding-security-vulnerabilities-and-errors-in-your-code/configuring-code-scanning#changing-the-languages-that-are-analyzed
+
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: Analyze
+
+      - name: Checkout repository
+        uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version-file: 'go.mod'
+
+      # Initializes the CodeQL tools for scanning.
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@3f62b754e23e0dd60f91b744033e1dc1654c0ec6 # v2.1.15
+        with:
+          languages: \${{ matrix.language }}
+
+      # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
+      # If this step fails, then you should remove it and run the build manually (see below)
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@3f62b754e23e0dd60f91b744033e1dc1654c0ec6 # v2.1.15
+
+      # ℹ️ Command-line programs to run using the OS shell.
+      # 📚 https://git.io/JvXDl
+
+      # ✏️ If the Autobuild fails above, remove it and uncomment the following three lines
+      #    and modify them (or add more) to build your code if your project
+      #    uses a compiled language
+
+      #- run: |
+      #   make bootstrap
+      #   make release
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@3f62b754e23e0dd60f91b744033e1dc1654c0ec6 # v2.1.15
+"
+`;
+
+exports[`updateWorkflow loads workflow file paths then updates them 15`] = `
+"name: create automated stage/prod promotion pull request
+on:
+  pull_request:
+    branches:
+      - sand
+    types: [ closed ]
+jobs:
+  createStagePromotionPr:
+    concurrency:
+      group: combo-promotion
+    env:
+      NUM_COMMITS: \${{ github.event.pull_request.commits }}
+      BASE_ENV: \${{ github.event.pull_request.base.ref }}
+      RELEASE_ENV: stage
+      GH_USER_NAME: chainlink-k8s
+      GH_USER_EMAIL: 8700084+chainlink-k8s@users.noreply.github.com
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: createStagePromotionPr
+
+      - name: determine release env
+        if: github.event.pull_request.merged == true
+        run: |
+          set -x
+          echo \\"release_env=$RELEASE_ENV\\" >> $GITHUB_ENV
+      - if: github.event.pull_request.merged == true
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
+        with:
+          ref: \${{ env.release_env }}
+      - name: check for promotion pins to update
+        if: github.event.pull_request.merged == true
+        run: |
+          set -x
+          git config user.name $GH_USER_NAME
+          git config user.email $GH_USER_EMAIL
+          git fetch origin $BASE_ENV:$BASE_ENV
+          git merge $BASE_ENV -X theirs --allow-unrelated-histories # --message
+          DIFF_PROJECTS=$(git diff --name-only $BASE_ENV~1..$BASE_ENV | grep \\"^helmfile.d/projects\\" | cut -f1,2,3 -d'/' | uniq | xargs)
+          echo \\"Pinning projects: $DIFF_PROJECTS\\"
+          for dir in $DIFF_PROJECTS; do
+            printf '%s\\\\n' > \\"$dir/files/shared/.revision\\" \\\\
+              $(git rev-parse $BASE_ENV)
+          done
+          echo \\"base_rev=$(git rev-parse --short $BASE_ENV)\\" >> $GITHUB_ENV
+      - name: hacky-string-truncate
+        run: |
+          PR_TITLE=\\"[STAGE] \${{ github.event.pull_request.title }}\\"
+          echo \\"pr_title=$PR_TITLE\\" >> $GITHUB_ENV
+      - if: github.event.pull_request.merged == true
+        id: cprStage
+        name: create pull request
+        uses: peter-evans/create-pull-request@9825ae65b1cb54b543b938503728b432a0176d29 # v3.10.0
+        with:
+          branch: \\"promote/pr-\${{ github.event.pull_request.number }}-to-\${{ env.release_env }}\\"
+          commit-message: \\"Pinning projects to revision: \${{ env.base_rev }}\\"
+          token: \${{ secrets.PR_BOT_TOKEN }}
+          title: \${{ env.pr_title }}
+          labels: \\"automerge-stage\\"
+          delete-branch: true
+  createProdPromotionPr:
+    needs: [ \\"createStagePromotionPr\\" ]
+    concurrency:
+      group: combo-promotion
+    env:
+      NUM_COMMITS: \${{ github.event.pull_request.commits }}
+      BASE_ENV: \${{ github.event.pull_request.base.ref }}
+      RELEASE_ENV: prod
+      GH_USER_NAME: chainlink-k8s
+      GH_USER_EMAIL: 8700084+chainlink-k8s@users.noreply.github.com
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: createProdPromotionPr
+
+      - name: determine release env
+        if: github.event.pull_request.merged == true
+        run: |
+          set -x
+          echo \\"release_env=$RELEASE_ENV\\" >> $GITHUB_ENV
+      - if: github.event.pull_request.merged == true
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
+        with:
+          ref: \${{ env.release_env }}
+      - name: check for promotion pins to update
+        if: github.event.pull_request.merged == true
+        run: |
+          set -x
+          git config user.name $GH_USER_NAME
+          git config user.email $GH_USER_EMAIL
+          git fetch origin $BASE_ENV:$BASE_ENV
+          git merge $BASE_ENV -X theirs --allow-unrelated-histories # --message
+          DIFF_PROJECTS=$(git diff --name-only $BASE_ENV~1..$BASE_ENV | grep \\"^helmfile.d/projects\\" | cut -f1,2,3 -d'/' | uniq | xargs)
+          echo \\"Pinning projects: $DIFF_PROJECTS\\"
+          for dir in $DIFF_PROJECTS; do
+            printf '%s\\\\n' > \\"$dir/files/shared/.revision\\" \\\\
+              $(git rev-parse $BASE_ENV)
+          done
+          echo \\"base_rev=$(git rev-parse --short $BASE_ENV)\\" >> $GITHUB_ENV
+      - name: hacky-string-truncate
+        run: |
+          PR_TITLE=\\"[PROD] \${{ github.event.pull_request.title }}\\"
+          echo \\"pr_title=$PR_TITLE\\" >> $GITHUB_ENV
+      - if: github.event.pull_request.merged == true
+        id: cprProd
+        name: create pull request
+        uses: peter-evans/create-pull-request@9825ae65b1cb54b543b938503728b432a0176d29 # v3.1.0
+        with:
+          branch: \\"promote/pr-\${{ github.event.pull_request.number }}-to-\${{ env.release_env }}\\"
+          commit-message: \\"Pinning projects to revision: \${{ env.base_rev }}\\"
+          token: \${{ secrets.PR_BOT_TOKEN }}
+          title: \${{ env.pr_title }}
+          delete-branch: true
+"
+`;
+
+exports[`updateWorkflow loads workflow file paths then updates them 16`] = `
+"name: Consume changesets
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  consume-changesets:
+    name: Consume changesets
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: Consume changesets
+
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+        with:
+          # This makes Actions fetch all Git history so that Changesets can generate changelogs with the correct commits
+          fetch-depth: 0
+
+      - name: Setup Node.js 16.x
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16.x
+
+      - name: Install Dependencies
+        run: yarn
+
+      - name: Get release notes
+        run: yarn get-release-notes
+
+      - name: Create Release Pull Request
+        uses: changesets/action@v1
+        with:
+          version: yarn changeset version
+          title: 'Consume changesets'
+          commit: 'Consume changesets'
+        env:
+          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Repo
+        run: yarn setup
+
+      - name: Generate Documentation
+        run: |
+          yarn generate:master-list -v
+          yarn generate:readme -a -v
+          git add *
+          yarn lint-staged
+          git commit --amend --no-edit
+          git push --force
+          echo \\"README(s) generated successfully.\\"
+        env:
+          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
+"
+`;
+
+exports[`updateWorkflow loads workflow file paths then updates them 17`] = `
+"# This action acts as a signal dispatcher that fires whenever the release process has
+# successfully completed. The listening workflow within the infra-k8s repository has
+# a corresponding event handler to generate releases based on this signal
+
+on:
+  workflow_run:
+    workflows: [ Release ]
+    types: [ completed ]
+
+jobs:
+  on-success:
+    environment: InfraK8s
+    runs-on: ubuntu-latest
+    if: \${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: on-success
+
+      - run: gh workflow run --repo smartcontractkit/infra-k8s updater.yaml -F image-updater-head-branch=image-updater/adapters -F pr-delay=60
+        env:
+          GITHUB_TOKEN: \${{ secrets.INFRA_K8s_PAT }}
+"
+`;
+
+exports[`updateWorkflow loads workflow file paths then updates them 18`] = `
+"##
+# This workflow needs to be ran in case it is a required check and
+# we conditionally only run the \`dependency-check\` workflow when certain
+# paths change.
+# If the workflow does not run, and it is ever marked as required,
+# then the check will never pass.
+# This is GitHub's workaround:
+# https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/defining-the-mergeability-of-pull-requests/troubleshooting-required-status-checks#example
+##
+
+name: Dependency Vulnerability Check
+
+on:
+  push:
+    paths-ignore:
+      - '**/go.mod'
+      - '**/go.sum'
+jobs:
+  Go:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: Go
+
+      - run: 'echo \\"No job required\\" '
+"
+`;
+
+exports[`updateWorkflow loads workflow file paths then updates them 19`] = `
+"##
+# NOTE: any changes to the event triggers or the paths here should be reflected in:
+#       dependency-check-paths-ignore.yml
+##
+
+name: Dependency Vulnerability Check
+
+on:
+  push:
+    paths:
+      - '**/go.mod'
+      - '**/go.sum'
+jobs:
+  Go:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: Go
+
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version-file: 'go.mod'
+        id: go
+
+      - name: Write Go Modules list
+        run: go list -json -m all > go.list
+
+      - name: Check vulnerabilities
+        uses: sonatype-nexus-community/nancy-github-action@main
+        with:
+          nancyVersion: \\"v1.0.22\\"
+"
+`;
+
+exports[`updateWorkflow loads workflow file paths then updates them 20`] = `
+"##
+# This workflow needs to be ran because \`lint\` is a required check and
+# we conditionally only run the \`golangci-lint\` workflow when certain paths 
+# change.
+# If the workflow does not run, the required check will never pass. This is
+# GitHub's workaround:
+# https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/defining-the-mergeability-of-pull-requests/troubleshooting-required-status-checks#example
+##
+
+name: golangci-lint
+
+on:
+  push:
+    branches:
+      - staging
+      - trying
+      - rollup
+    paths-ignore:
+      - '**.go'
+  pull_request:
+    paths-ignore:
+      - '**.go'
+
+jobs:
+  golangci:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: lint
+
+      - run: 'echo \\"No job required\\" '
+"
+`;
+
+exports[`updateWorkflow loads workflow file paths then updates them 21`] = `
+"##
+# NOTE: any changes to the event triggers or the paths here should be reflected in:
+#       golangci-lint-paths-ignore.yml
+##
+
+name: golangci-lint
+
+on:
+  push:
+    branches:
+      - staging
+      - trying
+      - rollup
+    paths:
+      - '**.go'
+  pull_request:
+    paths:
+      - '**.go'
+
+jobs:
+  golangci:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: lint
+
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@v3
+        with:
+          go-version-file: 'go.mod'
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        if: github.event_name == 'push' || (github.event_name == 'pull_request' && !startsWith(github.head_ref, 'release/'))
+        with:
+          # Optional: version of golangci-lint to use in form of v1.2 or v1.2.3 or \`latest\` to use the latest version
+          version: v1.48.0
+
+          # Optional: working directory, useful for monorepos
+          # working-directory: somedir
+
+          # Optional: golangci-lint command line arguments.
+          args: --timeout=10m0s
+
+          # Optional: show only new issues if it's a pull request. The default value is \`false\`.
+          only-new-issues: true
+          # Optional: if set to true then the action don't cache or restore ~/go/pkg.
+          # skip-pkg-cache: true
+
+          # Optional: if set to true then the action don't cache or restore ~/.cache/go-build.
+          # skip-build-cache: true
+"
+`;
+
+exports[`updateWorkflow loads workflow file paths then updates them 22`] = `
+"name: Create automated promotion pull request
+on:
+  pull_request:
+    branches:
+      - sand-nomatch
+      - stage-nomatch
+    types: [ closed ]
+jobs:
+  createPromotion:
+    env:
+      NUM_COMMITS: \${{ github.event.pull_request.commits}}
+      PROMOTE_ENV: \${{ github.event.pull_request.head.ref }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: createPromotion
+
+      - name: Determine Release Env
+        if: github.event.pull_request.merged == true
+        run: |
+          if [[ $PROMOTE_ENV == 'sand' ]]; then
+            echo \\"release_env=stage\\" >> $GITHUB_ENV
+          elif [[ $PROMOTE_ENV == 'stage' ]]; then
+            echo \\"release_env=prod\\" >> $GITHUB_ENV
+          else
+            echo \\"Unexpected promote env: $PROMOTE_ENV\\"
+            exit 1
+          fi
+      - if: github.event.pull_request.merged == true
+        uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f #v2.3.4
+        with:
+          ref: \\"\${{ env.release_env }}\\"
+      - name: Reset promotion branch
+        if: github.event.pull_request.merged == true
+        run: |
+          git fetch origin \${{ github.event.pull_request.head.ref }}:\${{ github.event.pull_request.head.ref }}
+          git reset --hard \${{ github.event.pull_request.head.ref }}
+      - name: Check for promotion pins to update
+        if: github.event.pull_request.merged == true
+        run: |
+          git config user.name chainlink-k8s
+          git config user.email 8700084+chainlink-k8s@users.noreply.github.com
+          export DIFF_FILES=$(git diff --name-only \${{ github.event.pull_request.base.ref}}~$NUM_COMMITS..\${{ github.event.pull_request.base.ref}} | grep \\"^helmfile.d/projects\\" | cut -f1,2,3 -d'/' | uniq | xargs)
+          echo \\"Pinning helm apps: $DIFF_FILES\\"
+          for dir in $DIFF_FILES; do
+            printf '%s\\\\n' > \\"$dir/files/shared/.revision\\" \\\\
+              '\${{ github.event.pull_request.head.sha}}'
+          done
+          git status
+          if ! git diff-index --quiet HEAD; then
+            echo \\"No pins to commit\\"
+          fi
+      - if: github.event.pull_request.merged == true
+        id: cpr
+        name: Create pull request
+        uses: peter-evans/create-pull-request@9825ae65b1cb54b543b938503728b432a0176d29 # v3.1.0
+        with:
+          branch: \\"promote/pr-\${{ github.event.pull_request.number }}-to-\${{ env.RELEASE_ENV }}\\"
+          commit-message: \\"Pinning apps to revision: \${{ github.event.pull_request.head.sha}}\\"
+          token: \${{ secrets.PR_BOT_TOKEN }}
+          title: \\"[\${{ env.RELEASE_ENV_UPPER }}] \${{ github.event.pull_request.title }}\\"
+          labels: automerge
+      - if: github.event.pull_request.merged == true && steps.cpr.outputs.pull-request-operation == 'created'
+        name: Enable pull request automerge
+        uses: peter-evans/enable-pull-request-automerge@cb41a1ef95d7852916a3b0893903d53e7b4218f8
+        with:
+          token: \${{ secrets.PR_BOT_TOKEN }}
+          pull-request-number: \${{ steps.cpr.outputs.pull-request-number}}
+"
+`;
+
+exports[`updateWorkflow loads workflow file paths then updates them 23`] = `
+"name: Create production promotion pull request
+on:
+  push:
+    branches:
+      - staging-nomatch
+jobs:
+  productionPromotion:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: productionPromotion
+
+      - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f #v2.3.4
+        with:
+          ref: production
+      - name: Reset promotion branch
+        run: |
+          git fetch origin staging:staging
+          git reset --hard staging
+      - name: hacky-string-truncate
+        run: |
+          PR_TITLE=$(echo \\"\${{ github.event.commits[0].message }}\\" | head -n 1 | head -c 256)
+          echo \\"PR_TITLE=$PR_TITLE\\" >> $GITHUB_ENV
+      - id: cpr
+        name: Create Pull Request
+        uses: peter-evans/create-pull-request@9825ae65b1cb54b543b938503728b432a0176d29 # v3.1.0
+        with:
+          branch: promote/production
+          token: \${{ secrets.PR_BOT_TOKEN }}
+          title: \\"Promote \`\${{ env.PR_TITLE }}\` to Production\\"
+"
+`;
+
+exports[`updateWorkflow loads workflow file paths then updates them 24`] = `
+"name: Create staging promotion pull request
+on:
+  push:
+    branches:
+      - develop-nomatch
+jobs:
+  stagingPromotion:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: stagingPromotion
+
+      - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f #v2.3.4
+        with:
+          ref: staging
+      - name: Reset promotion branch
+        run: |
+          git fetch origin develop:develop
+          git reset --hard develop
+      - name: hacky-string-truncate
+        run: |
+          PR_TITLE=$(echo \\"\${{ github.event.commits[0].message }}\\" | head -n 1 | head -c 256)
+          echo \\"PR_TITLE=$PR_TITLE\\" >> $GITHUB_ENV
+      - id: cpr
+        name: Create Pull Request
+        uses: peter-evans/create-pull-request@9825ae65b1cb54b543b938503728b432a0176d29 # v3.1.0
+        with:
+          branch: promote/staging
+          token: \${{ secrets.PR_BOT_TOKEN }}
+          title: \\"Promote \`\${{ env.PR_TITLE }}\` to Staging\\"
+          labels: automerge
+      - if: steps.cpr.outputs.pull-request-operation == 'created'
+        name: Enable Pull Request Automerge
+        uses: peter-evans/enable-pull-request-automerge@cb41a1ef95d7852916a3b0893903d53e7b4218f8
+        with:
+          token: \${{ secrets.PR_BOT_TOKEN }}
+          pull-request-number: \${{ steps.cpr.outputs.pull-request-number}}
+          merge-method: merge
+"
+`;
+
+exports[`updateWorkflow loads workflow file paths then updates them 25`] = `
+"name: Image-sync
+on:
+  workflow_dispatch: null
+  schedule:
+    - cron: \\"0 */12 * * *\\"
+
+jobs:
+  lambda-promtail-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: lambda-promtail-sync
+
+      - name: Configure AWS credentials # Production creds to push to ECR
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: \\"\${{ secrets.LAMBDA_PROMTAIL_AWS_ECR_CI_ACCESS_KEY }}\\"
+          aws-secret-access-key: \\"\${{ secrets.LAMBDA_PROMTAIL_AWS_ECR_CI_SECRET_KEY }}\\"
+          aws-region: \\"\${{ secrets.AWS_REGION }}\\"
+          role-duration-seconds: 1200
+          role-session-name: \\"lambda-promtail-sync\\"
+          role-skip-session-tagging: true
+      - name: Login to ECR
+        uses: docker/login-action@v1
+        with:
+          registry: \${{ secrets.AWS_ECR_REGISTRY_URL_PROD }}
+      - name: Lambda Promtail Sync
+        run: skopeo copy docker://public.ecr.aws/grafana/lambda-promtail:main docker://\${{ secrets.AWS_ECR_REGISTRY_URL_PROD }}/lambda-promtail:latest
+  # TODO Enable monotoring once action proved to run without errors
+  ### Aleart for failed workflow
+  # alert-failures:
+  #   name: Alert failures
+  #   needs: [lambda-promtail-sync]
+  #   if: always()
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - if: always() && needs.lambda-promtail-sync.result == 'failure'
+  #       uses: smartcontractkit/action-pagerduty-alert@0.3.0
+  #       with:
+  #         alert-summary: \\"Image sync workflow failed.\\"
+  #         alert-severity: \\"warning\\"
+  #         alert-event-action: \\"trigger\\"
+  #         pagerduty-integration-key: \\"\${{ secrets.PAGERDUTY_INTEGRATION_KEY }}\\"
+  #         pagerduty-dedup-key: \\"lambda_promtail_sync\\"
+  #     - if: always() && needs.lambda-promtail-sync.result == 'success'
+  #       uses: smartcontractkit/action-pagerduty-alert@0.3.0
+  #       with:
+  #         alert-summary: \\"Image sync workflow failed.\\"
+  #         alert-severity: \\"warning\\"
+  #         alert-event-action: \\"resolve\\"
+  #         pagerduty-integration-key: \\"\${{ secrets.PAGERDUTY_INTEGRATION_KEY }}\\"
+  #         pagerduty-dedup-key: \\"lambda_promtail_sync\\"
+"
+`;
+
+exports[`updateWorkflow loads workflow file paths then updates them 26`] = `
+"name: Image Updater Squash Merge
+on:
+  push:
+    branches:
+      - \\"image-updater/*\\"
+      - \\"!image-updater/adapters\\"
+concurrency:
+  group: \${{ github.workflow }}-\${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  mergeImageUpdates:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: mergeImageUpdates
+
+      - name: Sleep for 120 seconds
+        run: sleep 120s
+        shell: bash
+      - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f #v2.3.4
+        with:
+          ref: develop
+      - name: Reset image squash branch
+        run: |
+          git config --local user.email \\"78700084+chainlink-k8s@users.noreply.github.com\\"
+          git config --local user.name \\"Koo-beer-net-ees\\"
+          git fetch origin \${{ github.event.ref }}:\${{ github.event.ref }}
+          git reset --hard \${{ github.event.ref }}
+      - name: hacky-string-replace
+        run: |
+          BRANCH_REF=\\"\${{ github.event.ref }}\\"
+          BRANCH_SUBJECT=$(echo $BRANCH_REF | sed 's/refs\\\\/heads\\\\/image-updater\\\\///')
+          echo \\"BRANCH_SUBJECT=$BRANCH_SUBJECT\\" >> $GITHUB_ENV
+      - id: cpr
+        name: Create Pull Request
+        uses: peter-evans/create-pull-request@9825ae65b1cb54b543b938503728b432a0176d29 # v3.1.0
+        with:
+          branch: \\"image-cd/\${{ env.BRANCH_SUBJECT}}\\"
+          token: \${{ secrets.PR_BOT_TOKEN }}
+          title: \\"[Images] \${{ env.BRANCH_SUBJECT }}\\"
+          labels: automerge
+"
+`;
+
+exports[`updateWorkflow loads workflow file paths then updates them 27`] = `
+"name: Integration Chaos Test
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  push:
+    tags:
+      - '*'
+jobs:
+  build-chainlink:
+    environment: integration
+    permissions:
+      id-token: write
+      contents: read
+    name: Build Chainlink Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: Build Chainlink Image
+
+      - name: Checkout the repo
+        uses: actions/checkout@v2
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: \${{ secrets.QA_AWS_REGION }}
+          role-to-assume: \${{ secrets.QA_AWS_ROLE_TO_ASSUME }}
+          role-duration-seconds: 3600
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Build and Push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: core/chainlink.Dockerfile
+          # comma separated like: KEY1=VAL1,KEY2=VAL2,...
+          build-args: COMMIT_SHA=\${{ github.sha }}
+          tags: \${{ secrets.QA_AWS_ACCOUNT_NUMBER }}.dkr.ecr.\${{ secrets.QA_AWS_REGION }}.amazonaws.com/chainlink:latest.\${{ github.sha }}
+          push: true
+
+  chaos:
+    environment: integration
+    permissions:
+      checks: write
+      pull-requests: write
+      id-token: write
+      contents: read
+    name: EVM Chaos Tests
+    runs-on: ubuntu-latest
+    needs:
+      - build-chainlink
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: EVM Chaos Tests
+
+      - name: Checkout the repo
+        uses: actions/checkout@v2
+      - name: Run Tests
+        uses: smartcontractkit/ctf-ci-e2e-action@v1.0.4
+        with:
+          test_command_to_run: make test_chaos
+          test_download_vendor_packages_command: make gomod
+          test_download_ginkgo_command: make test_install_ginkgo
+          cl_repo: \${{ secrets.QA_AWS_ACCOUNT_NUMBER }}.dkr.ecr.\${{ secrets.QA_AWS_REGION }}.amazonaws.com/chainlink
+          cl_image_tag: latest.\${{ github.sha }}
+          artifacts_location: ./integration-tests/chaos/logs
+          publish_check_name: EVM Chaos Test Results
+          QA_AWS_REGION: \${{ secrets.QA_AWS_REGION }}
+          QA_AWS_ROLE_TO_ASSUME: \${{ secrets.QA_AWS_ROLE_TO_ASSUME }}
+          QA_KUBECONFIG: \${{ secrets.QA_KUBECONFIG }}
+"
+`;
+
+exports[`updateWorkflow loads workflow file paths then updates them 28`] = `
+"# This is a dummy file so when changes occur that do not need smoke tests ran we can still have the check be required
+name: Integration Tests
+on:
+  pull_request:
+    # keep these paths identical to the integration-tests.yml
+    paths-ignore:
+      - '**/*.go'
+      - '**/*go.sum'
+      - '**/*go.mod'
+      - '.github/workflows/integration-tests.yml'
+
+jobs:
+  # Dummy required checks that will pass
+  eth-smoke-tests:
+    environment: integration
+    name: ETH Smoke Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: ETH Smoke Tests
+
+      - run: echo \\"No smoke tests required\\"
+  solana-smoke-tests:
+    environment: integration
+    name: Solana Smoke Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: Solana Smoke Tests
+
+      - run: echo \\"No smoke tests required\\"
+"
+`;
+
+exports[`updateWorkflow loads workflow file paths then updates them 29`] = `
+"name: Integration Tests
+on:
+  pull_request:
+    # keep these paths identical to the integration-tests-ignored.yml
+    paths:
+      - \\"**/*.go\\"
+      - \\"**/*go.sum\\"
+      - \\"**/*go.mod\\"
+      - \\".github/workflows/integration-tests.yml\\"
+env:
+  solana_ref: develop # Note: this may not make sense to be develop and may need to be a more stable branch
+jobs:
+  build-chainlink:
+    environment: integration
+    permissions:
+      id-token: write
+      contents: read
+    name: Build Chainlink Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: Build Chainlink Image
+
+      - name: Checkout the repo
+        uses: actions/checkout@f25a3a9f25bd5f4c5d77189cab02ff357b5aedeb # v2.4.1
+      - name: Build Image
+        uses: smartcontractkit/chainlink-github-actions/chainlink-testing-framework/build-image@010068ddc7dd55cd4439159a485390aa651fdd39 # v2.0.3
+        with:
+          cl_repo: smartcontractkit/chainlink
+          cl_ref: \${{ github.sha }}
+          dep_solana_sha: \${{ env.solana_sha }}
+          push_tag: \${{ secrets.QA_AWS_ACCOUNT_NUMBER }}.dkr.ecr.\${{ secrets.QA_AWS_REGION }}.amazonaws.com/chainlink:latest.\${{ github.sha }}
+          QA_AWS_REGION: \${{ secrets.QA_AWS_REGION }}
+          QA_AWS_ROLE_TO_ASSUME: \${{ secrets.QA_AWS_ROLE_TO_ASSUME }}
+
+  eth-smoke-tests:
+    environment: integration
+    permissions:
+      checks: write
+      pull-requests: write
+      id-token: write
+      contents: read
+    name: ETH Smoke Tests
+    runs-on: ubuntu-latest
+    needs: [ build-chainlink ]
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: ETH Smoke Tests
+
+      - name: Checkout the repo
+        uses: actions/checkout@f25a3a9f25bd5f4c5d77189cab02ff357b5aedeb # v2.4.1
+      - name: Run Tests
+        uses: smartcontractkit/chainlink-github-actions/chainlink-testing-framework/run-tests@7d405e28e1419c0a48198793e6647005c409f4cf # v2.0.4
+        env:
+          CHAINLINK_COMMIT_SHA: \${{ github.sha }}
+          CHAINLINK_ENV_USER: \${{ github.actor }}
+          TEST_TRIGGERED_BY: core-CI
+          TEST_LOG_LEVEL: debug
+        with:
+          test_command_to_run: make test_smoke_simulated args=\\"-nodes=30\\"
+          test_download_vendor_packages_command: make gomod
+          test_download_ginkgo_command: make test_install_ginkgo
+          cl_repo: \${{ secrets.QA_AWS_ACCOUNT_NUMBER }}.dkr.ecr.\${{ secrets.QA_AWS_REGION }}.amazonaws.com/chainlink
+          cl_image_tag: latest.\${{ github.sha }}
+          artifacts_location: ./integration-tests/smoke/logs
+          publish_check_name: EVM Smoke Test Results
+          QA_AWS_REGION: \${{ secrets.QA_AWS_REGION }}
+          QA_AWS_ROLE_TO_ASSUME: \${{ secrets.QA_AWS_ROLE_TO_ASSUME }}
+          QA_KUBECONFIG: \${{ secrets.QA_KUBECONFIG }}
+
+  ### Solana Section
+
+  solana-build-contracts:
+    environment: integration
+    permissions:
+      checks: write
+      pull-requests: write
+      id-token: write
+      contents: read
+    name: Solana Build Artifacts
+    runs-on: ubuntu-latest
+    container:
+      image: projectserum/build:v0.24.2
+      env:
+        RUSTUP_HOME: \\"/root/.rustup\\"
+        FORCE_COLOR: 1
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: Solana Build Artifacts
+
+      - name: Checkout the solana repo
+        uses: actions/checkout@f25a3a9f25bd5f4c5d77189cab02ff357b5aedeb # v2.4.1
+        with:
+          repository: smartcontractkit/chainlink-solana
+          ref: \${{ env.solana_sha }}
+      - name: Build contracts
+        uses: smartcontractkit/chainlink-solana/.github/actions/build_contract_artifacts@691e86b1e3b27e6b90830661499a5c372224fea1 # stable action on 18/07/2022
+        with:
+          ref: \${{ env.solana_sha }}
+
+  solana-smoke-tests:
+    environment: integration
+    permissions:
+      checks: write
+      pull-requests: write
+      id-token: write
+      contents: read
+    name: Solana Smoke Tests
+    runs-on: ubuntu-latest
+    needs: [ build-chainlink, solana-build-contracts ]
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: Solana Smoke Tests
+
+      - name: Checkout the repo
+        uses: actions/checkout@f25a3a9f25bd5f4c5d77189cab02ff357b5aedeb # v2.4.1
+        with:
+          repository: smartcontractkit/chainlink-solana
+          ref: \${{ env.solana_sha }}
+      - name: Run Tests
+        uses: smartcontractkit/chainlink-github-actions/chainlink-testing-framework/run-tests@7d405e28e1419c0a48198793e6647005c409f4cf # v2.0.4
+        with:
+          test_command_to_run: make test_smoke
+          cl_repo: \${{ secrets.QA_AWS_ACCOUNT_NUMBER }}.dkr.ecr.\${{ secrets.QA_AWS_REGION }}.amazonaws.com/chainlink
+          cl_image_tag: latest.\${{ github.sha }}
+          download_contract_artifacts_path: contracts/target/deploy
+          artifacts_location: /home/runner/work/chainlink-solana/chainlink-solana/tests/e2e/logs
+          publish_check_name: Solana Smoke Test Results
+          QA_AWS_REGION: \${{ secrets.QA_AWS_REGION }}
+          QA_AWS_ROLE_TO_ASSUME: \${{ secrets.QA_AWS_ROLE_TO_ASSUME }}
+          QA_KUBECONFIG: \${{ secrets.QA_KUBECONFIG }}
+  ### End Solana Section
+"
+`;
+
+exports[`updateWorkflow loads workflow file paths then updates them 30`] = `
+"name: Lint GH Workflows
+on:
+  push:
+jobs:
+  lint_workflows:
+    name: Validate Github Action Workflows
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: Validate Github Action Workflows
+
+      - name: Check out Code
+        uses: actions/checkout@v3
+      - name: Run actionlint
+        uses: reviewdog/action-actionlint@a0541743e79d2ce4ee65276807ac493a93149b7c # v1.23.0
+"
+`;
+
+exports[`updateWorkflow loads workflow file paths then updates them 31`] = `
+"name: Test & build
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+  pull_request: ~
+
+jobs:
+  packages:
+    name: Verify dependency package archives
+    runs-on: [ self-hosted, sdlc-ghr-prod ]
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: Verify dependency package archives
+
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16.x'
+      - name: Install Yarn
+        run: npm install -g yarn
+      - name: Re-download dependencies & verify checksum
+        run: yarn install --check-cache
+
+  run-integration-tests:
+    name: Run integration tests
+    runs-on: [ self-hosted, sdlc-ghr-prod ]
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: Run integration tests
+
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16.x'
+      - name: Install Yarn
+        run: npm install -g yarn
+      - run: yarn install
+      - run: yarn setup
+      - run: timeout 300 yarn test:ci:integration
+  # Disable Codecov until we can make it reliable: sc-22561
+  #      - uses: codecov/codecov-action@v2
+  #        with:
+  #          flags: integration
+  #          fail_ci_if_error: false # TODO: Set back to true once coverage reports are consistent
+  #          override_commit: \${{ github.sha }} # PR merge commit, what checkout@v2 uses by default
+
+  run-unit-tests:
+    name: Run unit tests
+    runs-on: [ self-hosted, sdlc-ghr-prod ]
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: Run unit tests
+
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16.x'
+      - name: Install Yarn
+        run: npm install -g yarn
+      - run: yarn install
+      - run: yarn setup
+      - run: yarn test:ci:unit
+  # Disable Codecov until we can make it reliable: sc-22561
+  #      - uses: codecov/codecov-action@v2
+  #        with:
+  #          flags: unit
+  #          fail_ci_if_error: false # TODO: Set back to true once coverage reports are consistent
+  #          override_commit: \${{ github.sha }} # PR merge commit, what checkout@v2 uses by default
+
+  run-basic-checks:
+    name: Run linters
+    runs-on: [ self-hosted, sdlc-ghr-prod ]
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: Run linters
+
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16.x'
+      - name: Install Yarn
+        run: npm install -g yarn
+      - run: yarn install
+      - run: yarn setup
+      - run: yarn lint
+      - run: yarn format:check
+
+  run-docmentation-check:
+    name: Documentation generation test
+    runs-on: [ self-hosted, sdlc-ghr-prod ]
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: Documentation generation test
+
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      - name: Install Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16.x'
+      - name: Install Yarn
+        run: |
+          npm install -g yarn
+          yarn install
+      - name: Build Repo
+        run: yarn setup
+      - name: Test Master List Generation
+        run: yarn generate:master-list -v
+      - name: Test README Generation
+        run: yarn generate:readme -a -v
+
+  # Changeset check
+  adapter-change-has-changeset:
+    name: Adapter changes accompanied by a changeset
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: Adapter changes accompanied by a changeset
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+
+      - name: Check whether adapter change also has a changeset
+        id: adapter_change_has_changeset
+        run: ./.github/isvalidadapterchange.sh
+
+  # Read build strategy matrix of adapters, from a json file
+  matrix-adapters:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: \${{ steps.create-matrix.outputs.result }}
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: matrix-adapters
+
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16.x'
+      - name: Generate job matrix
+        id: create-matrix
+        run: yarn generate:gha:matrix
+
+  build-adapters:
+    needs: [ run-basic-checks, matrix-adapters ]
+    name: (\${{ matrix.adapter.type }}) Build \${{matrix.adapter.name}} adapter
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: \${{fromJson(needs.matrix-adapters.outputs.matrix)}}
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: (\${{ matrix.adapter.type }}) Build \${{matrix.adapter.name}} adapter
+
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16.x'
+      - name: Install yarn deps
+        run: yarn
+      - name: Generate docker-compose file
+        run: yarn generate:docker-compose
+      - run: docker-compose -f docker-compose.generated.yaml build \${{ matrix.adapter.name }}
+"
+`;
+
+exports[`updateWorkflow loads workflow file paths then updates them 32`] = `
+"##
+# This workflow needs to be ran because \`Operator UI Tests\` is a required check
+# and we conditionally only run the \`Operator UI\` workflow when certain paths
+# change.
+# If the workflow does not run, the required check will never pass. This is
+# GitHub's workaround:
+# https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/defining-the-mergeability-of-pull-requests/troubleshooting-required-status-checks#example
+##
+
+name: Operator UI
+
+on:
+  push:
+    branches:
+      - staging
+      - trying
+      - rollup
+    paths-ignore:
+      - 'operator_ui/**'
+      - yarn.lock
+      - 'tools/ci/**'
+  pull_request:
+    paths-ignore:
+      - 'operator_ui/**'
+      - yarn.lock
+      - 'tools/ci/**'
+
+jobs:
+  operator-ui:
+    name: Operator UI Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: Operator UI Tests
+
+      - run: 'echo \\"No job required\\" '
+"
+`;
+
+exports[`updateWorkflow loads workflow file paths then updates them 33`] = `
+"##
+# NOTE: any changes to the event triggers or the paths here should be reflected in:
+#       operator-ui-paths-ignore.yml
+##
+
+name: Operator UI
+
+on:
+  push:
+    branches:
+      - staging
+      - trying
+      - rollup
+    paths:
+      - 'operator_ui/**'
+      - yarn.lock
+      - 'tools/ci/**'
+  pull_request:
+    paths:
+      - 'operator_ui/**'
+      - yarn.lock
+      - 'tools/ci/**'
+
+jobs:
+  operator-ui:
+    name: Operator UI Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: Operator UI Tests
+
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: \\"16\\"
+      - name: Checkout the repo
+        uses: actions/checkout@v2
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        env:
+          cache-name: yarn-cache
+        with:
+          path: |
+            ~/.npm
+            ~/.cache
+            **/node_modules
+          key: \${{ runner.os }}-build-\${{ env.cache-name }}-\${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            \${{ runner.os }}-build-\${{ env.cache-name }}-
+            \${{ runner.os }}-build-
+            \${{ runner.os }}-
+      - name: Run yarn install
+        run: yarn install --frozen-lockfile
+      - name: Run Operator UI tests
+        run: ./tools/ci/operator_ui_test
+"
+`;
+
+exports[`updateWorkflow loads workflow file paths then updates them 34`] = `
+"name: Performance Tests
+on:
+  workflow_dispatch:
+    inputs:
+      focus:
+        description: cron|directrequest|flux|keeper|ocr|vrf|suite
+        required: true
+        default: suite
+        type: string
+jobs:
+  build-chainlink:
+    environment: integration
+    permissions:
+      id-token: write
+      contents: read
+    name: Build Chainlink Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: Build Chainlink Image
+
+      - name: Checkout the repo
+        uses: actions/checkout@v2
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: \${{ secrets.QA_AWS_REGION }}
+          role-to-assume: \${{ secrets.QA_AWS_ROLE_TO_ASSUME }}
+          role-duration-seconds: 3600
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Build and Push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: core/chainlink.Dockerfile
+          # comma separated like: KEY1=VAL1,KEY2=VAL2,...
+          build-args: COMMIT_SHA=\${{ github.sha }}
+          tags: \${{ secrets.QA_AWS_ACCOUNT_NUMBER }}.dkr.ecr.\${{ secrets.AWS_REGION }}.amazonaws.com/chainlink:latest.\${{ github.sha }}
+          push: true
+  run_tests:
+    environment: integration
+    name: run core evm \${{ github.event.inputs.focus }} performance tests
+    runs-on: ubuntu-latest
+    needs: build-chainlink
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: run core evm \${{ github.event.inputs.focus }} performance tests
+
+      - name: Checkout the repo
+        uses: actions/checkout@v2
+      - name: Run Tests
+        uses: smartcontractkit/ctf-ci-e2e-action@41848377703354a32d355d3f2f7cb3b9e3049b8c
+        with:
+          test_command_to_run: make test_perf args=\\"--procs=10 --focus=\${{ github.event.inputs.focus }}\\"
+          test_download_vendor_packages_command: make gomod
+          test_download_ginkgo_command: make test_install_ginkgo
+          cl_repo: \${{ secrets.QA_AWS_ACCOUNT_NUMBER }}.dkr.ecr.\${{ secrets.AWS_REGION }}.amazonaws.com/chainlink
+          cl_image_tag: latest.\${{ github.sha }}
+          artifacts_location: ./integration-tests/performance/logs
+          publish_report_paths: ./tests-perf-report.xml
+          QA_AWS_REGION: \${{ secrets.QA_AWS_REGION }}
+          QA_AWS_ROLE_TO_ASSUME: \${{ secrets.QA_AWS_ROLE_TO_ASSUME }}
+          QA_KUBECONFIG: \${{ secrets.QA_KUBECONFIG }}
+          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
+      - name: Publish pprof artifacts
+        if: \${{ success() }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: pprof_results
+          path: ./integration-tests/performance/logs
+"
+`;
+
+exports[`updateWorkflow loads workflow file paths then updates them 35`] = `
+"# this will be the default pr validator for the new promotion model
+# need to uncomment the existing jobs once we are fully migrated (captured in the original workflow)
+name: validate pull requests
+# on: pull_request
+on:
+  pull_request:
+    branches:
+      - sand
+      - stage
+      - prod
+jobs:
+  helmfile:
+    name: helmfile-pr-check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: helmfile-pr-check
+
+      - name: Checkout the repo
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
+      - name: Setup helmfile
+        uses: mamezou-tech/setup-helmfile@961091a6d469cdf12701ad29c357448abe2bcb95 # v0.9.0
+      - name: Helmfile root app render
+        run: |
+          helmfile --version
+          cd helmfile.d
+          clusters=$(find clusters -type f -name \\"*.yaml\\" -exec basename {} \\".yaml\\" \\\\;)
+          for cluster in \${clusters}; do
+            echo \\"Rendering helmfile root app for cluster: \${cluster}\\"
+            helmfile \\\\
+              --file 01-app.yaml \\\\
+              --state-values-set cluster=\\"\${cluster}\\",app.project=argocd,app.name=helmfile-argocd \\\\
+              --debug=false template --skip-deps 1> /dev/null
+          done
+  # prettier:
+  #   name: formatting-pr-check
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout the repo
+  #       uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
+  #     - name: Run Shellcheck
+  #       uses: ludeeus/action-shellcheck@94e0aab03ca135d11a35e5bfc14e6746dc56e7e9 # pin@master
+  #     - name: Run Prettier
+  #       uses: creyD/prettier_action@394fa2de3b2acce9f63808b958c54aa823a43b71 # pin@v3.1
+  #       with:
+  #         dry: true
+  #         prettier_options: --write **/*.{yaml,yml,json}
+  # helmlint:
+  #   name: helm-lint-pr-check
+  #   runs-on: ubuntu-latest
+  #   env:
+  #     CT_TARGET_BRANCH: \${{ github.event.pull_request.base.ref }}
+  #   steps:
+  #     - name: Checkout the repo
+  #       uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
+  #       with:
+  #         fetch-depth: \\"0\\"
+  #     - name: Set up chart-testing
+  #       uses: helm/chart-testing-action@b0d4458c71155b54fcf33e11dd465dc923550009 # pin@v2.0.1
+  #     - name: Run chart-testing (list-changed)
+  #       id: list-changed
+  #       run: |
+  #         changed=$(ct list-changed --config .ct.yaml)
+  #         if [[ -n \\"$changed\\" ]]; then
+  #           echo \\"::set-output name=changed::true\\"
+  #         fi
+  #     - name: Run chart-testing (lint)
+  #       run: ct lint --config .ct.yaml --excluded-charts astronomer-wrapper,cluster-bootstrap,cluster-calico,homu # Excluding these since ct fails to lint/install them.
+  # sops:
+  #   name: sops-pr-check
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Check
+  #       uses: AndresJulia/sops-gh@1f2fc77c307fac41f211e641583dbaac44a05497 # pin@v1
+  #       with:
+  #         filename_pattern: secrets
+"
+`;
+
+exports[`updateWorkflow loads workflow file paths then updates them 36`] = `
+"name: validate pull requests
+on: pull_request
+jobs:
+  prettier:
+    name: Formatting
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: Formatting
+
+      - name: Checkout the repo
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
+      - name: Run Shellcheck
+        uses: ludeeus/action-shellcheck@94e0aab03ca135d11a35e5bfc14e6746dc56e7e9 # pin@master
+      - name: Run Prettier
+        uses: creyD/prettier_action@394fa2de3b2acce9f63808b958c54aa823a43b71 # pin@v3.1
+        with:
+          dry: true
+          prettier_options: --write **/*.{yaml,yml,json}
+  helmlint:
+    name: Helm
+    runs-on: ubuntu-latest
+    env:
+      CT_TARGET_BRANCH: \${{ github.event.pull_request.base.ref }}
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: Helm
+
+      - name: Checkout
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
+        with:
+          fetch-depth: \\"0\\"
+      - name: Set up chart-testing
+        uses: helm/chart-testing-action@b0d4458c71155b54fcf33e11dd465dc923550009 # pin@v2.0.1
+      - name: Run chart-testing (list-changed)
+        id: list-changed
+        run: |
+          changed=$(ct list-changed --config .ct.yaml)
+          if [[ -n \\"$changed\\" ]]; then
+            echo \\"::set-output name=changed::true\\"
+          fi
+      - name: Run chart-testing (lint)
+        run: ct lint --config .ct.yaml --excluded-charts astronomer-wrapper,cluster-bootstrap,cluster-calico,homu # Excluding these since ct fails to lint/install them.
+  sops:
+    name: Checking unencrypted secrets
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: Checking unencrypted secrets
+
+      - name: Check
+        uses: AndresJulia/sops-gh@1f2fc77c307fac41f211e641583dbaac44a05497 # pin@v1
+        with:
+          filename_pattern: secrets
+"
+`;
+
+exports[`updateWorkflow loads workflow file paths then updates them 37`] = `
+"name: check prod promotion pull requests
+on:
+  pull_request:
+    branches:
+      - prod
+concurrency:
+  group: prod-promotion-check
+jobs:
+  checkProdPromotionPrs:
+    env:
+      RELEASE_ENV: prod
+      GH_USER_NAME: chainlink-k8s
+      GH_USER_EMAIL: 8700084+chainlink-k8s@users.noreply.github.com
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: checkProdPromotionPrs
+
+      - name: determine release env
+        run: |
+          set -x
+          echo \\"release_env=$RELEASE_ENV\\" >> $GITHUB_ENV
+      - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
+        with:
+          ref: sand
+          fetch-depth: 0
+      - name: pr checker
+        env:
+          GITHUB_TOKEN: \${{ secrets.PR_BOT_TOKEN }}
+        run: |
+          set -x
+          git config user.name $GH_USER_NAME
+          git config user.email $GH_USER_EMAIL
+
+          git fetch origin stage:stage
+          git checkout stage
+
+          commits_on_stage=false
+          pr_branch=\${{ github.event.pull_request.head.ref }}
+          echo \\"pr_branch: $pr_branch\\"
+          git fetch origin $pr_branch:$pr_branch
+          git checkout $pr_branch
+          git rev-list stage..$pr_branch --oneline --no-merges --invert-grep --grep=\\"Pinning projects to revision:\\" | grep . > /dev/null 2>&1 && commits_on_stage=false || commits_on_stage=true
+          [[ \\"\${commits_on_stage}\\" == \\"true\\" ]] && exit 0 || exit 1
+"
+`;
+
+exports[`updateWorkflow loads workflow file paths then updates them 38`] = `
+"name: update prod promotion pull requests
+on:
+  pull_request:
+    branches:
+      - prod
+    types: [ closed ]
+concurrency:
+  group: promotion
+jobs:
+  updateProdPromotionPrs:
+    env:
+      RELEASE_ENV: prod
+      GH_USER_NAME: chainlink-k8s
+      GH_USER_EMAIL: 8700084+chainlink-k8s@users.noreply.github.com
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: updateProdPromotionPrs
+
+      - name: determine release env
+        if: github.event.pull_request.merged == true
+        run: |
+          set -x
+          echo \\"release_env=$RELEASE_ENV\\" >> $GITHUB_ENV
+      - if: github.event.pull_request.merged == true
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
+        with:
+          ref: sand
+          fetch-depth: 0
+      - name: pr updater
+        if: github.event.pull_request.merged == true
+        env:
+          GITHUB_TOKEN: \${{ secrets.PR_BOT_TOKEN }}
+        run: |
+          set -x
+          git config user.name $GH_USER_NAME
+          git config user.email $GH_USER_EMAIL
+
+          git fetch origin \${{ env.release_env }}:\${{ env.release_env }}
+          git checkout \${{ env.release_env }}
+
+          git log prod --oneline -n 10
+
+          is_ancestor=true
+
+          prod_pr_branches=$(gh pr list --base prod --json \\"headRefName\\" --jq \\".[].headRefName\\" | xargs)
+          for prod_pr_branch in $prod_pr_branches; do
+            echo \\"prod_pr_branch: $prod_pr_branch\\"
+            git fetch origin $prod_pr_branch:$prod_pr_branch
+            git checkout $prod_pr_branch
+
+            # conflict resolution
+            rev_list=$(git merge-tree $(git merge-base prod $prod_pr_branch) prod $prod_pr_branch | perl -0777ne 'print \\"$2,$3,$1\\\\n\\" while(/their  [0-9]{6} [a-z0-9]{40} ([a-zA-Z0-9\\\\/\\\\-\\\\.]+?\\\\/.revision)\\\\n[@\\\\ \\\\-0-9\\\\+,]+\\\\n\\\\+<<<<<<< \\\\.our\\\\n\\\\h([a-z0-9]{40})\\\\n\\\\+=======\\\\n\\\\+([a-z0-9]{40})\\\\n\\\\+>>>>>>> \\\\.their/sg)')
+            for i in \${rev_list}; do
+              arr=(\${i//,/ })
+              echo \\"ours | theirs | pin_file: \${arr[0]} \${arr[1]} \${arr[2]}\\"
+              git merge-base --is-ancestor \\"\${arr[0]}\\" \\"\${arr[1]}\\" && is_ancestor=true || is_ancestor=false
+              [[ \\"\${is_ancestor}\\" == \\"true\\" ]] && break
+            done
+
+            git log $prod_pr_branch --oneline -n 10
+            
+            echo \\"is_ancestor: \${is_ancestor}\\"
+            if [[ \\"\${is_ancestor}\\" == \\"true\\" ]]; then
+              git merge prod -X ours --allow-unrelated-histories
+            else
+              git merge prod -X theirs --allow-unrelated-histories
+            fi
+            
+            git push origin $prod_pr_branch -f
+          done
+"
+`;
+
+exports[`updateWorkflow loads workflow file paths then updates them 39`] = `
+"name: Release
+
+on:
+  push:
+    branches:
+      # On develop, we build and publish containers to our *private* ECR repo
+
+      # Ex. If the value of the field \\"version\\" in the \\"package.json\\" file of the coingecko adapter is \\"0.0.5-beta\\",
+      # The \\"coingecko-adapter\\" container will be resolvable with the following specifiers:
+      # coingecko-adapter:0.0.5-beta
+      # docker pull <accountid>.dkr.ecr.<region>.amazonaws.com/adapters/coingecko-adapter:0.0.5-beta
+
+      - develop
+
+      # Ex. If the value of the field \\"version\\" in the \\"package.json\\" file of the coingecko adapter is \\"0.0.5-beta\\",
+      # The \\"coingecko-adapter\\" container will be resolvable with the following specifiers:
+      # coingecko-adapter:0.0.5-beta
+
+      # The ECR registry is reachable at public.ecr.aws/chainlink/adapters/
+
+      # You would be able to pull the coingecko adapter with the following commands:
+      # docker pull public.ecr.aws/chainlink/adapters/coingecko-adapter:0.0.5-beta
+      - master
+
+  # A workflow dispatch would trigger the same behaviour as a push to the master branch
+  workflow_dispatch:
+
+
+env:
+  publicecr-name: chainlink
+
+jobs:
+  matrix-adapters:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: \${{ steps.create-matrix.outputs.result }}
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: matrix-adapters
+
+      - uses: actions/checkout@v2
+      - name: Generate job matrix
+        id: create-matrix
+        uses: ./.github/actions/release/matrix-adapters
+
+  publish-artifacts:
+    needs: [ matrix-adapters ]
+    runs-on: ubuntu-latest
+    name: (\${{ matrix.adapter.type }}) Publish \${{ matrix.adapter.name }} adapter Docker image
+    strategy:
+      matrix: \${{fromJson(needs.matrix-adapters.outputs.matrix)}}
+      max-parallel: 35
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: (\${{ matrix.adapter.type }}) Publish \${{ matrix.adapter.name }} adapter Docker image
+
+      - uses: actions/checkout@v2
+
+      #
+      #
+      # ----- Private ECR publishing logic -----
+      #
+      #
+      - name: Configure AWS Credentials for SDLC Private ECR
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: \${{ secrets.AWS_PRIVATEECR_ACCESSKEY }}
+          aws-secret-access-key: \${{ secrets.AWS_PRIVATEECR_SECRETKEY }}
+          aws-region: \${{ secrets.AWS_REGION }}
+      - name: Publish adapter to private ECR
+        id: publish-adapter-versioned-private-ecr
+        uses: ./.github/actions/release/publish-artifacts
+        with:
+          # Having both branch and latest be null means that the underlying action will only publish semver-style versions.
+          # Take a look at scripts/src/generate-image-name/__snapshots__/lib.test.ts.snap for example image name outputs based on
+          # branch / latest inputs
+          branch: null
+          latest: null
+
+          image-prefix: \${{ secrets.SDLC_ACCOUNT_ID }}.dkr.ecr.\${{ secrets.AWS_REGION }}.amazonaws.com/adapters/
+          adapter-name: \${{ matrix.adapter.name }}
+          aws-region: \${{ secrets.AWS_REGION }}
+          aws-ecr-private: 'true' # Use of string intentional for evaluation
+          aws-ecr-account-ids: \${{ secrets.AWS_PRIVATE_ECR_SECONDARY_ACCOUNT_ACCESS_IDS }}
+
+      # For our private ECR repo that we use for staging, we keep the latest tag around to have staging auto-update
+      - if: steps.publish-adapter-versioned-private-ecr.outputs.image-exists == 'false'
+        name: Publish adapter to private ECR, with latest tag
+        uses: ./.github/actions/release/publish-artifacts
+        with:
+          branch: null
+          latest: true
+
+          image-prefix: \${{ secrets.SDLC_ACCOUNT_ID }}.dkr.ecr.\${{ secrets.AWS_REGION }}.amazonaws.com/adapters/
+          adapter-name: \${{ matrix.adapter.name }}
+          aws-region: \${{ secrets.AWS_REGION }}
+          aws-ecr-private: 'true' # Use of string intentional for evaluation
+          aws-ecr-account-ids: \${{ secrets.AWS_PRIVATE_ECR_SECONDARY_ACCOUNT_ACCESS_IDS }}
+
+      #
+      #
+      # ----- Public ECR publishing logic -----
+      #
+      #
+      - name: Configure AWS Credentials for SDLC Public ECR
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: \${{ secrets.AWS_PUBLICECR_ACCESSKEY }}
+          aws-secret-access-key: \${{ secrets.AWS_PUBLICECR_SECRETKEY }}
+          aws-region: \${{ secrets.AWS_REGION }}
+          role-to-assume: \${{ secrets.AWS_PUBLICECR_ROLE_ARN }}
+          role-duration-seconds: 1200
+
+      - if: github.ref == 'refs/heads/master'
+        name: Publish adapter to public ECR
+        id: publish-adapter-versioned-public-ecr
+        uses: ./.github/actions/release/publish-artifacts
+        with:
+          branch: null
+          latest: null
+
+          image-prefix: public.ecr.aws/\${{ env.publicecr-name }}/adapters/
+          adapter-name: \${{ matrix.adapter.name }}
+          aws-region: us-east-1
+          aws-ecr-private: 'false' # Use of string intentional for evaluation
+"
+`;
+
+exports[`updateWorkflow loads workflow file paths then updates them 40`] = `
+"name: Silence Suggestion Check
+on:
+  pull_request:
+    paths:
+      - \\"**/cl-proxy-failover/**\\"
+    branches:
+      - sand
+
+jobs:
+  comment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: comment
+
+      - name: Add comment suggesting adding a silence
+        env:
+          GITHUB_TOKEN: \${{secrets.GITHUB_TOKEN}}
+        run: gh pr comment \${{github.event.number}} -R \${{github.repository}} --body '👋 Changes to these files usually trigger alerts for the on-call, do you want to add a silence? See [this guide](https://www.notion.so/chainlink/Silencing-Alerts-382c7476ee854b37ab0bbc8f037d2364).'
+"
+`;
+
+exports[`updateWorkflow loads workflow file paths then updates them 41`] = `
+"name: Soak test
+
+on:
+  pull_request: ~
+
+jobs:
+  run-basic-checks:
+    name: Run Soak Tests Against Changed Adapters
+    runs-on: ubuntu-latest
+    environment: QA
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: Run Soak Tests Against Changed Adapters
+
+      - uses: actions/checkout@v2
+      - uses: jwalton/gh-find-current-pr@v1
+        id: findPr
+        with:
+          # Can be \\"open\\", \\"closed\\", or \\"all\\".  Defaults to \\"open\\".
+          state: all
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: \${{ secrets.QA_SDLC_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: \${{ secrets.QA_SDLC_AWS_SECRET_KEY }}
+          aws-region: \${{ secrets.QA_SDLC_AWS_REGION }}
+          role-to-assume: \${{ secrets.QA_SDLC_AWS_ROLE_TO_ASSUME }}
+          role-duration-seconds: 3600
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+      - name: Set Kubernetes Context
+        uses: azure/k8s-set-context@v1
+        with:
+          method: kubeconfig
+          kubeconfig: \${{ secrets.QA_SDLC_KUBECONFIG }}
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16.x'
+      - name: Install Yarn and setup project
+        run: |
+          npm install -g yarn
+          yarn install
+          yarn setup
+      - name: Use GH CLI to get pr info
+        id: get-pr-info
+        env:
+          GITHUB_TOKEN: \${{ secrets.QA_GITHUB_TOKEN }}
+          PR_NUMBER: \${{ steps.findPr.outputs.pr }}
+        run: |
+          set -x
+          CHANGED_FILES_NAME=./changedFiles.txt
+          gh pr view \${PR_NUMBER} --json files --jq '.files.[].path' > \${CHANGED_FILES_NAME}
+          ADAPTERS_LIST=\\"$(yarn get-changed-adapters \\"\${CHANGED_FILES_NAME}\\")\\"
+
+          # export adapters from this step
+          echo \\"::set-output name=ADAPTERS_LIST::\${ADAPTERS_LIST}\\"
+      - name: Remove adapters that have no fluxconfig
+        id: adapters-list
+        env:
+          ADAPTER_NAMES: \${{ steps.get-pr-info.outputs.ADAPTERS_LIST }}
+        run: |
+          set -x
+          ADAPTERS_LIST=
+          for adapter in \${ADAPTER_NAMES}; do
+            echo \\"\${adapter}\\"
+            DONT_ADD=0
+            yarn qa:flux:configure exists \${adapter} blank || DONT_ADD=1
+            if [ $DONT_ADD = '1' ]; then
+              continue
+            fi
+            ADAPTERS_LIST=\\"\${ADAPTERS_LIST} \${adapter}\\"
+          done
+          ADAPTERS_LIST=\\"$(echo \${ADAPTERS_LIST} | xargs)\\"
+          # export adapters from this step
+          echo \\"::set-output name=ADAPTERS_LIST::\${ADAPTERS_LIST}\\"
+      - name: Build adapters
+        env:
+          PR_NUMBER: \${{ steps.findPr.outputs.pr }}
+          ADAPTER_NAMES: \${{ steps.adapters-list.outputs.ADAPTERS_LIST }}
+          IMAGE_PREFIX: \${{ secrets.SDLC_ACCOUNT_ID }}.dkr.ecr.\${{ secrets.AWS_REGION }}.amazonaws.com/adapters/
+        run: |
+          IMAGE_TAG=pr\${PR_NUMBER}
+          IMAGE_TAG=\${IMAGE_TAG} IMAGE_PREFIX=\${IMAGE_PREFIX} yarn generate:docker-compose
+          BUILD_NAMES=
+          if [ -n \\"$ADAPTER_NAMES\\" ]; then
+            for adapter in \${ADAPTER_NAMES}; do
+              BUILD_NAMES=\\"\${BUILD_NAMES} \${adapter}-adapter\\"
+            done
+            docker-compose -f docker-compose.generated.yaml build \${BUILD_NAMES}
+            for adapter in \${ADAPTER_NAMES}; do
+              docker push \${IMAGE_PREFIX}\${adapter}-adapter:\${IMAGE_TAG}
+            done
+          fi
+      - name: Deploy adapters
+        env:
+          PR_NUMBER: \${{ steps.findPr.outputs.pr }}
+          ADAPTER_NAMES: \${{ steps.adapters-list.outputs.ADAPTERS_LIST }}
+          IMAGE_PREFIX: \${{ secrets.SDLC_ACCOUNT_ID }}.dkr.ecr.\${{ secrets.AWS_REGION }}.amazonaws.com/adapters/
+          GITHUB_TOKEN: \${{ secrets.QA_GITHUB_TOKEN }}
+        run: |
+          IMAGE_TAG=pr\${PR_NUMBER}
+          # pull down the chainlink adapter helm chart
+          helm repo add chainlink https://raw.githubusercontent.com/smartcontractkit/charts/gh-pages/ --password \${GITHUB_TOKEN} --username dummy
+          # deploy all the adapters
+          if [ -n \\"$ADAPTER_NAMES\\" ]; then
+            for adapter in \${ADAPTER_NAMES}; do
+              yarn qa:adapter start \${adapter} \${PR_NUMBER} \${IMAGE_TAG}
+            done
+          fi
+      - name: Build the k6 payloads and images
+        env:
+          PR_NUMBER: \${{ steps.findPr.outputs.pr }}
+          ADAPTER_NAMES: \${{ steps.adapters-list.outputs.ADAPTERS_LIST }}
+          IMAGE_PREFIX: \${{ secrets.SDLC_ACCOUNT_ID }}.dkr.ecr.\${{ secrets.AWS_REGION }}.amazonaws.com/k6
+        run: |
+          IMAGE_TAG=pr\${PR_NUMBER}
+          OUTER_DIR=$(pwd)
+          if [ -n \\"$ADAPTER_NAMES\\" ]; then
+            for adapter in \${ADAPTER_NAMES}; do
+              cd \${OUTER_DIR}
+              # create the config
+              yarn qa:flux:configure k6payload \${adapter} \${PR_NUMBER}
+              # Move to the k6 package and build/push
+              cd ./packages/k6
+              # configure docker env
+              echo \\"\\" >> ./.env
+              echo \\"PAYLOAD_GENERATED=true\\" >> ./.env
+              echo \\"CI_ADAPTER_NAME=\${adapter}\\" >> ./.env
+              echo \\"QA_RELEASE_TAG=\${PR_NUMBER}\\" >> ./.env
+              echo \\"PR_NUMBER=\${PR_NUMBER}\\" >> ./.env
+              cat ./.env
+              yarn build
+              docker build -t \${IMAGE_PREFIX}:\${IMAGE_TAG}-\${adapter} .
+              docker push \${IMAGE_PREFIX}:\${IMAGE_TAG}-\${adapter}
+            done
+          fi
+      - name: Deploy k6
+        env:
+          PR_NUMBER: \${{ steps.findPr.outputs.pr }}
+          ADAPTER_NAMES: \${{ steps.adapters-list.outputs.ADAPTERS_LIST }}
+        run: |
+          IMAGE_TAG=pr\${PR_NUMBER}
+          cd ./packages/k6
+          if [ -n \\"$ADAPTER_NAMES\\" ]; then
+            for adapter in \${ADAPTER_NAMES}; do
+              helm upgrade k6-\${PR_NUMBER}-\${adapter} ./k8s \\\\
+                --install \\\\
+                --namespace adapters \\\\
+                --create-namespace \\\\
+                -f ./k8s/values.yaml \\\\
+                --set image.tag=\${IMAGE_TAG}-\${adapter} \\\\
+                --set name=k6-\${PR_NUMBER}-\${adapter} \\\\
+                --wait
+            done
+          fi
+"
+`;
+
+exports[`updateWorkflow loads workflow file paths then updates them 42`] = `
+"##
+# This workflow needs to be ran because \`Solidity\` is a required check and we 
+# conditionally only run the \`Solidity\` workflow when certain paths change.
+# If the workflow does not run, the required check will never pass. This is
+# GitHub's workaround:
+# https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/defining-the-mergeability-of-pull-requests/troubleshooting-required-status-checks#example
+##
+
+name: Solidity
+
+on:
+  push:
+    branches:
+      - staging
+      - trying
+      - rollup
+    paths-ignore:
+      - 'contracts/**'
+      - yarn.lock
+      - 'tools/ci/**'
+  pull_request:
+    paths-ignore:
+      - 'contracts/**'
+      - yarn.lock
+      - 'tools/ci/**'
+
+jobs:
+  solidity-coverage:
+    name: Solidity Coverage
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: Solidity Coverage
+
+      - run: 'echo \\"No job required\\" '
+  solidity:
+    name: Solidity
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: Solidity
+
+      - run: 'echo \\"No job required\\" '
+"
+`;
+
+exports[`updateWorkflow loads workflow file paths then updates them 43`] = `
+"##
+# NOTE: any changes to the event triggers or the paths here should be reflected in:
+#       solidity-paths-ignore.yml
+##
+
+name: Solidity
+
+on:
+  push:
+    branches:
+      - staging
+      - trying
+      - rollup
+    paths:
+      - 'contracts/**'
+      - yarn.lock
+      - 'tools/ci/**'
+  pull_request:
+    paths:
+      - 'contracts/**'
+      - yarn.lock
+      - 'tools/ci/**'
+
+jobs:
+  solidity-coverage:
+    name: Solidity Coverage
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: Solidity Coverage
+
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: \\"16\\"
+      - name: Checkout the repo
+        uses: actions/checkout@v2
+      - name: Yarn cache
+        uses: actions/cache@v2
+        env:
+          cache-name: yarn-cache
+        with:
+          path: |
+            ~/.npm
+            ~/.cache
+            **/node_modules
+          key: \${{ runner.os }}-build-\${{ env.cache-name }}-\${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            \${{ runner.os }}-build-\${{ env.cache-name }}-
+            \${{ runner.os }}-build-
+            \${{ runner.os }}-
+      - run: yarn install --frozen-lockfile
+      - name: Run coverage
+        env:
+          NODE_OPTIONS: \\"--max-old-space-size=6144\\"
+        run: ./tools/ci/solidity_coverage
+
+  solidity:
+    name: Solidity
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: Solidity
+
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: \\"16\\"
+      - name: Checkout the repo
+        uses: actions/checkout@v2
+      - name: Yarn cache
+        uses: actions/cache@v2
+        env:
+          cache-name: yarn-cache
+        with:
+          path: |
+            ~/.npm
+            ~/.cache
+            **/node_modules
+          key: \${{ runner.os }}-build-\${{ env.cache-name }}-\${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            \${{ runner.os }}-build-\${{ env.cache-name }}-
+            \${{ runner.os }}-build-
+            \${{ runner.os }}-
+      - run: yarn install --frozen-lockfile
+      - name: Compile all contracts
+        run: ./contracts/scripts/native_solc_compile_all
+      - name: Verify local solc binaries
+        run: ./tools/ci/check_solc_hashes
+      - name: Run tests
+        run: ./tools/ci/solidity_test_hardhat
+      - name: Run prepublish NPM test
+        run: ./tools/ci/prepublish_npm_test
+"
+`;
+
+exports[`updateWorkflow loads workflow file paths then updates them 44`] = `
+"name: update stage promotion pull requests
+on:
+  pull_request:
+    branches:
+      - stage
+    types: [ closed ]
+concurrency:
+  group: promotion
+jobs:
+  updateStagePromotionPrs:
+    env:
+      RELEASE_ENV: stage
+      GH_USER_NAME: chainlink-k8s
+      GH_USER_EMAIL: 8700084+chainlink-k8s@users.noreply.github.com
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: updateStagePromotionPrs
+
+      - name: determine release env
+        if: github.event.pull_request.merged == true
+        run: |
+          set -x
+          echo \\"release_env=$RELEASE_ENV\\" >> $GITHUB_ENV
+      - if: github.event.pull_request.merged == true
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
+        with:
+          ref: sand
+          fetch-depth: 0
+      - name: pr updater
+        if: github.event.pull_request.merged == true
+        env:
+          GITHUB_TOKEN: \${{ secrets.PR_BOT_TOKEN }}
+        run: |
+          set -x
+          git config user.name $GH_USER_NAME
+          git config user.email $GH_USER_EMAIL
+
+          git fetch origin \${{ env.release_env }}:\${{ env.release_env }}
+          git checkout \${{ env.release_env }}
+
+          git log stage --oneline -n 10
+
+          is_ancestor=true
+
+          stage_pr_branches=$(gh pr list --base stage --json \\"headRefName\\" --jq \\".[].headRefName\\" | xargs)
+          for stage_pr_branch in $stage_pr_branches; do
+            echo \\"stage_pr_branch: $stage_pr_branch\\"
+            git fetch origin $stage_pr_branch:$stage_pr_branch
+            git checkout $stage_pr_branch
+
+            # conflict resolution
+            rev_list=$(git merge-tree $(git merge-base stage $stage_pr_branch) stage $stage_pr_branch | perl -0777ne 'print \\"$2,$3,$1\\\\n\\" while(/their  [0-9]{6} [a-z0-9]{40} ([a-zA-Z0-9\\\\/\\\\-\\\\.]+?\\\\/.revision)\\\\n[@\\\\ \\\\-0-9\\\\+,]+\\\\n\\\\+<<<<<<< \\\\.our\\\\n\\\\h([a-z0-9]{40})\\\\n\\\\+=======\\\\n\\\\+([a-z0-9]{40})\\\\n\\\\+>>>>>>> \\\\.their/sg)')
+            for i in \${rev_list}; do
+              arr=(\${i//,/ })
+              echo \\"ours | theirs | pin_file: \${arr[0]} \${arr[1]} \${arr[2]}\\"
+              git merge-base --is-ancestor \\"\${arr[0]}\\" \\"\${arr[1]}\\" && is_ancestor=true || is_ancestor=false
+              [[ \\"\${is_ancestor}\\" == \\"true\\" ]] && break
+            done
+
+            git log $stage_pr_branch --oneline -n 10
+
+            echo \\"is_ancestor: \${is_ancestor}\\"
+            if [[ \\"\${is_ancestor}\\" == \\"true\\" ]]; then
+              git merge stage -X ours --allow-unrelated-histories
+            else
+              git merge stage -X theirs --allow-unrelated-histories
+            fi
+
+            git push origin $stage_pr_branch -f
+          done
+      - name: prod pr check updater
+        if: github.event.pull_request.merged == true
+        env:
+          GITHUB_TOKEN: \${{ secrets.PR_BOT_TOKEN }}
+        run: |
+          set -x
+          prod_pr_branches=$(gh pr list --base prod --json \\"headRefName\\" --jq \\".[].headRefName\\" | xargs)
+          for prod_pr_branch in $prod_pr_branches; do
+            run_json=$(gh run list -b \\"\${prod_pr_branch}\\" -w \\"check prod promotion pull requests\\" --json \\"conclusion,databaseId\\")
+            run_result=$(echo \\"\${run_json}\\" | jq -r '.[0].conclusion')
+            run_id=$(echo \\"\${run_json}\\" | jq -r '.[0].databaseId')
+            if [[ \\"\${run_result}\\" == \\"failure\\" ]]; then
+              gh run rerun \\"\${run_id}\\" --failed
+            fi
+          done
+"
+`;
+
+exports[`updateWorkflow loads workflow file paths then updates them 45`] = `
+"name: Sync develop from smartcontractkit/chainlink
+
+on:
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    - cron: '*/30 * * * *'
+
+jobs:
+  sync:
+    name: Sync
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: Sync
+
+      - uses: actions/checkout@v2
+        with:
+          ref: develop
+        if: env.GITHUB_REPOSITORY != 'smartcontractkit/chainlink'
+      - name: Sync
+        run: |
+          git remote add upstream \\"https://github.com/smartcontractkit/chainlink.git\\"
+          COMMIT_HASH_UPSTREAM=$(git ls-remote upstream develop | grep -P '^[0-9a-f]{40}\\\\trefs/heads/develop$' | cut -f 1)
+          COMMIT_HASH_ORIGIN=$(git ls-remote origin develop | grep -P '^[0-9a-f]{40}\\\\trefs/heads/develop$' | cut -f 1)
+          if [ \\"$COMMIT_HASH_UPSTREAM\\" = \\"$COMMIT_HASH_ORIGIN\\" ]; then
+            echo \\"Both remotes have develop at $COMMIT_HASH_UPSTREAM. No need to sync.\\"
+          else
+            echo \\"upstream has develop at $COMMIT_HASH_UPSTREAM. origin has develop at $COMMIT_HASH_ORIGIN. Syncing...\\"
+            git fetch upstream
+            git push origin upstream/develop:develop
+          fi
+        if: env.GITHUB_REPOSITORY != 'smartcontractkit/chainlink'
+"
+`;
+
+exports[`updateWorkflow loads workflow file paths then updates them 46`] = `
+"name: Updater
+on:
+  workflow_dispatch:
+    inputs:
+      image-updater-head-branch:
+        description: The head branch that should be used to open an image-updater PR for. Ex. If we want to open a PR whenever the external adapters repository has pushed updates, we should look for the annotation value of \`argocd-image-updater.argoproj.io/git-branch\` within the \`apps/templates/adapters/adapters.yaml\` file, and set this input to that same value, which in this case would be \`image-updater/adapters\`
+        required: true
+      pr-delay:
+        description: A configurable delay in seconds, since there is a delay between the ecr repo having an updated image vs image-updater polling an ECR repo for any new images.
+        required: true
+
+jobs:
+  updateImages:
+    runs-on: ubuntu-latest
+
+    env:
+      PR_USER: Koo-beer-net-ees <78700084+chainlink-k8s@users.noreply.github.com>
+      HEAD_BRANCH: \${{ github.event.inputs.image-updater-head-branch }}
+      BASE_BRANCH: develop
+
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: updateImages
+
+      - name: Checkout \${{ env.BASE_BRANCH }}
+        uses: actions/checkout@a12a3943b4bdde767164f792f33f40b04645d846 #v3.0.0
+        with:
+          ref: \${{ env.BASE_BRANCH }}
+
+      - name: Sleep for \${{ github.event.inputs.pr-delay }} seconds
+        run: sleep \${{ github.event.inputs.pr-delay }}
+
+      - name: Prepare pull request for merging \${{ env.HEAD_BRANCH }} into \${{ env.BASE_BRANCH }}
+        run: |
+          # See https://github.com/peter-evans/create-pull-request/blob/main/docs/examples.md#keep-a-branch-up-to-date-with-another
+          git fetch origin $HEAD_BRANCH:$HEAD_BRANCH 
+          git reset --hard $HEAD_BRANCH
+
+      - name: Create Pull Request for merging \${{ env.HEAD_BRANCH }} into \${{ env.BASE_BRANCH }}
+        uses: peter-evans/create-pull-request@9825ae65b1cb54b543b938503728b432a0176d29 # v3.1.0
+        with:
+          branch: \\"cpr-\${{ env.HEAD_BRANCH }}\\"
+          token: \${{ secrets.PR_BOT_TOKEN }}
+          committer: \${{ env.PR_USER }}
+          author: \${{ env.PR_USER }}
+          commit-message: Update \${{ env.HEAD_BRANCH }}
+          title: \\"[Images] \${{ env.HEAD_BRANCH }}\\"
+          labels: automerge
+"
+`;
