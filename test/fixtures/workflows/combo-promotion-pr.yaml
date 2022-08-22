@@ -49,7 +49,9 @@ jobs:
         name: create pull request
         uses: peter-evans/create-pull-request@9825ae65b1cb54b543b938503728b432a0176d29 # v3.10.0
         with:
-          branch: "promote/pr-${{ github.event.pull_request.number }}-to-${{ env.release_env }}"
+          branch:
+            "promote/pr-${{ github.event.pull_request.number }}-to-${{
+            env.release_env }}"
           commit-message: "Pinning projects to revision: ${{ env.base_rev }}"
           token: ${{ secrets.PR_BOT_TOKEN }}
           title: ${{ env.pr_title }}
@@ -100,7 +102,9 @@ jobs:
         name: create pull request
         uses: peter-evans/create-pull-request@9825ae65b1cb54b543b938503728b432a0176d29 # v3.1.0
         with:
-          branch: "promote/pr-${{ github.event.pull_request.number }}-to-${{ env.release_env }}"
+          branch:
+            "promote/pr-${{ github.event.pull_request.number }}-to-${{
+            env.release_env }}"
           commit-message: "Pinning projects to revision: ${{ env.base_rev }}"
           token: ${{ secrets.PR_BOT_TOKEN }}
           title: ${{ env.pr_title }}

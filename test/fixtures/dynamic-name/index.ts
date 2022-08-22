@@ -1,1 +1,1 @@
-export * as pullRequest from "./pull_request";
+export * as pullRequest from "./pull_request"

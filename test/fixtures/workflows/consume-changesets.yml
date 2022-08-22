@@ -31,8 +31,8 @@ jobs:
         uses: changesets/action@v1
         with:
           version: yarn changeset version
-          title: 'Consume changesets'
-          commit: 'Consume changesets'
+          title: "Consume changesets"
+          commit: "Consume changesets"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

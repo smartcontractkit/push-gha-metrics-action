@@ -16,14 +16,14 @@ on:
       - trying
       - rollup
     paths-ignore:
-      - 'operator_ui/**'
+      - "operator_ui/**"
       - yarn.lock
-      - 'tools/ci/**'
+      - "tools/ci/**"
   pull_request:
     paths-ignore:
-      - 'operator_ui/**'
+      - "operator_ui/**"
       - yarn.lock
-      - 'tools/ci/**'
+      - "tools/ci/**"
 
 jobs:
   operator-ui:

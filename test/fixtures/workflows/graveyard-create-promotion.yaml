@@ -52,12 +52,19 @@ jobs:
         name: Create pull request
         uses: peter-evans/create-pull-request@9825ae65b1cb54b543b938503728b432a0176d29 # v3.1.0
         with:
-          branch: "promote/pr-${{ github.event.pull_request.number }}-to-${{ env.RELEASE_ENV }}"
-          commit-message: "Pinning apps to revision: ${{ github.event.pull_request.head.sha}}"
+          branch:
+            "promote/pr-${{ github.event.pull_request.number }}-to-${{
+            env.RELEASE_ENV }}"
+          commit-message:
+            "Pinning apps to revision: ${{ github.event.pull_request.head.sha}}"
           token: ${{ secrets.PR_BOT_TOKEN }}
-          title: "[${{ env.RELEASE_ENV_UPPER }}] ${{ github.event.pull_request.title }}"
+          title:
+            "[${{ env.RELEASE_ENV_UPPER }}] ${{ github.event.pull_request.title
+            }}"
           labels: automerge
-      - if: github.event.pull_request.merged == true && steps.cpr.outputs.pull-request-operation == 'created'
+      - if:
+          github.event.pull_request.merged == true &&
+          steps.cpr.outputs.pull-request-operation == 'created'
         name: Enable pull request automerge
         uses: peter-evans/enable-pull-request-automerge@cb41a1ef95d7852916a3b0893903d53e7b4218f8
         with:

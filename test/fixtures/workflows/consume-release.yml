@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
-      - run: gh workflow run --repo smartcontractkit/infra-k8s updater.yaml -F image-updater-head-branch=image-updater/adapters -F pr-delay=60
+      - run:
+          gh workflow run --repo smartcontractkit/infra-k8s updater.yaml -F
+          image-updater-head-branch=image-updater/adapters -F pr-delay=60
         env:
           GITHUB_TOKEN: ${{ secrets.INFRA_K8s_PAT }}

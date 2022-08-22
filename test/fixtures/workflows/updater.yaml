@@ -3,10 +3,19 @@ on:
   workflow_dispatch:
     inputs:
       image-updater-head-branch:
-        description: The head branch that should be used to open an image-updater PR for. Ex. If we want to open a PR whenever the external adapters repository has pushed updates, we should look for the annotation value of `argocd-image-updater.argoproj.io/git-branch` within the `apps/templates/adapters/adapters.yaml` file, and set this input to that same value, which in this case would be `image-updater/adapters`
+        description:
+          The head branch that should be used to open an image-updater PR for.
+          Ex. If we want to open a PR whenever the external adapters repository
+          has pushed updates, we should look for the annotation value of
+          `argocd-image-updater.argoproj.io/git-branch` within the
+          `apps/templates/adapters/adapters.yaml` file, and set this input to
+          that same value, which in this case would be `image-updater/adapters`
         required: true
       pr-delay:
-        description: A configurable delay in seconds, since there is a delay between the ecr repo having an updated image vs image-updater polling an ECR repo for any new images.
+        description:
+          A configurable delay in seconds, since there is a delay between the
+          ecr repo having an updated image vs image-updater polling an ECR repo
+          for any new images.
         required: true
 
 jobs:
@@ -14,7 +23,8 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      PR_USER: Koo-beer-net-ees <78700084+chainlink-k8s@users.noreply.github.com>
+      PR_USER:
+        Koo-beer-net-ees <78700084+chainlink-k8s@users.noreply.github.com>
       HEAD_BRANCH: ${{ github.event.inputs.image-updater-head-branch }}
       BASE_BRANCH: develop
 
@@ -27,13 +37,17 @@ jobs:
       - name: Sleep for ${{ github.event.inputs.pr-delay }} seconds
         run: sleep ${{ github.event.inputs.pr-delay }}
 
-      - name: Prepare pull request for merging ${{ env.HEAD_BRANCH }} into ${{ env.BASE_BRANCH }}
+      - name:
+          Prepare pull request for merging ${{ env.HEAD_BRANCH }} into ${{
+          env.BASE_BRANCH }}
         run: |
           # See https://github.com/peter-evans/create-pull-request/blob/main/docs/examples.md#keep-a-branch-up-to-date-with-another
           git fetch origin $HEAD_BRANCH:$HEAD_BRANCH 
           git reset --hard $HEAD_BRANCH
 
-      - name: Create Pull Request for merging ${{ env.HEAD_BRANCH }} into ${{ env.BASE_BRANCH }}
+      - name:
+          Create Pull Request for merging ${{ env.HEAD_BRANCH }} into ${{
+          env.BASE_BRANCH }}
         uses: peter-evans/create-pull-request@9825ae65b1cb54b543b938503728b432a0176d29 # v3.1.0
         with:
           branch: "cpr-${{ env.HEAD_BRANCH }}"

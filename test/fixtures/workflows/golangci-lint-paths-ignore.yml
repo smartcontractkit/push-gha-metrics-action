@@ -1,6 +1,6 @@
 ##
 # This workflow needs to be ran because `lint` is a required check and
-# we conditionally only run the `golangci-lint` workflow when certain paths 
+# we conditionally only run the `golangci-lint` workflow when certain paths
 # change.
 # If the workflow does not run, the required check will never pass. This is
 # GitHub's workaround:
@@ -16,10 +16,10 @@ on:
       - trying
       - rollup
     paths-ignore:
-      - '**.go'
+      - "**.go"
   pull_request:
     paths-ignore:
-      - '**.go'
+      - "**.go"
 
 jobs:
   golangci:

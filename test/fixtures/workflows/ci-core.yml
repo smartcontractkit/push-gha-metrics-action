@@ -3,7 +3,7 @@ name: CI Core
 on:
   push:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: "0 0 * * *"
 
 jobs:
   core:
@@ -28,9 +28,7 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
+          --health-cmd pg_isready --health-interval 10s --health-timeout 5s
           --health-retries 5
     steps:
       - name: Checkout the repo
@@ -38,7 +36,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version-file: 'go.mod'
+          go-version-file: "go.mod"
           cache: true
       - name: Touching core/web/assets/index.html
         run: mkdir -p core/web/assets && touch core/web/assets/index.html
@@ -53,14 +51,16 @@ jobs:
             ~/.npm
             ~/.cache
             **/node_modules
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('yarn.lock') }}
+          key:
+            ${{ runner.os }}-build-${{ env.cache-name }}-${{
+            hashFiles('yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
       - run: yarn install --frozen-lockfile
-#      - name: Install terrad
-#        run: ./tools/ci/install_terrad
+      #      - name: Install terrad
+      #        run: ./tools/ci/install_terrad
       - name: Install solana cli
         run: ./tools/ci/install_solana
       - name: Setup DB

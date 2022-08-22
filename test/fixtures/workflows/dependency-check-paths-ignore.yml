@@ -10,15 +10,13 @@
 
 name: Dependency Vulnerability Check
 
-on: 
+on:
   push:
     paths-ignore:
-      - '**/go.mod'
-      - '**/go.sum'
+      - "**/go.mod"
+      - "**/go.sum"
 jobs:
   Go:
     runs-on: ubuntu-latest
     steps:
       - run: 'echo "No job required" '
-
-

@@ -1,6 +1,6 @@
-import type { context as RawGithubContext } from "@actions/github";
-import * as types from "./context.types";
-import { iso8601ToUnixTimeSeconds, unixNowSeconds } from "./utils";
+import type { context as RawGithubContext } from "@actions/github"
+import * as types from "./context.types"
+import { iso8601ToUnixTimeSeconds, unixNowSeconds } from "./utils"
 
 /**
  * Fetch the current context, includes relevant information about the triggering event, workflow run, and job run
@@ -14,36 +14,36 @@ export async function fetchContext(
   rawGithubContext: typeof RawGithubContext,
   contextOverrides?: types.ContextOverrides,
 ): Promise<types.Context> {
-  const githubContext = getGithubContext(rawGithubContext, contextOverrides);
+  const githubContext = getGithubContext(rawGithubContext, contextOverrides)
   const jobRunContext = await fetchJobRunContext(
     githubClient,
     githubContext,
     contextOverrides,
-  );
+  )
   const workflowRunContext = await fetchWorkflowRunContext(
     githubClient,
     githubContext,
-  );
+  )
 
   const { runAttempt, runId, runNumber, workflowName, jobName, ...rest } =
-    githubContext;
+    githubContext
   const mergedJobRunContext: types.Context["jobRun"] = {
     ...jobRunContext,
     jobName,
-  };
+  }
   const mergedWorkflowRunContext: types.Context["workflowRun"] = {
     ...workflowRunContext,
     runAttempt,
     runId,
     runNumber,
     workflowName,
-  };
+  }
 
   return {
     event: rest,
     workflowRun: mergedWorkflowRunContext,
     jobRun: mergedJobRunContext,
-  };
+  }
 }
 
 /**
@@ -57,21 +57,21 @@ export function getGithubContext(
   // The event path must exist
   // since it contains a JSON file with the payload
   if (!process.env.GITHUB_EVENT_PATH) {
-    throw Error(`GITHUB_EVENT_PATH must exist to obtain context`);
+    throw Error(`GITHUB_EVENT_PATH must exist to obtain context`)
   }
 
-  const runAttempt = process.env.GITHUB_RUN_ATTEMPT;
+  const runAttempt = process.env.GITHUB_RUN_ATTEMPT
   if (!runAttempt) {
-    throw Error(`GITHUB_RUN_ATTEMPT must exist to get workflow run attempt`);
+    throw Error(`GITHUB_RUN_ATTEMPT must exist to get workflow run attempt`)
   }
 
   // both issue and repo are getters
   //https://github.com/actions/toolkit/blob/main/packages/github/src/context.ts#L55
   // so naively copying over enumerable properties via spread syntax does not work
-  const issue = rawGithubContext.issue;
-  const repo = rawGithubContext.repo;
-  const restContext = { ...rawGithubContext };
-  const fullContext = { ...restContext, issue, repo, runAttempt };
+  const issue = rawGithubContext.issue
+  const repo = rawGithubContext.repo
+  const restContext = { ...rawGithubContext }
+  const fullContext = { ...restContext, issue, repo, runAttempt }
 
   return {
     actor: fullContext.actor,
@@ -84,7 +84,7 @@ export function getGithubContext(
     runNumber: fullContext.runNumber,
     sha: fullContext.sha,
     workflowName: fullContext.workflow,
-  };
+  }
 }
 
 /**
@@ -103,19 +103,19 @@ export async function fetchJobRunContext(
     attempt_number: githubContext.runAttempt,
     run_id: githubContext.runId,
     ...githubContext.repo,
-  });
-  const { jobs } = jobRuns.data;
+  })
+  const { jobs } = jobRuns.data
 
   const relevantJobs = jobs.filter(
-    (j) => j.name === githubContext.jobName && j.status === "in_progress",
-  );
+    j => j.name === githubContext.jobName && j.status === "in_progress",
+  )
 
   // This should never happen, as job names reported by the API always have a number post-fixed to them if the default
   // name is not unique within the context of matrix execution
   if (relevantJobs.length > 1) {
     throw Error(
       `More than one job found during self-lookup, non-unique matrix job names being used will result in metrics ambiguity`,
-    );
+    )
   }
 
   // Non-exhaustive situations where this could happen in order of likelihood:
@@ -128,11 +128,11 @@ export async function fetchJobRunContext(
       `No job for job name: "${
         githubContext.jobName
       }" found during self-lookup, invalid job name given?
-      Available jobs names + ids: ${jobs.map((j) => `${j.name}|${j.id}`)}
+      Available jobs names + ids: ${jobs.map(j => `${j.name}|${j.id}`)}
       `,
-    );
+    )
   }
-  const [self] = relevantJobs;
+  const [self] = relevantJobs
 
   return {
     id: self.id,
@@ -143,7 +143,7 @@ export async function fetchJobRunContext(
     estimatedEndedAtUnixSeconds: unixNowSeconds(
       contextOverrides?.estimatedEndedAtUnixSeconds,
     ),
-  };
+  }
 }
 
 /**
@@ -160,16 +160,16 @@ export async function fetchWorkflowRunContext(
     ...githubContext.repo,
     attempt_number: githubContext.runAttempt,
     run_id: githubContext.runId,
-  });
+  })
 
-  const { data } = workflowRun;
-  const { url, updated_at, created_at, workflow_url, run_started_at } = data;
+  const { data } = workflowRun
+  const { url, updated_at, created_at, workflow_url, run_started_at } = data
 
   // This can happen when the github runner state hasn't been synchronized with the github API state yet
   if (!run_started_at) {
     throw Error(
       `Could not find "run_started_at" for workflow run attempt runId:${githubContext.runId}|attemptNumber:${githubContext.runAttempt}, github api down / inconsistent?`,
-    );
+    )
   }
 
   const workflowRunContext: types.WorkflowRunContext = {
@@ -181,7 +181,7 @@ export async function fetchWorkflowRunContext(
     workflowUrl: workflow_url,
     runStartedAt: run_started_at,
     runStartedAtUnixSeconds: iso8601ToUnixTimeSeconds(run_started_at),
-  };
+  }
 
-  return workflowRunContext;
+  return workflowRunContext
 }

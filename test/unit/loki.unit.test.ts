@@ -3,26 +3,26 @@ import {
   createLokiLogValueFromContext,
   extractStreamFromContext,
   sendLokiRequest,
-} from "../../src/loki";
-import { Context } from "../../src/context.types";
-import { LokiRequestOptions } from "../../src/loki.types";
-import nock from "nock";
-import mockContext from "./__mocks__/fetchContext1.json";
+} from "../../src/loki"
+import { Context } from "../../src/context.types"
+import { LokiRequestOptions } from "../../src/loki.types"
+import nock from "nock"
+import mockContext from "./__mocks__/fetchContext1.json"
 
 describe("Loki", () => {
   // Taken from context.test.ts snapshots
-  const context: Context = mockContext;
+  const context: Context = mockContext
 
   describe(createLokiLogEntriesFromContext.name, () => {
     it("should create loki log entries from context", () => {
       const {
         streams: [{ stream, values }],
-      } = createLokiLogEntriesFromContext(context);
-      const [ts, value] = values[0];
+      } = createLokiLogEntriesFromContext(context)
+      const [ts, value] = values[0]
 
       expect(BigInt(ts)).toBeLessThanOrEqual(
         BigInt(Date.now()) * BigInt(1_000_000),
-      );
+      )
       expect(JSON.parse(value)).toMatchInlineSnapshot(`
 Object {
   "event": Object {
@@ -59,7 +59,7 @@ Object {
     "workflowUrl": "https://api.github.com/repos/smartcontractkit/push-gha-metrics-action/actions/workflows/28123629",
   },
 }
-`);
+`)
       expect(stream).toMatchInlineSnapshot(`
 Object {
   "actor": "HenryNguyen5",
@@ -71,17 +71,17 @@ Object {
   "repo": "mockRepo",
   "workflowName": "Push Metrics CI",
 }
-`);
-    });
-  });
+`)
+    })
+  })
 
   describe(createLokiLogValueFromContext.name, () => {
     it("should create a log value from context", () => {
-      const [ts, value] = createLokiLogValueFromContext(context);
+      const [ts, value] = createLokiLogValueFromContext(context)
 
       expect(BigInt(ts)).toBeLessThanOrEqual(
         BigInt(Date.now()) * BigInt(1_000_000),
-      );
+      )
       expect(JSON.parse(value)).toMatchInlineSnapshot(`
 Object {
   "event": Object {
@@ -118,13 +118,13 @@ Object {
     "workflowUrl": "https://api.github.com/repos/smartcontractkit/push-gha-metrics-action/actions/workflows/28123629",
   },
 }
-`);
-    });
-  });
+`)
+    })
+  })
 
   describe(extractStreamFromContext.name, () => {
     it("should generate a stream object from a github context", () => {
-      const stream = extractStreamFromContext(context);
+      const stream = extractStreamFromContext(context)
       expect(stream).toMatchInlineSnapshot(`
 Object {
   "actor": "HenryNguyen5",
@@ -136,9 +136,9 @@ Object {
   "repo": "mockRepo",
   "workflowName": "Push Metrics CI",
 }
-`);
-    });
-  });
+`)
+    })
+  })
 
   describe(sendLokiRequest.name, () => {
     if (process.env.RECORD) {
@@ -146,7 +146,7 @@ Object {
     }
 
     it("should send a successful dry run request", async () => {
-      const logEntries = createLokiLogEntriesFromContext(context);
+      const logEntries = createLokiLogEntriesFromContext(context)
       const requestOptions: LokiRequestOptions = {
         contentType: "application/json",
         headers: {},
@@ -155,10 +155,10 @@ Object {
         port: 3030,
         protocol: "http",
         timeout: 1000,
-      };
-      const response = await sendLokiRequest(logEntries, requestOptions, true);
-      expect(response).toBeNull();
-    });
+      }
+      const response = await sendLokiRequest(logEntries, requestOptions, true)
+      expect(response).toBeNull()
+    })
 
     it("should throw on a non 200 status code", async () => {
       nock("http://localhost:3030", { encodedQueryParams: true })
@@ -194,9 +194,9 @@ Object {
             "Connection",
             "close",
           ],
-        );
+        )
 
-      const logEntries = createLokiLogEntriesFromContext(context);
+      const logEntries = createLokiLogEntriesFromContext(context)
       const requestOptions: LokiRequestOptions = {
         contentType: "application/json",
         headers: {},
@@ -205,15 +205,15 @@ Object {
         port: 3030,
         protocol: "http",
         timeout: 1000,
-      };
+      }
 
-      expect.assertions(1);
+      expect.assertions(1)
       await expect(sendLokiRequest(logEntries, requestOptions, false)).rejects
         .toMatchInlineSnapshot(`
 [Error: sendLokiRequest Received non 200 status code. StatusCode: 400 StatusMessage: N/A Body: entry for stream '{actor="HenryNguyen5", eventName="pull_request", jobName="generate-fixtures-name-1", owner="mockOwner", repo="mockRepo", workflowName="Push Metrics CI"}' has timestamp too old: 1970-01-03T12:22:04Z, oldest acceptable timestamp is: 2022-06-16T22:19:04Z
 ]
-`);
-    });
+`)
+    })
 
     it("should send a successful request", async () => {
       nock("http://localhost:3030", { encodedQueryParams: true })
@@ -239,9 +239,9 @@ Object {
           "Thu, 23 Jun 2022 22:17:16 GMT",
           "Connection",
           "close",
-        ]);
+        ])
 
-      const logEntries = createLokiLogEntriesFromContext(context);
+      const logEntries = createLokiLogEntriesFromContext(context)
       const requestOptions: LokiRequestOptions = {
         contentType: "application/json",
         headers: {},
@@ -250,8 +250,8 @@ Object {
         port: 3030,
         protocol: "http",
         timeout: 1000,
-      };
-      const response = await sendLokiRequest(logEntries, requestOptions, false);
+      }
+      const response = await sendLokiRequest(logEntries, requestOptions, false)
       expect(response).toMatchInlineSnapshot(`
 Object {
   "data": "",
@@ -262,7 +262,7 @@ Object {
   "statusCode": 204,
   "statusMessage": null,
 }
-`);
-    });
-  });
-});
+`)
+    })
+  })
+})

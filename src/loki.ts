@@ -3,11 +3,11 @@
  * https://grafana.com/docs/loki/latest/api/#post-lokiapiv1push
  * https://github.com/JaniAnttonen/winston-loki/tree/c440b051a254112d71c64e5dbd3ec7e86befe4ec
  */
-import * as core from "@actions/core";
-import http, { OutgoingHttpHeaders, RequestOptions } from "http";
-import https from "https";
-import * as contextTypes from "./context.types";
-import * as lokiTypes from "./loki.types";
+import * as core from "@actions/core"
+import http, { OutgoingHttpHeaders, RequestOptions } from "http"
+import https from "https"
+import * as contextTypes from "./context.types"
+import * as lokiTypes from "./loki.types"
 
 /**
  * Given a context, create a Loki log entries object that's compatible with the POST `/loki/api/v1/push` endpoint as a payload.
@@ -18,8 +18,8 @@ import * as lokiTypes from "./loki.types";
 export function createLokiLogEntriesFromContext(
   context: contextTypes.Context,
 ): lokiTypes.LokiLogEntries {
-  const stream = extractStreamFromContext(context);
-  const value = createLokiLogValueFromContext(context);
+  const stream = extractStreamFromContext(context)
+  const value = createLokiLogValueFromContext(context)
 
   const logEntries: lokiTypes.LokiLogEntries = {
     streams: [
@@ -28,9 +28,9 @@ export function createLokiLogEntriesFromContext(
         values: [value],
       },
     ],
-  };
+  }
 
-  return logEntries;
+  return logEntries
 }
 
 /**
@@ -42,15 +42,15 @@ export function createLokiLogEntriesFromContext(
 export function extractStreamFromContext(
   context: contextTypes.Context,
 ): lokiTypes.LokiStream {
-  const { event, jobRun, workflowRun } = context;
-  const { actor, eventName, repo } = event;
-  const { jobName } = jobRun;
-  const { workflowName } = workflowRun;
+  const { event, jobRun, workflowRun } = context
+  const { actor, eventName, repo } = event
+  const { jobName } = jobRun
+  const { workflowName } = workflowRun
 
   const staticLabels = {
     host: "github.com",
     application: "push-gha-metrics-action",
-  } as const;
+  } as const
 
   const dynamicLabels = {
     eventName,
@@ -59,8 +59,8 @@ export function extractStreamFromContext(
     jobName,
     workflowName,
     actor,
-  };
-  const streamLabels = { ...staticLabels, ...dynamicLabels };
+  }
+  const streamLabels = { ...staticLabels, ...dynamicLabels }
 
   core.info(
     `${
@@ -70,8 +70,8 @@ export function extractStreamFromContext(
       null,
       1,
     )}`,
-  );
-  return streamLabels;
+  )
+  return streamLabels
 }
 
 /**
@@ -82,18 +82,18 @@ export function extractStreamFromContext(
 export function createLokiLogValueFromContext(
   context: contextTypes.Context,
 ): lokiTypes.LokiValue {
-  const log = JSON.stringify(context);
-  const secondInNanoSeconds = BigInt(1e9);
+  const log = JSON.stringify(context)
+  const secondInNanoSeconds = BigInt(1e9)
   const ts =
-    BigInt(context.jobRun.estimatedEndedAtUnixSeconds) * secondInNanoSeconds;
+    BigInt(context.jobRun.estimatedEndedAtUnixSeconds) * secondInNanoSeconds
 
   core.debug(
     `${createLokiLogValueFromContext.name} Created loki log value: ${log}`,
-  );
+  )
   core.debug(
     `${createLokiLogValueFromContext.name} Created loki log timestamp in nanoseconds ${ts}`,
-  );
-  return [ts.toString(), log];
+  )
+  return [ts.toString(), log]
 }
 
 /**
@@ -110,12 +110,12 @@ export async function sendLokiRequest(
   dryRun: boolean,
 ): Promise<lokiTypes.LokiResponse | null> {
   // Prepare request data and options
-  const serializedLogEntries = JSON.stringify(logEntries);
+  const serializedLogEntries = JSON.stringify(logEntries)
   const outgoingHeaders: OutgoingHttpHeaders = {
     ...requestOptions.headers,
     "Content-Type": requestOptions.contentType,
     "Content-Length": serializedLogEntries.length,
-  };
+  }
   const options: RequestOptions = {
     auth: requestOptions.basicAuth,
     hostname: requestOptions.hostname,
@@ -124,7 +124,7 @@ export async function sendLokiRequest(
     method: "POST",
     headers: outgoingHeaders,
     timeout: requestOptions.timeout,
-  };
+  }
   const optionsWhitelist: (keyof Omit<RequestOptions, "auth">)[] = [
     "hostname",
     "port",
@@ -132,32 +132,32 @@ export async function sendLokiRequest(
     "method",
     "headers",
     "timeout",
-  ];
+  ]
   core.debug(
     `${sendLokiRequest.name} SanitizedRequestOptions: ${JSON.stringify(
       options,
       optionsWhitelist,
       1,
     )}`,
-  );
+  )
 
-  const lib = requestOptions.protocol === "http" ? http : https;
+  const lib = requestOptions.protocol === "http" ? http : https
   if (dryRun) {
-    return null;
+    return null
   }
   // Send request, gracefully handle errors
   const response = await new Promise<lokiTypes.LokiResponse>(
     (resolve, reject) => {
-      const request = lib.request(options, (res) => {
-        const { statusCode, statusMessage, headers: incomingHeaders } = res;
+      const request = lib.request(options, res => {
+        const { statusCode, statusMessage, headers: incomingHeaders } = res
         core.debug(
           `${sendLokiRequest.name} Incoming headers ${JSON.stringify(
             incomingHeaders,
           )}`,
-        );
+        )
         // Collect data and resolve once finished
-        let data = "";
-        res.on("data", (d) => (data += d));
+        let data = ""
+        res.on("data", d => (data += d))
         res.on("end", () => {
           // If status code isn't in 200 range, reject
           if (statusCode && !(statusCode >= 200 && statusCode < 300)) {
@@ -167,8 +167,8 @@ export async function sendLokiRequest(
               } Received non 200 status code. StatusCode: ${statusCode} StatusMessage: ${
                 statusMessage || "N/A"
               } Body: ${data}`,
-            );
-            return reject(error);
+            )
+            return reject(error)
           }
 
           resolve({
@@ -176,24 +176,24 @@ export async function sendLokiRequest(
             data,
             statusCode,
             statusMessage,
-          });
-        });
-      });
+          })
+        })
+      })
 
-      request.on("error", (err) => {
+      request.on("error", err => {
         const contextualError = Error(
           `${sendLokiRequest.name} Got error during request: ${err.message}`,
-        );
-        reject(contextualError);
-      });
+        )
+        reject(contextualError)
+      })
 
-      request.write(serializedLogEntries);
-      request.end();
+      request.write(serializedLogEntries)
+      request.end()
     },
-  );
+  )
 
   core.debug(
     `${sendLokiRequest.name} Response: ${JSON.stringify(response, null, 1)}`,
-  );
-  return response;
+  )
+  return response
 }

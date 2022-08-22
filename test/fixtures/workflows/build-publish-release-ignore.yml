@@ -1,11 +1,11 @@
 ##
-# This workflow needs to be ran because `build-sign-publish-chainlink` is 
+# This workflow needs to be ran because `build-sign-publish-chainlink` is
 # a required check but we do not want our release branches to build and
 # publish images. Instead we use tags.
 # If the workflow does not run, the required check will never pass.
 ##
 
-name: 'Build Chainlink and Publish'
+name: "Build Chainlink and Publish"
 
 on:
   push:

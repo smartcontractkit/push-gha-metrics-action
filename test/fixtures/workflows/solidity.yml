@@ -12,14 +12,14 @@ on:
       - trying
       - rollup
     paths:
-      - 'contracts/**'
+      - "contracts/**"
       - yarn.lock
-      - 'tools/ci/**'
+      - "tools/ci/**"
   pull_request:
     paths:
-      - 'contracts/**'
+      - "contracts/**"
       - yarn.lock
-      - 'tools/ci/**'
+      - "tools/ci/**"
 
 jobs:
   solidity-coverage:
@@ -41,7 +41,9 @@ jobs:
             ~/.npm
             ~/.cache
             **/node_modules
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('yarn.lock') }}
+          key:
+            ${{ runner.os }}-build-${{ env.cache-name }}-${{
+            hashFiles('yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
@@ -71,7 +73,9 @@ jobs:
             ~/.npm
             ~/.cache
             **/node_modules
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('yarn.lock') }}
+          key:
+            ${{ runner.os }}-build-${{ env.cache-name }}-${{
+            hashFiles('yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-

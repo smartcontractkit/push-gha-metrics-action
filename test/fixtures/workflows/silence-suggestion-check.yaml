@@ -13,4 +13,8 @@ jobs:
       - name: Add comment suggesting adding a silence
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-        run: gh pr comment ${{github.event.number}} -R ${{github.repository}} --body '👋 Changes to these files usually trigger alerts for the on-call, do you want to add a silence? See [this guide](https://www.notion.so/chainlink/Silencing-Alerts-382c7476ee854b37ab0bbc8f037d2364).'
+        run:
+          gh pr comment ${{github.event.number}} -R ${{github.repository}}
+          --body '👋 Changes to these files usually trigger alerts for the
+          on-call, do you want to add a silence? See [this
+          guide](https://www.notion.so/chainlink/Silencing-Alerts-382c7476ee854b37ab0bbc8f037d2364).'

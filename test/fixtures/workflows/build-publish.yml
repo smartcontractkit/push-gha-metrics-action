@@ -1,10 +1,10 @@
-name: 'Build Chainlink and Publish'
+name: "Build Chainlink and Publish"
 
 on:
   # Mimics old circleci behaviour
   push:
     tags:
-      - 'v*'
+      - "v*"
     branches:
       - master
 
@@ -27,7 +27,7 @@ jobs:
           aws-role-duration-seconds: ${{ secrets.AWS_ROLE_DURATION_SECONDS }}
           aws-region: ${{ secrets.AWS_REGION }}
           sign-images: true
-          sign-method: 'keypair'
+          sign-method: "keypair"
           cosign-private-key: ${{ secrets.COSIGN_PRIVATE_KEY }}
           cosign-public-key: ${{ secrets.COSIGN_PUBLIC_KEY }}
           cosign-password: ${{ secrets.COSIGN_PASSWORD }}

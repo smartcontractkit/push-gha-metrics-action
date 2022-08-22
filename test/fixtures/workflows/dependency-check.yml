@@ -5,11 +5,11 @@
 
 name: Dependency Vulnerability Check
 
-on: 
+on:
   push:
     paths:
-      - '**/go.mod'
-      - '**/go.sum'
+      - "**/go.mod"
+      - "**/go.sum"
 jobs:
   Go:
     runs-on: ubuntu-latest
@@ -20,7 +20,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version-file: 'go.mod'
+          go-version-file: "go.mod"
         id: go
 
       - name: Write Go Modules list
@@ -30,4 +30,3 @@ jobs:
         uses: sonatype-nexus-community/nancy-github-action@main
         with:
           nancyVersion: "v1.0.22"
-

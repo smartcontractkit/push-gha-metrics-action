@@ -1,4 +1,4 @@
-name: 'Push develop to private ECR'
+name: "Push develop to private ECR"
 
 on:
   push:

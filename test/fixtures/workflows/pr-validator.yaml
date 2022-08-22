@@ -34,7 +34,8 @@ jobs:
             echo "::set-output name=changed::true"
           fi
       - name: Run chart-testing (lint)
-        run: ct lint --config .ct.yaml --excluded-charts astronomer-wrapper,cluster-bootstrap,cluster-calico,homu # Excluding these since ct fails to lint/install them.
+        run: ct lint --config .ct.yaml --excluded-charts
+          astronomer-wrapper,cluster-bootstrap,cluster-calico,homu # Excluding these since ct fails to lint/install them.
   sops:
     name: Checking unencrypted secrets
     runs-on: ubuntu-latest

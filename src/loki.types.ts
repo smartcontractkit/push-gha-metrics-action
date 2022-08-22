@@ -1,10 +1,10 @@
-import type { IncomingHttpHeaders, OutgoingHttpHeaders } from "http";
+import type { IncomingHttpHeaders, OutgoingHttpHeaders } from "http"
 
 /**
  * Loki by default expects a snappy-compressed protobuf message,
  * but we're implementing JSON for now for simplicity and bundle size constraints
  */
-type SupportedPushEndpointContentTypes = "application/json";
+type SupportedPushEndpointContentTypes = "application/json"
 
 /**
  * HTTP request options
@@ -13,55 +13,55 @@ export interface LokiRequestOptions {
   /**
    * Basic auth like `user:password` to compute an authorization header
    */
-  basicAuth?: string;
+  basicAuth?: string
 
   /**
    * The content type to use
    */
-  contentType: SupportedPushEndpointContentTypes;
+  contentType: SupportedPushEndpointContentTypes
 
   /**
    * The hostname of the loki instance
    */
-  hostname: string;
+  hostname: string
 
   /**
    * Whether to use http or https
    */
-  protocol: "http" | "https";
+  protocol: "http" | "https"
 
   /**
    * The port of the loki instance
    */
-  port: number;
+  port: number
 
   /**
    * The path to the push endpoint
    */
-  path: string;
+  path: string
 
   /**
    * Headers to include
    */
-  headers: OutgoingHttpHeaders;
+  headers: OutgoingHttpHeaders
 
   /**
    * The request timeout limit
    */
-  timeout: number;
+  timeout: number
 }
 
 /**
  * A collection of labels that identifies a unique stream within loki
  */
 export interface LokiStream {
-  [label: string]: string;
+  [label: string]: string
 }
 
 /**
  * The value of a log line, a tuple of the current log time in unix epoch in nanoseconds, and the log line itself
  */
-export type LokiValue = [timestampInUnixNano: string, logLine: string];
+export type LokiValue = [timestampInUnixNano: string, logLine: string]
 
 /**
  * A collection of loki log entries in the format that the `POST /loki/api/v1/push` api endpoint expects
@@ -76,13 +76,13 @@ export interface LokiLogEntries {
     /**
      * The stream label metadata
      */
-    stream: LokiStream;
+    stream: LokiStream
 
     /**
      * The log values for the aforementioned stream
      */
-    values: LokiValue[];
-  }[];
+    values: LokiValue[]
+  }[]
 }
 
 /**
@@ -92,20 +92,20 @@ export interface LokiResponse {
   /**
    * The response data
    */
-  data: string;
+  data: string
 
   /**
    * The HTTP status code, if any
    */
-  statusCode?: number;
+  statusCode?: number
 
   /**
    * The HTTP status message, if any
    */
-  statusMessage?: string;
+  statusMessage?: string
 
   /**
    * The headers from the response
    */
-  headers: IncomingHttpHeaders;
+  headers: IncomingHttpHeaders
 }

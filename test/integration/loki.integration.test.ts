@@ -1,11 +1,11 @@
 import {
   createLokiLogEntriesFromContext,
   sendLokiRequest,
-} from "../../src/loki";
-import { Context } from "../../src/context.types";
-import { LokiRequestOptions } from "../../src/loki.types";
-import { faker } from "@faker-js/faker";
-import { iso8601ToUnixTimeSeconds } from "../../src/utils";
+} from "../../src/loki"
+import { Context } from "../../src/context.types"
+import { LokiRequestOptions } from "../../src/loki.types"
+import { faker } from "@faker-js/faker"
+import { iso8601ToUnixTimeSeconds } from "../../src/utils"
 
 /**
  * Generate mock contexts used for seeding loki logs
@@ -15,15 +15,15 @@ import { iso8601ToUnixTimeSeconds } from "../../src/utils";
  * @returns
  */
 function generateMockContexts(amount = 100, dateRangeInDays = 1) {
-  const fakeOwnerArr = [faker.name.firstName()];
-  const fakeRepoArr = [faker.word.verb(), faker.word.verb(), faker.word.verb()];
+  const fakeOwnerArr = [faker.name.firstName()]
+  const fakeRepoArr = [faker.word.verb(), faker.word.verb(), faker.word.verb()]
   const fakeCIJobNameArr = [
     "unit tests",
     "integration tests",
     "format",
-  ] as const;
-  const fakeCDJobNameArr = ["release", "create-tags", "push-image"] as const;
-  const fakeWorkflowNameArr = ["CI", "CD"] as const;
+  ] as const
+  const fakeCDJobNameArr = ["release", "create-tags", "push-image"] as const
+  const fakeWorkflowNameArr = ["CI", "CD"] as const
 
   return Array(amount)
     .fill(null)
@@ -31,21 +31,21 @@ function generateMockContexts(amount = 100, dateRangeInDays = 1) {
       const repo = {
         repo: faker.helpers.arrayElement(fakeRepoArr),
         owner: faker.helpers.arrayElement(fakeOwnerArr),
-      };
-      const workflowName = faker.helpers.arrayElement(fakeWorkflowNameArr);
+      }
+      const workflowName = faker.helpers.arrayElement(fakeWorkflowNameArr)
       const jobName = faker.helpers.arrayElement(
         workflowName === "CI" ? fakeCIJobNameArr : fakeCDJobNameArr,
-      );
+      )
 
-      const jobStartedAt = faker.date.recent(dateRangeInDays);
+      const jobStartedAt = faker.date.recent(dateRangeInDays)
       const workflowCreatedAt = faker.date
         // make sure that the workflow creation date is always before the job run
         .recent(1, jobStartedAt)
-        .toISOString();
+        .toISOString()
       const workflowRunStartedAt = faker.date
         // make the workflow run start at somewhere between the workflow creation and the job start
         .between(workflowCreatedAt, jobStartedAt)
-        .toISOString();
+        .toISOString()
 
       const ctx: Context = {
         event: {
@@ -95,18 +95,18 @@ function generateMockContexts(amount = 100, dateRangeInDays = 1) {
           workflowName,
           workflowUrl: faker.internet.url(),
         },
-      };
+      }
 
-      return ctx;
-    });
+      return ctx
+    })
 }
 
 describe("Loki", () => {
-  const contexts = generateMockContexts();
+  const contexts = generateMockContexts()
 
   describe(sendLokiRequest.name, () => {
-    it.each(contexts)("should send a successful request %#", async (c) => {
-      const logEntries = createLokiLogEntriesFromContext(c);
+    it.each(contexts)("should send a successful request %#", async c => {
+      const logEntries = createLokiLogEntriesFromContext(c)
       const requestOptions: LokiRequestOptions = {
         contentType: "application/json",
         headers: {},
@@ -115,10 +115,10 @@ describe("Loki", () => {
         port: 3030,
         protocol: "http",
         timeout: 1000,
-      };
-      const response = await sendLokiRequest(logEntries, requestOptions, false);
-      expect(response?.statusCode).toEqual(204);
-      expect(response?.data).toMatchInlineSnapshot(`""`);
-    });
-  });
-});
+      }
+      const response = await sendLokiRequest(logEntries, requestOptions, false)
+      expect(response?.statusCode).toEqual(204)
+      expect(response?.data).toMatchInlineSnapshot(`""`)
+    })
+  })
+})

@@ -3,9 +3,9 @@ import {
   getWorkflowRunAttempt2,
   listJobsForWorkflowRunAttempt1,
   listJobsForWorkflowRunAttempt2,
-} from "./api";
-import { context1, context2 } from "./context";
-import { event1, event2 } from "./event";
+} from "./api"
+import { context1, context2 } from "./context"
+import { event1, event2 } from "./event"
 
 export const fixtures = [
   {
@@ -27,4 +27,4 @@ export const fixtures = [
     event: event2,
     index: 2,
   },
-];
+]
