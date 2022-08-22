@@ -24,6 +24,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: Adapter changes accompanied by a changeset
+        continue-on-error: true
 
       - name: Checkout code
         uses: actions/checkout@v2
@@ -56,6 +57,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: Airtable Master List Generation
+        continue-on-error: true
 
       - name: Checkout Repo
         uses: actions/checkout@v2
@@ -91,6 +93,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: validate atlantis.yaml
+        continue-on-error: true
 
       - uses: actions/checkout@v2
       - name: Ensure atlantis.yaml is up to date using terragrunt-atlantis-config
@@ -121,19 +124,20 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: autoupdate
+        continue-on-error: true
 
       - name: Automatically update PR
         uses: smartcontractkit/update-pr-branch@master
         with:
           token: \${{ secrets.AUTOREBASE_TOKEN }}
-          base: 'develop'
+          base: \\"develop\\"
           required_approval_count: 1
           require_passed_checks: false
 "
 `;
 
 exports[`updateWorkflow loads workflow file paths then updates them 5`] = `
-"name: 'Push develop to private ECR'
+"name: \\"Push develop to private ECR\\"
 
 on:
   push:
@@ -155,6 +159,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: push-chainlink-develop
+        continue-on-error: true
 
       - name: Checkout repository
         uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
@@ -173,13 +178,13 @@ jobs:
 
 exports[`updateWorkflow loads workflow file paths then updates them 6`] = `
 "##
-# This workflow needs to be ran because \`build-sign-publish-chainlink\` is 
+# This workflow needs to be ran because \`build-sign-publish-chainlink\` is
 # a required check but we do not want our release branches to build and
 # publish images. Instead we use tags.
 # If the workflow does not run, the required check will never pass.
 ##
 
-name: 'Build Chainlink and Publish'
+name: \\"Build Chainlink and Publish\\"
 
 on:
   push:
@@ -197,19 +202,20 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: build-sign-publish-chainlink
+        continue-on-error: true
 
       - run: 'echo \\"No job required\\"'
 "
 `;
 
 exports[`updateWorkflow loads workflow file paths then updates them 7`] = `
-"name: 'Build Chainlink and Publish'
+"name: \\"Build Chainlink and Publish\\"
 
 on:
   # Mimics old circleci behaviour
   push:
     tags:
-      - 'v*'
+      - \\"v*\\"
     branches:
       - master
 
@@ -228,6 +234,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: build-sign-publish-chainlink
+        continue-on-error: true
 
       - name: Checkout repository
         uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
@@ -240,7 +247,7 @@ jobs:
           aws-role-duration-seconds: \${{ secrets.AWS_ROLE_DURATION_SECONDS }}
           aws-region: \${{ secrets.AWS_REGION }}
           sign-images: true
-          sign-method: 'keypair'
+          sign-method: \\"keypair\\"
           cosign-private-key: \${{ secrets.COSIGN_PRIVATE_KEY }}
           cosign-public-key: \${{ secrets.COSIGN_PUBLIC_KEY }}
           cosign-password: \${{ secrets.COSIGN_PASSWORD }}
@@ -249,7 +256,7 @@ jobs:
 `;
 
 exports[`updateWorkflow loads workflow file paths then updates them 8`] = `
-"name: 'Build Chainlink'
+"name: \\"Build Chainlink\\"
 
 on:
   pull_request:
@@ -258,7 +265,6 @@ on:
       - master
 
 jobs:
-
   build-chainlink:
     runs-on: ubuntu-20.04
     steps:
@@ -269,6 +275,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: build-chainlink
+        continue-on-error: true
 
       - name: Checkout repository
         uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
@@ -305,13 +312,14 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: Changelog checker
+        continue-on-error: true
 
       - name: Check for changed files
         id: changedfiles
         uses: umani/changed-files@1d252c611c64289d35243fc37ece7323ea5e93e1 # Version 3.3.0
         with:
           repo-token: \${{ secrets.GITHUB_TOKEN }}
-          pattern: '^docs/CHANGELOG.*$'
+          pattern: \\"^docs/CHANGELOG.*$\\"
       - name: Make a comment
         uses: unsplash/comment-on-pr@ffe8f97ccc63ce12c3c23c6885b169db67958d3b # Version v1.2.0
         env:
@@ -329,7 +337,7 @@ exports[`updateWorkflow loads workflow file paths then updates them 10`] = `
 on:
   push:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: \\"0 0 * * *\\"
 
 jobs:
   core:
@@ -363,13 +371,14 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: Core Tests
+        continue-on-error: true
 
       - name: Checkout the repo
         uses: actions/checkout@v2
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version-file: 'go.mod'
+          go-version-file: \\"go.mod\\"
           cache: true
       - name: Touching core/web/assets/index.html
         run: mkdir -p core/web/assets && touch core/web/assets/index.html
@@ -437,6 +446,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: fmt
+        continue-on-error: true
 
       - name: Checkout the repo
         uses: actions/checkout@v2
@@ -454,6 +464,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: hclfmt
+        continue-on-error: true
 
       - name: Checkout the repo
         uses: actions/checkout@v2
@@ -472,6 +483,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: prettier (yaml)
+        continue-on-error: true
 
       - name: Checkout the repo
         uses: actions/checkout@v2
@@ -502,6 +514,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: Cleanup Ephemeral Adapters used for testing
+        continue-on-error: true
 
       - uses: actions/checkout@v2
       - name: Configure AWS Credentials
@@ -522,7 +535,7 @@ jobs:
           kubeconfig: \${{ secrets.QA_SDLC_KUBECONFIG }}
       - uses: actions/setup-node@v2
         with:
-          node-version: '16.x'
+          node-version: \\"16.x\\"
       - name: Install Yarn and setup project
         run: |
           npm install -g yarn
@@ -567,6 +580,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: Lint
+        continue-on-error: true
 
       - name: Setup node
         uses: actions/setup-node@v2
@@ -603,6 +617,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: Prettier Formatting
+        continue-on-error: true
 
       - name: Setup node
         uses: actions/setup-node@v2
@@ -632,7 +647,7 @@ jobs:
 `;
 
 exports[`updateWorkflow loads workflow file paths then updates them 14`] = `
-"name: 'CodeQL'
+"name: \\"CodeQL\\"
 
 on:
   push:
@@ -645,7 +660,7 @@ on:
     # The branches below must be a subset of the branches above
     branches: [ develop ]
   schedule:
-    - cron: '23 19 * * 4'
+    - cron: \\"23 19 * * 4\\"
 
 jobs:
   analyze:
@@ -655,7 +670,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [ 'go', 'javascript' ]
+        language: [ \\"go\\", \\"javascript\\" ]
         # CodeQL supports [ 'cpp', 'csharp', 'go', 'java', 'javascript', 'python' ]
         # Learn more:
         # https://docs.github.com/en/free-pro-team@latest/github/finding-security-vulnerabilities-and-errors-in-your-code/configuring-code-scanning#changing-the-languages-that-are-analyzed
@@ -668,6 +683,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: Analyze
+        continue-on-error: true
 
       - name: Checkout repository
         uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f
@@ -675,7 +691,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version-file: 'go.mod'
+          go-version-file: \\"go.mod\\"
 
       # Initializes the CodeQL tools for scanning.
       - name: Initialize CodeQL
@@ -730,6 +746,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: createStagePromotionPr
+        continue-on-error: true
 
       - name: determine release env
         if: github.event.pull_request.merged == true
@@ -789,6 +806,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: createProdPromotionPr
+        continue-on-error: true
 
       - name: determine release env
         if: github.event.pull_request.merged == true
@@ -851,6 +869,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: Consume changesets
+        continue-on-error: true
 
       - name: Checkout Repo
         uses: actions/checkout@v2
@@ -873,8 +892,8 @@ jobs:
         uses: changesets/action@v1
         with:
           version: yarn changeset version
-          title: 'Consume changesets'
-          commit: 'Consume changesets'
+          title: \\"Consume changesets\\"
+          commit: \\"Consume changesets\\"
         env:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
 
@@ -918,6 +937,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: on-success
+        continue-on-error: true
 
       - run: gh workflow run --repo smartcontractkit/infra-k8s updater.yaml -F image-updater-head-branch=image-updater/adapters -F pr-delay=60
         env:
@@ -941,8 +961,8 @@ name: Dependency Vulnerability Check
 on:
   push:
     paths-ignore:
-      - '**/go.mod'
-      - '**/go.sum'
+      - \\"**/go.mod\\"
+      - \\"**/go.sum\\"
 jobs:
   Go:
     runs-on: ubuntu-latest
@@ -954,6 +974,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: Go
+        continue-on-error: true
 
       - run: 'echo \\"No job required\\" '
 "
@@ -970,8 +991,8 @@ name: Dependency Vulnerability Check
 on:
   push:
     paths:
-      - '**/go.mod'
-      - '**/go.sum'
+      - \\"**/go.mod\\"
+      - \\"**/go.sum\\"
 jobs:
   Go:
     runs-on: ubuntu-latest
@@ -983,6 +1004,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: Go
+        continue-on-error: true
 
       - name: Check out code
         uses: actions/checkout@v2
@@ -990,7 +1012,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version-file: 'go.mod'
+          go-version-file: \\"go.mod\\"
         id: go
 
       - name: Write Go Modules list
@@ -1006,7 +1028,7 @@ jobs:
 exports[`updateWorkflow loads workflow file paths then updates them 20`] = `
 "##
 # This workflow needs to be ran because \`lint\` is a required check and
-# we conditionally only run the \`golangci-lint\` workflow when certain paths 
+# we conditionally only run the \`golangci-lint\` workflow when certain paths
 # change.
 # If the workflow does not run, the required check will never pass. This is
 # GitHub's workaround:
@@ -1022,10 +1044,10 @@ on:
       - trying
       - rollup
     paths-ignore:
-      - '**.go'
+      - \\"**.go\\"
   pull_request:
     paths-ignore:
-      - '**.go'
+      - \\"**.go\\"
 
 jobs:
   golangci:
@@ -1039,6 +1061,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: lint
+        continue-on-error: true
 
       - run: 'echo \\"No job required\\" '
 "
@@ -1059,10 +1082,10 @@ on:
       - trying
       - rollup
     paths:
-      - '**.go'
+      - \\"**.go\\"
   pull_request:
     paths:
-      - '**.go'
+      - \\"**.go\\"
 
 jobs:
   golangci:
@@ -1076,13 +1099,14 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: lint
+        continue-on-error: true
 
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
       - uses: actions/setup-go@v3
         with:
-          go-version-file: 'go.mod'
+          go-version-file: \\"go.mod\\"
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
         if: github.event_name == 'push' || (github.event_name == 'pull_request' && !startsWith(github.head_ref, 'release/'))
@@ -1128,6 +1152,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: createPromotion
+        continue-on-error: true
 
       - name: Determine Release Env
         if: github.event.pull_request.merged == true
@@ -1200,6 +1225,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: productionPromotion
+        continue-on-error: true
 
       - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f #v2.3.4
         with:
@@ -1239,6 +1265,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: stagingPromotion
+        continue-on-error: true
 
       - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f #v2.3.4
         with:
@@ -1287,6 +1314,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: lambda-promtail-sync
+        continue-on-error: true
 
       - name: Configure AWS credentials # Production creds to push to ECR
         uses: aws-actions/configure-aws-credentials@v1
@@ -1351,6 +1379,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: mergeImageUpdates
+        continue-on-error: true
 
       - name: Sleep for 120 seconds
         run: sleep 120s
@@ -1384,10 +1413,10 @@ exports[`updateWorkflow loads workflow file paths then updates them 27`] = `
 "name: Integration Chaos Test
 on:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: \\"0 0 * * *\\"
   push:
     tags:
-      - '*'
+      - \\"*\\"
 jobs:
   build-chainlink:
     environment: integration
@@ -1404,6 +1433,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: Build Chainlink Image
+        continue-on-error: true
 
       - name: Checkout the repo
         uses: actions/checkout@v2
@@ -1447,6 +1477,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: EVM Chaos Tests
+        continue-on-error: true
 
       - name: Checkout the repo
         uses: actions/checkout@v2
@@ -1473,10 +1504,10 @@ on:
   pull_request:
     # keep these paths identical to the integration-tests.yml
     paths-ignore:
-      - '**/*.go'
-      - '**/*go.sum'
-      - '**/*go.mod'
-      - '.github/workflows/integration-tests.yml'
+      - \\"**/*.go\\"
+      - \\"**/*go.sum\\"
+      - \\"**/*go.mod\\"
+      - \\".github/workflows/integration-tests.yml\\"
 
 jobs:
   # Dummy required checks that will pass
@@ -1492,6 +1523,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: ETH Smoke Tests
+        continue-on-error: true
 
       - run: echo \\"No smoke tests required\\"
   solana-smoke-tests:
@@ -1506,6 +1538,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: Solana Smoke Tests
+        continue-on-error: true
 
       - run: echo \\"No smoke tests required\\"
 "
@@ -1539,6 +1572,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: Build Chainlink Image
+        continue-on-error: true
 
       - name: Checkout the repo
         uses: actions/checkout@f25a3a9f25bd5f4c5d77189cab02ff357b5aedeb # v2.4.1
@@ -1570,6 +1604,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: ETH Smoke Tests
+        continue-on-error: true
 
       - name: Checkout the repo
         uses: actions/checkout@f25a3a9f25bd5f4c5d77189cab02ff357b5aedeb # v2.4.1
@@ -1616,6 +1651,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: Solana Build Artifacts
+        continue-on-error: true
 
       - name: Checkout the solana repo
         uses: actions/checkout@f25a3a9f25bd5f4c5d77189cab02ff357b5aedeb # v2.4.1
@@ -1645,6 +1681,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: Solana Smoke Tests
+        continue-on-error: true
 
       - name: Checkout the repo
         uses: actions/checkout@f25a3a9f25bd5f4c5d77189cab02ff357b5aedeb # v2.4.1
@@ -1683,6 +1720,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: Validate Github Action Workflows
+        continue-on-error: true
 
       - name: Check out Code
         uses: actions/checkout@v3
@@ -1713,11 +1751,12 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: Verify dependency package archives
+        continue-on-error: true
 
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
-          node-version: '16.x'
+          node-version: \\"16.x\\"
       - name: Install Yarn
         run: npm install -g yarn
       - name: Re-download dependencies & verify checksum
@@ -1734,11 +1773,12 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: Run integration tests
+        continue-on-error: true
 
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
-          node-version: '16.x'
+          node-version: \\"16.x\\"
       - name: Install Yarn
         run: npm install -g yarn
       - run: yarn install
@@ -1762,11 +1802,12 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: Run unit tests
+        continue-on-error: true
 
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
-          node-version: '16.x'
+          node-version: \\"16.x\\"
       - name: Install Yarn
         run: npm install -g yarn
       - run: yarn install
@@ -1790,11 +1831,12 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: Run linters
+        continue-on-error: true
 
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
-          node-version: '16.x'
+          node-version: \\"16.x\\"
       - name: Install Yarn
         run: npm install -g yarn
       - run: yarn install
@@ -1813,13 +1855,14 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: Documentation generation test
+        continue-on-error: true
 
       - name: Checkout Code
         uses: actions/checkout@v2
       - name: Install Node
         uses: actions/setup-node@v2
         with:
-          node-version: '16.x'
+          node-version: \\"16.x\\"
       - name: Install Yarn
         run: |
           npm install -g yarn
@@ -1843,6 +1886,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: Adapter changes accompanied by a changeset
+        continue-on-error: true
 
       - name: Checkout code
         uses: actions/checkout@v2
@@ -1866,11 +1910,12 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: matrix-adapters
+        continue-on-error: true
 
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
-          node-version: '16.x'
+          node-version: \\"16.x\\"
       - name: Generate job matrix
         id: create-matrix
         run: yarn generate:gha:matrix
@@ -1889,11 +1934,12 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: (\${{ matrix.adapter.type }}) Build \${{matrix.adapter.name}} adapter
+        continue-on-error: true
 
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
-          node-version: '16.x'
+          node-version: \\"16.x\\"
       - name: Install yarn deps
         run: yarn
       - name: Generate docker-compose file
@@ -1921,14 +1967,14 @@ on:
       - trying
       - rollup
     paths-ignore:
-      - 'operator_ui/**'
+      - \\"operator_ui/**\\"
       - yarn.lock
-      - 'tools/ci/**'
+      - \\"tools/ci/**\\"
   pull_request:
     paths-ignore:
-      - 'operator_ui/**'
+      - \\"operator_ui/**\\"
       - yarn.lock
-      - 'tools/ci/**'
+      - \\"tools/ci/**\\"
 
 jobs:
   operator-ui:
@@ -1942,6 +1988,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: Operator UI Tests
+        continue-on-error: true
 
       - run: 'echo \\"No job required\\" '
 "
@@ -1962,14 +2009,14 @@ on:
       - trying
       - rollup
     paths:
-      - 'operator_ui/**'
+      - \\"operator_ui/**\\"
       - yarn.lock
-      - 'tools/ci/**'
+      - \\"tools/ci/**\\"
   pull_request:
     paths:
-      - 'operator_ui/**'
+      - \\"operator_ui/**\\"
       - yarn.lock
-      - 'tools/ci/**'
+      - \\"tools/ci/**\\"
 
 jobs:
   operator-ui:
@@ -1983,6 +2030,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: Operator UI Tests
+        continue-on-error: true
 
       - name: Setup node
         uses: actions/setup-node@v2
@@ -2037,6 +2085,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: Build Chainlink Image
+        continue-on-error: true
 
       - name: Checkout the repo
         uses: actions/checkout@v2
@@ -2073,6 +2122,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: run core evm \${{ github.event.inputs.focus }} performance tests
+        continue-on-error: true
 
       - name: Checkout the repo
         uses: actions/checkout@v2
@@ -2122,6 +2172,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: helmfile-pr-check
+        continue-on-error: true
 
       - name: Checkout the repo
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
@@ -2199,6 +2250,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: Formatting
+        continue-on-error: true
 
       - name: Checkout the repo
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
@@ -2222,6 +2274,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: Helm
+        continue-on-error: true
 
       - name: Checkout
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
@@ -2249,6 +2302,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: Checking unencrypted secrets
+        continue-on-error: true
 
       - name: Check
         uses: AndresJulia/sops-gh@1f2fc77c307fac41f211e641583dbaac44a05497 # pin@v1
@@ -2280,6 +2334,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: checkProdPromotionPrs
+        continue-on-error: true
 
       - name: determine release env
         run: |
@@ -2334,6 +2389,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: updateProdPromotionPrs
+        continue-on-error: true
 
       - name: determine release env
         if: github.event.pull_request.merged == true
@@ -2435,6 +2491,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: matrix-adapters
+        continue-on-error: true
 
       - uses: actions/checkout@v2
       - name: Generate job matrix
@@ -2456,6 +2513,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: (\${{ matrix.adapter.type }}) Publish \${{ matrix.adapter.name }} adapter Docker image
+        continue-on-error: true
 
       - uses: actions/checkout@v2
 
@@ -2483,7 +2541,7 @@ jobs:
           image-prefix: \${{ secrets.SDLC_ACCOUNT_ID }}.dkr.ecr.\${{ secrets.AWS_REGION }}.amazonaws.com/adapters/
           adapter-name: \${{ matrix.adapter.name }}
           aws-region: \${{ secrets.AWS_REGION }}
-          aws-ecr-private: 'true' # Use of string intentional for evaluation
+          aws-ecr-private: \\"true\\" # Use of string intentional for evaluation
           aws-ecr-account-ids: \${{ secrets.AWS_PRIVATE_ECR_SECONDARY_ACCOUNT_ACCESS_IDS }}
 
       # For our private ECR repo that we use for staging, we keep the latest tag around to have staging auto-update
@@ -2497,7 +2555,7 @@ jobs:
           image-prefix: \${{ secrets.SDLC_ACCOUNT_ID }}.dkr.ecr.\${{ secrets.AWS_REGION }}.amazonaws.com/adapters/
           adapter-name: \${{ matrix.adapter.name }}
           aws-region: \${{ secrets.AWS_REGION }}
-          aws-ecr-private: 'true' # Use of string intentional for evaluation
+          aws-ecr-private: \\"true\\" # Use of string intentional for evaluation
           aws-ecr-account-ids: \${{ secrets.AWS_PRIVATE_ECR_SECONDARY_ACCOUNT_ACCESS_IDS }}
 
       #
@@ -2525,7 +2583,7 @@ jobs:
           image-prefix: public.ecr.aws/\${{ env.publicecr-name }}/adapters/
           adapter-name: \${{ matrix.adapter.name }}
           aws-region: us-east-1
-          aws-ecr-private: 'false' # Use of string intentional for evaluation
+          aws-ecr-private: \\"false\\" # Use of string intentional for evaluation
 "
 `;
 
@@ -2549,6 +2607,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: comment
+        continue-on-error: true
 
       - name: Add comment suggesting adding a silence
         env:
@@ -2576,6 +2635,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: Run Soak Tests Against Changed Adapters
+        continue-on-error: true
 
       - uses: actions/checkout@v2
       - uses: jwalton/gh-find-current-pr@v1
@@ -2601,7 +2661,7 @@ jobs:
           kubeconfig: \${{ secrets.QA_SDLC_KUBECONFIG }}
       - uses: actions/setup-node@v2
         with:
-          node-version: '16.x'
+          node-version: \\"16.x\\"
       - name: Install Yarn and setup project
         run: |
           npm install -g yarn
@@ -2724,7 +2784,7 @@ jobs:
 
 exports[`updateWorkflow loads workflow file paths then updates them 42`] = `
 "##
-# This workflow needs to be ran because \`Solidity\` is a required check and we 
+# This workflow needs to be ran because \`Solidity\` is a required check and we
 # conditionally only run the \`Solidity\` workflow when certain paths change.
 # If the workflow does not run, the required check will never pass. This is
 # GitHub's workaround:
@@ -2740,14 +2800,14 @@ on:
       - trying
       - rollup
     paths-ignore:
-      - 'contracts/**'
+      - \\"contracts/**\\"
       - yarn.lock
-      - 'tools/ci/**'
+      - \\"tools/ci/**\\"
   pull_request:
     paths-ignore:
-      - 'contracts/**'
+      - \\"contracts/**\\"
       - yarn.lock
-      - 'tools/ci/**'
+      - \\"tools/ci/**\\"
 
 jobs:
   solidity-coverage:
@@ -2761,6 +2821,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: Solidity Coverage
+        continue-on-error: true
 
       - run: 'echo \\"No job required\\" '
   solidity:
@@ -2774,6 +2835,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: Solidity
+        continue-on-error: true
 
       - run: 'echo \\"No job required\\" '
 "
@@ -2794,14 +2856,14 @@ on:
       - trying
       - rollup
     paths:
-      - 'contracts/**'
+      - \\"contracts/**\\"
       - yarn.lock
-      - 'tools/ci/**'
+      - \\"tools/ci/**\\"
   pull_request:
     paths:
-      - 'contracts/**'
+      - \\"contracts/**\\"
       - yarn.lock
-      - 'tools/ci/**'
+      - \\"tools/ci/**\\"
 
 jobs:
   solidity-coverage:
@@ -2815,6 +2877,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: Solidity Coverage
+        continue-on-error: true
 
       - name: Setup node
         uses: actions/setup-node@v2
@@ -2853,6 +2916,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: Solidity
+        continue-on-error: true
 
       - name: Setup node
         uses: actions/setup-node@v2
@@ -2910,6 +2974,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: updateStagePromotionPrs
+        continue-on-error: true
 
       - name: determine release env
         if: github.event.pull_request.merged == true
@@ -2987,7 +3052,7 @@ exports[`updateWorkflow loads workflow file paths then updates them 45`] = `
 on:
   schedule:
     # * is a special character in YAML so you have to quote this string
-    - cron: '*/30 * * * *'
+    - cron: \\"*/30 * * * *\\"
 
 jobs:
   sync:
@@ -3001,6 +3066,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: Sync
+        continue-on-error: true
 
       - uses: actions/checkout@v2
         with:
@@ -3051,6 +3117,7 @@ jobs:
           basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: updateImages
+        continue-on-error: true
 
       - name: Checkout \${{ env.BASE_BRANCH }}
         uses: actions/checkout@a12a3943b4bdde767164f792f33f40b04645d846 #v3.0.0

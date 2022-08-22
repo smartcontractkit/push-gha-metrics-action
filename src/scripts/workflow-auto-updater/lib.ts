@@ -92,6 +92,7 @@ export async function updateWorkflow(workflowPath: string): Promise<string> {
         hostname: "${{ secrets.GRAFANA_CLOUD_HOST }}",
         "this-job-name": jobName,
       },
+      "continue-on-error": true,
     })
     metricsNode.comment = "\n"
     steps.items.unshift(metricsNode)
