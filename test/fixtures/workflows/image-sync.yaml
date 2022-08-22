@@ -1,0 +1,49 @@
+name: Image-sync
+on:
+  workflow_dispatch: null
+  schedule:
+    - cron: "0 */12 * * *"
+
+jobs:
+  lambda-promtail-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS credentials # Production creds to push to ECR
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: "${{ secrets.LAMBDA_PROMTAIL_AWS_ECR_CI_ACCESS_KEY }}"
+          aws-secret-access-key: "${{ secrets.LAMBDA_PROMTAIL_AWS_ECR_CI_SECRET_KEY }}"
+          aws-region: "${{ secrets.AWS_REGION }}"
+          role-duration-seconds: 1200
+          role-session-name: "lambda-promtail-sync"
+          role-skip-session-tagging: true
+      - name: Login to ECR
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ secrets.AWS_ECR_REGISTRY_URL_PROD }}
+      - name: Lambda Promtail Sync
+        run: skopeo copy docker://public.ecr.aws/grafana/lambda-promtail:main docker://${{ secrets.AWS_ECR_REGISTRY_URL_PROD }}/lambda-promtail:latest
+  # TODO Enable monotoring once action proved to run without errors
+  ### Aleart for failed workflow
+  # alert-failures:
+  #   name: Alert failures
+  #   needs: [lambda-promtail-sync]
+  #   if: always()
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - if: always() && needs.lambda-promtail-sync.result == 'failure'
+  #       uses: smartcontractkit/action-pagerduty-alert@0.3.0
+  #       with:
+  #         alert-summary: "Image sync workflow failed."
+  #         alert-severity: "warning"
+  #         alert-event-action: "trigger"
+  #         pagerduty-integration-key: "${{ secrets.PAGERDUTY_INTEGRATION_KEY }}"
+  #         pagerduty-dedup-key: "lambda_promtail_sync"
+  #     - if: always() && needs.lambda-promtail-sync.result == 'success'
+  #       uses: smartcontractkit/action-pagerduty-alert@0.3.0
+  #       with:
+  #         alert-summary: "Image sync workflow failed."
+  #         alert-severity: "warning"
+  #         alert-event-action: "resolve"
+  #         pagerduty-integration-key: "${{ secrets.PAGERDUTY_INTEGRATION_KEY }}"
+  #         pagerduty-dedup-key: "lambda_promtail_sync"

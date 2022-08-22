@@ -1,0 +1,38 @@
+name: Formatting checks
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  fmt:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v2
+      - name: asdf install
+        uses: asdf-vm/actions/install@707e84f3ee349548310aeabdad0dd3bfcb9b69fa # pin@v1.1.0
+      - name: Run Terraform fmt
+        run: terraform fmt -recursive -check
+  hclfmt:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v2
+      - name: asdf install
+        uses: asdf-vm/actions/install@707e84f3ee349548310aeabdad0dd3bfcb9b69fa # pin@v1.1.0
+      - name: Run Terragrunt hclfmt
+        run: terragrunt hclfmt --terragrunt-check
+  prettier:
+    name: prettier (yaml)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v2
+      - name: Run Prettier for YAML
+        uses: creyD/prettier_action@394fa2de3b2acce9f63808b958c54aa823a43b71 # pin@v3.1
+        with:
+          dry: true
+          prettier_options: --check **/*.{yaml,yml}

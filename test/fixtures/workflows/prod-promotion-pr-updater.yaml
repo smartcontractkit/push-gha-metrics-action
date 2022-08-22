@@ -1,0 +1,68 @@
+name: update prod promotion pull requests
+on:
+  pull_request:
+    branches:
+      - prod
+    types: [closed]
+concurrency:
+  group: promotion
+jobs:
+  updateProdPromotionPrs:
+    env:
+      RELEASE_ENV: prod
+      GH_USER_NAME: chainlink-k8s
+      GH_USER_EMAIL: 8700084+chainlink-k8s@users.noreply.github.com
+    runs-on: ubuntu-latest
+    steps:
+      - name: determine release env
+        if: github.event.pull_request.merged == true
+        run: |
+          set -x
+          echo "release_env=$RELEASE_ENV" >> $GITHUB_ENV
+      - if: github.event.pull_request.merged == true
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
+        with:
+          ref: sand
+          fetch-depth: 0
+      - name: pr updater
+        if: github.event.pull_request.merged == true
+        env:
+          GITHUB_TOKEN: ${{ secrets.PR_BOT_TOKEN }}
+        run: |
+          set -x
+          git config user.name $GH_USER_NAME
+          git config user.email $GH_USER_EMAIL
+
+          git fetch origin ${{ env.release_env }}:${{ env.release_env }}
+          git checkout ${{ env.release_env }}
+
+          git log prod --oneline -n 10
+
+          is_ancestor=true
+
+          prod_pr_branches=$(gh pr list --base prod --json "headRefName" --jq ".[].headRefName" | xargs)
+          for prod_pr_branch in $prod_pr_branches; do
+            echo "prod_pr_branch: $prod_pr_branch"
+            git fetch origin $prod_pr_branch:$prod_pr_branch
+            git checkout $prod_pr_branch
+
+            # conflict resolution
+            rev_list=$(git merge-tree $(git merge-base prod $prod_pr_branch) prod $prod_pr_branch | perl -0777ne 'print "$2,$3,$1\n" while(/their  [0-9]{6} [a-z0-9]{40} ([a-zA-Z0-9\/\-\.]+?\/.revision)\n[@\ \-0-9\+,]+\n\+<<<<<<< \.our\n\h([a-z0-9]{40})\n\+=======\n\+([a-z0-9]{40})\n\+>>>>>>> \.their/sg)')
+            for i in ${rev_list}; do
+              arr=(${i//,/ })
+              echo "ours | theirs | pin_file: ${arr[0]} ${arr[1]} ${arr[2]}"
+              git merge-base --is-ancestor "${arr[0]}" "${arr[1]}" && is_ancestor=true || is_ancestor=false
+              [[ "${is_ancestor}" == "true" ]] && break
+            done
+
+            git log $prod_pr_branch --oneline -n 10
+            
+            echo "is_ancestor: ${is_ancestor}"
+            if [[ "${is_ancestor}" == "true" ]]; then
+              git merge prod -X ours --allow-unrelated-histories
+            else
+              git merge prod -X theirs --allow-unrelated-histories
+            fi
+            
+            git push origin $prod_pr_branch -f
+          done
