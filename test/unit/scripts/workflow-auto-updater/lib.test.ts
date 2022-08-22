@@ -20,6 +20,6 @@ describe(updateWorkflow.name, () => {
       expect(updatedWorkflow).toMatchSnapshot()
     }
 
-    expect.assertions(46)
+    expect.assertions(48)
   })
 })

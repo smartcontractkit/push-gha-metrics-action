@@ -83,9 +83,10 @@ export async function updateWorkflow(workflowPath: string): Promise<string> {
       throw Error(`Could not access "steps" property within "jobs"`)
     }
 
+    const metricsStepId = "collect-gha-metrics"
     const metricsNode = doc.createNode({
       name: "Collect Metrics",
-      id: "collect-gha-metrics",
+      id: metricsStepId,
       uses: "smartcontractkit/push-gha-metrics-action",
       with: {
         "basic-auth": "${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}",
@@ -95,10 +96,35 @@ export async function updateWorkflow(workflowPath: string): Promise<string> {
       "continue-on-error": true,
     })
     metricsNode.comment = "\n"
-    steps.items.unshift(metricsNode)
+
+    const metricsIdx = findMetricsStepIndex(steps, metricsStepId)
+
+    if (metricsIdx !== undefined) {
+      console.log(
+        ` The job "${jobName}" already contains a metrics step. Updating metrics step.`,
+      )
+
+      steps.items[metricsIdx] = metricsNode
+    } else {
+      steps.items.unshift(metricsNode)
+    }
   })
 
   return doc.toString({
     lineWidth: 0,
   })
+}
+
+function findMetricsStepIndex(
+  steps: yaml.YAMLSeq<unknown>,
+  metricsStepId: string,
+): number | undefined {
+  for (let i = 0; i < steps.items.length; i++) {
+    const step = steps.items[i]
+    if (yaml.isMap(step) && step.get("id") === metricsStepId) {
+      return i
+    }
+  }
+
+  return undefined
 }

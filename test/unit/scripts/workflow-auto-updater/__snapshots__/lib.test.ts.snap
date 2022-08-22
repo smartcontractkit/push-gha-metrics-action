@@ -1,6 +1,220 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`updateWorkflow loads workflow file paths then updates them 1`] = `
+"name: update stage promotion pull requests
+on:
+  pull_request:
+    branches:
+      - stage
+    types: [ closed ]
+concurrency:
+  group: promotion
+jobs:
+  updateStagePromotionPrs:
+    env:
+      RELEASE_ENV: stage
+      GH_USER_NAME: chainlink-k8s
+      GH_USER_EMAIL: 8700084+chainlink-k8s@users.noreply.github.com
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: updateStagePromotionPrs
+        continue-on-error: true
+
+
+      - name: determine release env
+        if: github.event.pull_request.merged == true
+        run: |
+          set -x
+          echo \\"release_env=$RELEASE_ENV\\" >> $GITHUB_ENV
+      - if: github.event.pull_request.merged == true
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
+        with:
+          ref: sand
+          fetch-depth: 0
+          token: \${{ secrets.PR_BOT_TOKEN }}
+      - name: pr updater
+        if: github.event.pull_request.merged == true
+        env:
+          GITHUB_TOKEN: \${{ secrets.PR_BOT_TOKEN }}
+        run: |
+          set -x
+          git config user.name $GH_USER_NAME
+          git config user.email $GH_USER_EMAIL
+
+          git fetch origin \${{ env.release_env }}:\${{ env.release_env }}
+          git checkout \${{ env.release_env }}
+
+          git log stage --oneline -n 10
+
+          is_ancestor=true
+
+          stage_pr_branches=$(gh pr list --base stage --json \\"headRefName\\" --jq \\".[].headRefName\\" | xargs)
+          for stage_pr_branch in $stage_pr_branches; do
+            echo \\"stage_pr_branch: $stage_pr_branch\\"
+            git fetch origin $stage_pr_branch:$stage_pr_branch
+            git checkout $stage_pr_branch
+
+            # conflict resolution
+            rev_list=$(git merge-tree $(git merge-base stage $stage_pr_branch) stage $stage_pr_branch | perl -0777ne 'print \\"$2,$3,$1\\\\n\\" while(/their  [0-9]{6} [a-z0-9]{40} ([a-zA-Z0-9\\\\/\\\\-\\\\.]+?\\\\/.revision)\\\\n[@\\\\ \\\\-0-9\\\\+,]+\\\\n\\\\+<<<<<<< \\\\.our\\\\n\\\\h([a-z0-9]{40})\\\\n\\\\+=======\\\\n\\\\+([a-z0-9]{40})\\\\n\\\\+>>>>>>> \\\\.their/sg)')
+            for i in \${rev_list}; do
+              arr=(\${i//,/ })
+              echo \\"ours | theirs | pin_file: \${arr[0]} \${arr[1]} \${arr[2]}\\"
+              git merge-base --is-ancestor \\"\${arr[0]}\\" \\"\${arr[1]}\\" && is_ancestor=true || is_ancestor=false
+              [[ \\"\${is_ancestor}\\" == \\"true\\" ]] && break
+            done
+
+            git log $stage_pr_branch --oneline -n 10
+
+            echo \\"is_ancestor: \${is_ancestor}\\"
+            if [[ \\"\${is_ancestor}\\" == \\"true\\" ]]; then
+              git merge stage -X ours --allow-unrelated-histories
+            else
+              git merge stage -X theirs --allow-unrelated-histories
+            fi
+
+            diff_files=$(git diff stage..$stage_pr_branch --name-only)
+            if [[ -z \\"\${diff_files}\\" ]]; then
+              echo \\"diff_files is empty, closing pr\\"
+              gh pr comment $stage_pr_branch -R \${{github.repository}} --body \\"Changes promoted in \${{ github.event.pull_request.html_url }}\\"
+              gh pr close $stage_pr_branch
+              ## delete closed PR branch
+              git push origin \\":\${prod_pr_branch}\\"
+              echo \\"diff_files:\\"
+              echo \\"$diff_files\\"
+            else 
+              git push origin $stage_pr_branch -f
+            fi
+          done
+      - name: prod pr check updater
+        if: github.event.pull_request.merged == true
+        run: |
+          set -x
+          prod_pr_branches=$(gh pr list --base prod --json \\"headRefName\\" --jq \\".[].headRefName\\" | xargs)
+          for prod_pr_branch in $prod_pr_branches; do
+            run_json=$(gh run list -b \\"\${prod_pr_branch}\\" -w \\"check prod promotion pull requests\\" --json \\"conclusion,databaseId\\")
+            run_result=$(echo \\"\${run_json}\\" | jq -r '.[0].conclusion')
+            run_id=$(echo \\"\${run_json}\\" | jq -r '.[0].databaseId')
+            if [[ \\"\${run_result}\\" == \\"failure\\" ]]; then
+              gh run rerun \\"\${run_id}\\" --failed
+            fi
+          done
+"
+`;
+
+exports[`updateWorkflow loads workflow file paths then updates them 2`] = `
+"name: update stage promotion pull requests
+on:
+  pull_request:
+    branches:
+      - stage
+    types: [ closed ]
+concurrency:
+  group: promotion
+jobs:
+  updateStagePromotionPrs:
+    env:
+      RELEASE_ENV: stage
+      GH_USER_NAME: chainlink-k8s
+      GH_USER_EMAIL: 8700084+chainlink-k8s@users.noreply.github.com
+    runs-on: ubuntu-latest
+    steps:
+      - name: determine release env
+        if: github.event.pull_request.merged == true
+        run: |
+          set -x
+          echo \\"release_env=$RELEASE_ENV\\" >> $GITHUB_ENV
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action
+        with:
+          basic-auth: \${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: \${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: updateStagePromotionPrs
+        continue-on-error: true
+
+
+      - if: github.event.pull_request.merged == true
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
+        with:
+          ref: sand
+          fetch-depth: 0
+          token: \${{ secrets.PR_BOT_TOKEN }}
+      - name: pr updater
+        if: github.event.pull_request.merged == true
+        env:
+          GITHUB_TOKEN: \${{ secrets.PR_BOT_TOKEN }}
+        run: |
+          set -x
+          git config user.name $GH_USER_NAME
+          git config user.email $GH_USER_EMAIL
+
+          git fetch origin \${{ env.release_env }}:\${{ env.release_env }}
+          git checkout \${{ env.release_env }}
+
+          git log stage --oneline -n 10
+
+          is_ancestor=true
+
+          stage_pr_branches=$(gh pr list --base stage --json \\"headRefName\\" --jq \\".[].headRefName\\" | xargs)
+          for stage_pr_branch in $stage_pr_branches; do
+            echo \\"stage_pr_branch: $stage_pr_branch\\"
+            git fetch origin $stage_pr_branch:$stage_pr_branch
+            git checkout $stage_pr_branch
+
+            # conflict resolution
+            rev_list=$(git merge-tree $(git merge-base stage $stage_pr_branch) stage $stage_pr_branch | perl -0777ne 'print \\"$2,$3,$1\\\\n\\" while(/their  [0-9]{6} [a-z0-9]{40} ([a-zA-Z0-9\\\\/\\\\-\\\\.]+?\\\\/.revision)\\\\n[@\\\\ \\\\-0-9\\\\+,]+\\\\n\\\\+<<<<<<< \\\\.our\\\\n\\\\h([a-z0-9]{40})\\\\n\\\\+=======\\\\n\\\\+([a-z0-9]{40})\\\\n\\\\+>>>>>>> \\\\.their/sg)')
+            for i in \${rev_list}; do
+              arr=(\${i//,/ })
+              echo \\"ours | theirs | pin_file: \${arr[0]} \${arr[1]} \${arr[2]}\\"
+              git merge-base --is-ancestor \\"\${arr[0]}\\" \\"\${arr[1]}\\" && is_ancestor=true || is_ancestor=false
+              [[ \\"\${is_ancestor}\\" == \\"true\\" ]] && break
+            done
+
+            git log $stage_pr_branch --oneline -n 10
+
+            echo \\"is_ancestor: \${is_ancestor}\\"
+            if [[ \\"\${is_ancestor}\\" == \\"true\\" ]]; then
+              git merge stage -X ours --allow-unrelated-histories
+            else
+              git merge stage -X theirs --allow-unrelated-histories
+            fi
+
+            diff_files=$(git diff stage..$stage_pr_branch --name-only)
+            if [[ -z \\"\${diff_files}\\" ]]; then
+              echo \\"diff_files is empty, closing pr\\"
+              gh pr comment $stage_pr_branch -R \${{github.repository}} --body \\"Changes promoted in \${{ github.event.pull_request.html_url }}\\"
+              gh pr close $stage_pr_branch
+              ## delete closed PR branch
+              git push origin \\":\${prod_pr_branch}\\"
+              echo \\"diff_files:\\"
+              echo \\"$diff_files\\"
+            else 
+              git push origin $stage_pr_branch -f
+            fi
+          done
+      - name: prod pr check updater
+        if: github.event.pull_request.merged == true
+        run: |
+          set -x
+          prod_pr_branches=$(gh pr list --base prod --json \\"headRefName\\" --jq \\".[].headRefName\\" | xargs)
+          for prod_pr_branch in $prod_pr_branches; do
+            run_json=$(gh run list -b \\"\${prod_pr_branch}\\" -w \\"check prod promotion pull requests\\" --json \\"conclusion,databaseId\\")
+            run_result=$(echo \\"\${run_json}\\" | jq -r '.[0].conclusion')
+            run_id=$(echo \\"\${run_json}\\" | jq -r '.[0].databaseId')
+            if [[ \\"\${run_result}\\" == \\"failure\\" ]]; then
+              gh run rerun \\"\${run_id}\\" --failed
+            fi
+          done
+"
+`;
+
+exports[`updateWorkflow loads workflow file paths then updates them 3`] = `
 "name: Adapter changes accompanied by a changeset
 
 on:
@@ -37,7 +251,7 @@ jobs:
 "
 `;
 
-exports[`updateWorkflow loads workflow file paths then updates them 2`] = `
+exports[`updateWorkflow loads workflow file paths then updates them 4`] = `
 "name: Airtable Master List Generation
 
 on:
@@ -78,7 +292,7 @@ jobs:
 "
 `;
 
-exports[`updateWorkflow loads workflow file paths then updates them 3`] = `
+exports[`updateWorkflow loads workflow file paths then updates them 5`] = `
 "name: Atlantis
 on: push
 jobs:
@@ -105,7 +319,7 @@ jobs:
 "
 `;
 
-exports[`updateWorkflow loads workflow file paths then updates them 4`] = `
+exports[`updateWorkflow loads workflow file paths then updates them 6`] = `
 "name: Auto update open PRs
 
 on:
@@ -136,7 +350,7 @@ jobs:
 "
 `;
 
-exports[`updateWorkflow loads workflow file paths then updates them 5`] = `
+exports[`updateWorkflow loads workflow file paths then updates them 7`] = `
 "name: \\"Push develop to private ECR\\"
 
 on:
@@ -176,7 +390,7 @@ jobs:
 "
 `;
 
-exports[`updateWorkflow loads workflow file paths then updates them 6`] = `
+exports[`updateWorkflow loads workflow file paths then updates them 8`] = `
 "##
 # This workflow needs to be ran because \`build-sign-publish-chainlink\` is
 # a required check but we do not want our release branches to build and
@@ -208,7 +422,7 @@ jobs:
 "
 `;
 
-exports[`updateWorkflow loads workflow file paths then updates them 7`] = `
+exports[`updateWorkflow loads workflow file paths then updates them 9`] = `
 "name: \\"Build Chainlink and Publish\\"
 
 on:
@@ -255,7 +469,7 @@ jobs:
 "
 `;
 
-exports[`updateWorkflow loads workflow file paths then updates them 8`] = `
+exports[`updateWorkflow loads workflow file paths then updates them 10`] = `
 "name: \\"Build Chainlink\\"
 
 on:
@@ -288,7 +502,7 @@ jobs:
 "
 `;
 
-exports[`updateWorkflow loads workflow file paths then updates them 9`] = `
+exports[`updateWorkflow loads workflow file paths then updates them 11`] = `
 "#
 # This action checks PRs to see if any CHANGELOG* files were updated.
 # If none were, it will add a message to the PR asking if it would make sense to do so.
@@ -331,7 +545,7 @@ jobs:
 "
 `;
 
-exports[`updateWorkflow loads workflow file paths then updates them 10`] = `
+exports[`updateWorkflow loads workflow file paths then updates them 12`] = `
 "name: CI Core
 
 on:
@@ -426,7 +640,7 @@ jobs:
 "
 `;
 
-exports[`updateWorkflow loads workflow file paths then updates them 11`] = `
+exports[`updateWorkflow loads workflow file paths then updates them 13`] = `
 "name: Formatting checks
 
 on:
@@ -495,7 +709,7 @@ jobs:
 "
 `;
 
-exports[`updateWorkflow loads workflow file paths then updates them 12`] = `
+exports[`updateWorkflow loads workflow file paths then updates them 14`] = `
 "name: Clean up on PR close
 
 on:
@@ -556,7 +770,7 @@ jobs:
 "
 `;
 
-exports[`updateWorkflow loads workflow file paths then updates them 13`] = `
+exports[`updateWorkflow loads workflow file paths then updates them 15`] = `
 "name: Code Quality
 
 on:
@@ -646,7 +860,7 @@ jobs:
 "
 `;
 
-exports[`updateWorkflow loads workflow file paths then updates them 14`] = `
+exports[`updateWorkflow loads workflow file paths then updates them 16`] = `
 "name: \\"CodeQL\\"
 
 on:
@@ -720,7 +934,7 @@ jobs:
 "
 `;
 
-exports[`updateWorkflow loads workflow file paths then updates them 15`] = `
+exports[`updateWorkflow loads workflow file paths then updates them 17`] = `
 "name: create automated stage/prod promotion pull request
 on:
   pull_request:
@@ -849,7 +1063,7 @@ jobs:
 "
 `;
 
-exports[`updateWorkflow loads workflow file paths then updates them 16`] = `
+exports[`updateWorkflow loads workflow file paths then updates them 18`] = `
 "name: Consume changesets
 
 on:
@@ -914,7 +1128,7 @@ jobs:
 "
 `;
 
-exports[`updateWorkflow loads workflow file paths then updates them 17`] = `
+exports[`updateWorkflow loads workflow file paths then updates them 19`] = `
 "# This action acts as a signal dispatcher that fires whenever the release process has
 # successfully completed. The listening workflow within the infra-k8s repository has
 # a corresponding event handler to generate releases based on this signal
@@ -945,7 +1159,7 @@ jobs:
 "
 `;
 
-exports[`updateWorkflow loads workflow file paths then updates them 18`] = `
+exports[`updateWorkflow loads workflow file paths then updates them 20`] = `
 "##
 # This workflow needs to be ran in case it is a required check and
 # we conditionally only run the \`dependency-check\` workflow when certain
@@ -980,7 +1194,7 @@ jobs:
 "
 `;
 
-exports[`updateWorkflow loads workflow file paths then updates them 19`] = `
+exports[`updateWorkflow loads workflow file paths then updates them 21`] = `
 "##
 # NOTE: any changes to the event triggers or the paths here should be reflected in:
 #       dependency-check-paths-ignore.yml
@@ -1025,7 +1239,7 @@ jobs:
 "
 `;
 
-exports[`updateWorkflow loads workflow file paths then updates them 20`] = `
+exports[`updateWorkflow loads workflow file paths then updates them 22`] = `
 "##
 # This workflow needs to be ran because \`lint\` is a required check and
 # we conditionally only run the \`golangci-lint\` workflow when certain paths
@@ -1067,7 +1281,7 @@ jobs:
 "
 `;
 
-exports[`updateWorkflow loads workflow file paths then updates them 21`] = `
+exports[`updateWorkflow loads workflow file paths then updates them 23`] = `
 "##
 # NOTE: any changes to the event triggers or the paths here should be reflected in:
 #       golangci-lint-paths-ignore.yml
@@ -1130,7 +1344,7 @@ jobs:
 "
 `;
 
-exports[`updateWorkflow loads workflow file paths then updates them 22`] = `
+exports[`updateWorkflow loads workflow file paths then updates them 24`] = `
 "name: Create automated promotion pull request
 on:
   pull_request:
@@ -1208,7 +1422,7 @@ jobs:
 "
 `;
 
-exports[`updateWorkflow loads workflow file paths then updates them 23`] = `
+exports[`updateWorkflow loads workflow file paths then updates them 25`] = `
 "name: Create production promotion pull request
 on:
   push:
@@ -1248,7 +1462,7 @@ jobs:
 "
 `;
 
-exports[`updateWorkflow loads workflow file paths then updates them 24`] = `
+exports[`updateWorkflow loads workflow file paths then updates them 26`] = `
 "name: Create staging promotion pull request
 on:
   push:
@@ -1296,7 +1510,7 @@ jobs:
 "
 `;
 
-exports[`updateWorkflow loads workflow file paths then updates them 25`] = `
+exports[`updateWorkflow loads workflow file paths then updates them 27`] = `
 "name: Image-sync
 on:
   workflow_dispatch: null
@@ -1358,7 +1572,7 @@ jobs:
 "
 `;
 
-exports[`updateWorkflow loads workflow file paths then updates them 26`] = `
+exports[`updateWorkflow loads workflow file paths then updates them 28`] = `
 "name: Image Updater Squash Merge
 on:
   push:
@@ -1409,7 +1623,7 @@ jobs:
 "
 `;
 
-exports[`updateWorkflow loads workflow file paths then updates them 27`] = `
+exports[`updateWorkflow loads workflow file paths then updates them 29`] = `
 "name: Integration Chaos Test
 on:
   schedule:
@@ -1497,7 +1711,7 @@ jobs:
 "
 `;
 
-exports[`updateWorkflow loads workflow file paths then updates them 28`] = `
+exports[`updateWorkflow loads workflow file paths then updates them 30`] = `
 "# This is a dummy file so when changes occur that do not need smoke tests ran we can still have the check be required
 name: Integration Tests
 on:
@@ -1544,7 +1758,7 @@ jobs:
 "
 `;
 
-exports[`updateWorkflow loads workflow file paths then updates them 29`] = `
+exports[`updateWorkflow loads workflow file paths then updates them 31`] = `
 "name: Integration Tests
 on:
   pull_request:
@@ -1704,7 +1918,7 @@ jobs:
 "
 `;
 
-exports[`updateWorkflow loads workflow file paths then updates them 30`] = `
+exports[`updateWorkflow loads workflow file paths then updates them 32`] = `
 "name: Lint GH Workflows
 on:
   push:
@@ -1729,7 +1943,7 @@ jobs:
 "
 `;
 
-exports[`updateWorkflow loads workflow file paths then updates them 31`] = `
+exports[`updateWorkflow loads workflow file paths then updates them 33`] = `
 "name: Test & build
 
 on:
@@ -1948,7 +2162,7 @@ jobs:
 "
 `;
 
-exports[`updateWorkflow loads workflow file paths then updates them 32`] = `
+exports[`updateWorkflow loads workflow file paths then updates them 34`] = `
 "##
 # This workflow needs to be ran because \`Operator UI Tests\` is a required check
 # and we conditionally only run the \`Operator UI\` workflow when certain paths
@@ -1994,7 +2208,7 @@ jobs:
 "
 `;
 
-exports[`updateWorkflow loads workflow file paths then updates them 33`] = `
+exports[`updateWorkflow loads workflow file paths then updates them 35`] = `
 "##
 # NOTE: any changes to the event triggers or the paths here should be reflected in:
 #       operator-ui-paths-ignore.yml
@@ -2059,7 +2273,7 @@ jobs:
 "
 `;
 
-exports[`updateWorkflow loads workflow file paths then updates them 34`] = `
+exports[`updateWorkflow loads workflow file paths then updates them 36`] = `
 "name: Performance Tests
 on:
   workflow_dispatch:
@@ -2149,7 +2363,7 @@ jobs:
 "
 `;
 
-exports[`updateWorkflow loads workflow file paths then updates them 35`] = `
+exports[`updateWorkflow loads workflow file paths then updates them 37`] = `
 "# this will be the default pr validator for the new promotion model
 # need to uncomment the existing jobs once we are fully migrated (captured in the original workflow)
 name: validate pull requests
@@ -2235,7 +2449,7 @@ jobs:
 "
 `;
 
-exports[`updateWorkflow loads workflow file paths then updates them 36`] = `
+exports[`updateWorkflow loads workflow file paths then updates them 38`] = `
 "name: validate pull requests
 on: pull_request
 jobs:
@@ -2311,7 +2525,7 @@ jobs:
 "
 `;
 
-exports[`updateWorkflow loads workflow file paths then updates them 37`] = `
+exports[`updateWorkflow loads workflow file paths then updates them 39`] = `
 "name: check prod promotion pull requests
 on:
   pull_request:
@@ -2365,7 +2579,7 @@ jobs:
 "
 `;
 
-exports[`updateWorkflow loads workflow file paths then updates them 38`] = `
+exports[`updateWorkflow loads workflow file paths then updates them 40`] = `
 "name: update prod promotion pull requests
 on:
   pull_request:
@@ -2446,7 +2660,7 @@ jobs:
 "
 `;
 
-exports[`updateWorkflow loads workflow file paths then updates them 39`] = `
+exports[`updateWorkflow loads workflow file paths then updates them 41`] = `
 "name: Release
 
 on:
@@ -2587,7 +2801,7 @@ jobs:
 "
 `;
 
-exports[`updateWorkflow loads workflow file paths then updates them 40`] = `
+exports[`updateWorkflow loads workflow file paths then updates them 42`] = `
 "name: Silence Suggestion Check
 on:
   pull_request:
@@ -2616,7 +2830,7 @@ jobs:
 "
 `;
 
-exports[`updateWorkflow loads workflow file paths then updates them 41`] = `
+exports[`updateWorkflow loads workflow file paths then updates them 43`] = `
 "name: Soak test
 
 on:
@@ -2782,7 +2996,7 @@ jobs:
 "
 `;
 
-exports[`updateWorkflow loads workflow file paths then updates them 42`] = `
+exports[`updateWorkflow loads workflow file paths then updates them 44`] = `
 "##
 # This workflow needs to be ran because \`Solidity\` is a required check and we
 # conditionally only run the \`Solidity\` workflow when certain paths change.
@@ -2841,7 +3055,7 @@ jobs:
 "
 `;
 
-exports[`updateWorkflow loads workflow file paths then updates them 43`] = `
+exports[`updateWorkflow loads workflow file paths then updates them 45`] = `
 "##
 # NOTE: any changes to the event triggers or the paths here should be reflected in:
 #       solidity-paths-ignore.yml
@@ -2950,7 +3164,7 @@ jobs:
 "
 `;
 
-exports[`updateWorkflow loads workflow file paths then updates them 44`] = `
+exports[`updateWorkflow loads workflow file paths then updates them 46`] = `
 "name: update stage promotion pull requests
 on:
   pull_request:
@@ -3046,7 +3260,7 @@ jobs:
 "
 `;
 
-exports[`updateWorkflow loads workflow file paths then updates them 45`] = `
+exports[`updateWorkflow loads workflow file paths then updates them 47`] = `
 "name: Sync develop from smartcontractkit/chainlink
 
 on:
@@ -3088,7 +3302,7 @@ jobs:
 "
 `;
 
-exports[`updateWorkflow loads workflow file paths then updates them 46`] = `
+exports[`updateWorkflow loads workflow file paths then updates them 48`] = `
 "name: Updater
 on:
   workflow_dispatch:
