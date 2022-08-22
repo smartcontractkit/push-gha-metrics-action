@@ -16,10 +16,21 @@ import { join } from "node:path"
  */
 export async function main() {
   const workflowDirPath = process.argv[2]
+  const { env } = process
+  const includeNewline = !!env.INCLUDE_NEW_LINE
+  const tag = env.TAG
+  if (!tag) {
+    throw Error(`A valid tag must be set for the push-gha-metrics-action`)
+  }
+  const options: UpdateWorkflowOptions = {
+    includeNewline,
+    tag,
+  }
+
   const workflowFilePaths = await getWorkflowFilePathsFrom(workflowDirPath)
 
   for (const workflowFilePath of workflowFilePaths) {
-    const updatedWorkflow = await updateWorkflow(workflowFilePath)
+    const updatedWorkflow = await updateWorkflow(workflowFilePath, options)
     if (process.env.DRY_RUN) {
       console.log(updatedWorkflow)
       continue
@@ -49,6 +60,14 @@ export async function getWorkflowFilePathsFrom(dir: string): Promise<string[]> {
   return filteredWorkflowPaths
 }
 
+interface UpdateWorkflowOptions {
+  /** The tag to use for the metrics action */
+  tag: string
+  /** If true, inject a newline when creating the step
+   *  This option is ignored when a step is being updated rather than created
+   */
+  includeNewline: boolean
+}
 /**
  * Render an existing workflow with our metrics action.
  *
@@ -56,10 +75,14 @@ export async function getWorkflowFilePathsFrom(dir: string): Promise<string[]> {
  * within the specified workflow.
  *
  * @param workflowPath The absolute file path to the workflow to edit
+ * @param options Formatting options for the workflow
  *
  * @returns A string representation of the edited workflow
  */
-export async function updateWorkflow(workflowPath: string): Promise<string> {
+export async function updateWorkflow(
+  workflowPath: string,
+  options: UpdateWorkflowOptions,
+): Promise<string> {
   console.log(`Updating workflow file at path: ${workflowPath}`)
 
   const workflowFile = await fs.readFile(workflowPath, "utf-8")
@@ -87,7 +110,7 @@ export async function updateWorkflow(workflowPath: string): Promise<string> {
     const metricsNode = doc.createNode({
       name: "Collect Metrics",
       id: metricsStepId,
-      uses: "smartcontractkit/push-gha-metrics-action",
+      uses: `smartcontractkit/push-gha-metrics-action@${options.tag}`,
       with: {
         "basic-auth": "${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}",
         hostname: "${{ secrets.GRAFANA_CLOUD_HOST }}",
@@ -95,7 +118,6 @@ export async function updateWorkflow(workflowPath: string): Promise<string> {
       },
       "continue-on-error": true,
     })
-    metricsNode.comment = "\n"
 
     const metricsIdx = findMetricsStepIndex(steps, metricsStepId)
 
@@ -106,6 +128,9 @@ export async function updateWorkflow(workflowPath: string): Promise<string> {
 
       steps.items[metricsIdx] = metricsNode
     } else {
+      if (options.includeNewline) {
+        metricsNode.comment = "\n"
+      }
       steps.items.unshift(metricsNode)
     }
   })

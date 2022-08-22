@@ -15,7 +15,10 @@ describe(updateWorkflow.name, () => {
   it("loads workflow file paths then updates them", async () => {
     const workflowFiles = await loadTestWorkflowFilePaths(0)
     for (const workflowFile of workflowFiles) {
-      const updatedWorkflow = await updateWorkflow(workflowFile)
+      const updatedWorkflow = await updateWorkflow(workflowFile, {
+        includeNewline: true,
+        tag: "v1",
+      })
 
       expect(updatedWorkflow).toMatchSnapshot()
     }
