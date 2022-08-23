@@ -1,5 +1,24 @@
 # push-gha-metrics-action
 
+# Table of Contents
+
+- [About](#about)
+- [Usage](#usage)
+- [Considerations](#considerations)
+  - [Common Pitfalls](#common-pitfalls)
+    - [Security Concerns](#security-concerns)
+    - [Metrics Storage/Processing/Querying Scaling](#metrics-storageprocessingquerying-scaling)
+    - [Metrics Collection Scaling](#metrics-collection-scaling)
+    - [Metrics Collection Maintenance](#metrics-collection-maintenance)
+    - [Incompatible Technologies Used](#incompatible-technologies-used)
+  - [Projects Considered](#projects-considered)
+- [Notes](#notes)
+  - [Lifecycle of a Workflow Run](#lifecycle-of-a-workflow-run)
+  - [Job Name vs Job Id](#job-name-vs-job-id)
+    - [Matrices](#matrices)
+
+# About
+
 Github actions' insights for github actions is lacking in easily actionable
 information that someone would want if they are looking to optimize their CI/CD
 pipelines. The following questions are difficult to answer at a glance using the
@@ -25,32 +44,82 @@ github action's job, then pushes them to a Loki endpoint for metrics processing.
 From there, we visualize these metrics within Grafana. This enables us to answer
 the aforementioned questions.
 
-## Usage
+```mermaid
+sequenceDiagram
+  participant L as Loki
+  participant F as Grafana
+  participant A as Metrics Action
+  participant J1 as Workflow Run A: Job Run B
+  participant G as Github
+  G-->+J1: Start Job Run B
+    J1->>J1: Executes Step 1
+    Note Over J1,A: Let step "K" be the step that contains this action
+    J1->>A:  Executes Step K
+    A->>A: Detects that it's not in "post-step" phase, no-ops
+    J1->>J1: Executes Step N
+    J1->>J1: Executes Post-Step N
+    J1->>A: Executes Post-Step K
+    A->>A: Detects that it is in "post-step phase"
+    rect rgb(200, 150, 255)
+      Note Over G, A: Local and remote metadata collection
+      A->>A: Take current timestamp
+      A->>J1: Get local job metadata on runner
+      A->>G: Request remote job metadata
+      G->>A: Return remote job metadata
+      A->>A: Merge metadata
+      A->>A: Calculate execution duration
+    end
+    A->>L: Push calculated metrics as Loki Logs
+    J1->>J1: Executes Post-Step 1
+  J1-->-G: Finish Job Run B
+
+    L->>L: Store calculated metrics
+    F->>L: Send metrics query
+    L->>L: Perform metrics query
+    L->>F: Send query results
+    F->>F: Visualize metrics
+
+```
+
+# Usage
 
 You should have this action being used as the **first** step in every single job
 of each workflow you'd like to collect metrics about. **Every job name in your
 workflow must be unique**, see `Job Name vs Id` and `Matrices` in the `Notes`
 section.
 
-## Considerations
+You can use the included workflow updater script to help you update all of the
+workflows within a directory.
 
-### Common Pitfalls
+```sh
+# Install dependencies
+pnpm install
+
+# TAG is the tag you'd like to use for this github action, like a git full sha "7496bc182b18f685a59947a23c2e1c47c943dd33" or a tag "v1"
+# INCLUDE_NEW_LINE should be set if you want this script to append a new line after inserting this action as a step, leave unset to not inject any newlines
+
+TAG=7496bc182b18f685a59947a23c2e1c47c943dd33 pnpm update-workflow ~/src/smartcontractkit/infra-k8s/.github/workflows
+```
+
+# Considerations
+
+## Common Pitfalls
 
 Most of the following considerations were not used due to certain architectural
 decisions made which would cause friction either due to:
 
-#### Security Concerns
+### Security Concerns
 
 - Requiring PAT tokens for monitoring a repository
 - For multi-repository monitoring over an org, requiring a PAT token with org
   level access
 
-#### Metrics Storage/Processing/Querying Scaling
+### Metrics Storage/Processing/Querying Scaling
 
 - Creating labels with unbounded cardinality, which can cause severe degradation
   of the metrics processing service
 
-#### Metrics Collection Scaling
+### Metrics Collection Scaling
 
 - Collecting metrics by mass querying the Github HTTP API, or large queries
   against Github's GraphQL api, both resulting in rate limiting
@@ -59,19 +128,19 @@ decisions made which would cause friction either due to:
   doubling the amount of jobs being executed in a repository, making it very
   expensive.
 
-#### Metrics Collection Maintenance
+### Metrics Collection Maintenance
 
 - Collecting workflow + job metrics by having a standalone service, this results
   in having to maintain a long-lived service along with protecting any secrets
   it needs to access Github's API.
 
-#### Incompatible Technologies Used
+### Incompatible Technologies Used
 
 - Metrics collection / querying / vis revolving around a tech stack that isn't
   Prometheus / Loki / Grafana. Adopting another tech would make the user
   experience loaded with friction rather than using what we already have.
 
-### Projects Considered
+## Projects Considered
 
 - https://github.com/tchelovilar/github-org-runner-exporter
 - https://github.com/transferwise/github-actions-api-exporter
@@ -80,6 +149,8 @@ decisions made which would cause friction either due to:
 - https://github.com/kaidotdev/github-actions-exporter
 - https://github.com/cpanato/github_actions_exporter
 - https://docs.datadoghq.com/continuous_integration/setup_pipelines/github/
+
+# Notes
 
 ## Lifecycle of a Workflow Run
 
@@ -186,25 +257,7 @@ sequenceDiagram
   W-->-G: Finish Workflow Run A
 ```
 
-## Notes
-
-### Timing
-
-This runs as a post step, as post steps are run last, in LIFO order.
-
-1. list-jobs-for-workflow-job-attempt.jobs[0].started_at # When the job started,
-   can also use first step as estimation
-2. list-jobs-for-workflow-job-attempt.jobs[0].completed_at # When the job
-   finished, can also use last step as estimation
-3. get-workflow-run-attempt.created_at # When the workflow got queued
-
-```
-Workflow duration (including queue time) = 3 - 2
-Workflow duration (execution time only) = 2 - 1
-Queue time = 3 - 1
-```
-
-### Job Name vs Job Id
+## Job Name vs Job Id
 
 We gather additional context on the currently running job by querying the
 [List Jobs for a Workflow Run Attempt endpoint](https://docs.github.com/en/rest/actions/workflow-jobs#list-jobs-for-a-workflow-run-attempt),
