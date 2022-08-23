@@ -16,18 +16,23 @@ inputs:
       key is specified, and when matrices are used.
   basic-auth:
     required: false
-    description: Basic auth to use to sending requests to loki
+    description:
+      Basic auth to use to sending requests to loki, such as "bobsmith:hunter2"
   hostname:
     required: true
-    description: The hostname of the loki instance to connect to
+    description:
+      The hostname of the loki instance to connect to, such as
+      "my-logs.grafana.net"
   protocol:
     required: true
     default: https
-    description: The protocol to use when sending requests to loki
+    description:
+      The protocol to use when sending requests to loki such as "http" or
+      "https"
   port:
     required: true
     default: "443"
-    description: The port to use when sending requests to loki
+    description: The port to use when sending requests to loki such as "443"
   path:
     required: true
     default: "/loki/api/v1/push"
