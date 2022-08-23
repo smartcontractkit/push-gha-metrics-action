@@ -88,6 +88,9 @@ of each workflow you'd like to collect metrics about. **Every job name in your
 workflow must be unique**, see `Job Name vs Id` and `Matrices` in the `Notes`
 section.
 
+See the [action.yml](action.yml) file for information on inputs that this action
+accepts.
+
 You can use the included workflow updater script to help you update all of the
 workflows within a directory.
 
