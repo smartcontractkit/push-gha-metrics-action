@@ -98,7 +98,7 @@ pnpm install
 # TAG is the tag you'd like to use for this github action, like a git full sha "7496bc182b18f685a59947a23c2e1c47c943dd33" or a tag "v1"
 # INCLUDE_NEW_LINE should be set if you want this script to append a new line after inserting this action as a step, leave unset to not inject any newlines
 
-TAG=7496bc182b18f685a59947a23c2e1c47c943dd33 pnpm update-workflow ~/src/smartcontractkit/infra-k8s/.github/workflows
+TAG=7496bc182b18f685a59947a23c2e1c47c943dd33 pnpm update-workflows ~/src/smartcontractkit/infra-k8s/.github/workflows
 ```
 
 # Considerations

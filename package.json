@@ -6,7 +6,7 @@
   "scripts": {
     "build": "esbuild src/index.ts --bundle --platform=node --target=node16 --tsconfig=./tsconfig.build.json --outfile=dist/index.js",
     "format": "npx prettier --write .",
-    "update-workflow": "ts-node ./src/scripts/workflow-auto-updater/index.ts",
+    "update-workflows": "ts-node ./src/scripts/workflow-auto-updater/index.ts",
     "test": "jest"
   },
   "author": "",
