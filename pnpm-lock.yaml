@@ -7,6 +7,7 @@ specifiers:
   '@octokit/webhooks-types': ^5.6.0
   '@types/jest': ^28.1.1
   '@types/node': ^17.0.41
+  camelcase: ^7.0.0
   esbuild: ^0.14.43
   jest: ^28.1.1
   jest-mock-extended: ^2.0.6
@@ -28,6 +29,7 @@ devDependencies:
   '@octokit/webhooks-types': 5.6.0
   '@types/jest': 28.1.1
   '@types/node': 17.0.41
+  camelcase: 7.0.0
   esbuild: 0.14.43
   jest: 28.1.1_599206dd3f239e6d62ca9e36b25692df
   jest-mock-extended: 2.0.6_jest@28.1.1+typescript@4.7.3
@@ -1069,6 +1071,11 @@ packages:
   /camelcase/6.3.0:
     resolution: {integrity: sha512-Gmy6FhYlCY7uOElZUSbxo2UCDH8owEk996gkbrpsgGtrJLM3J7jGxl9Ic7Qwwj4ivOE5AWZWRMecDdF7hqGjFA==}
     engines: {node: '>=10'}
+    dev: true
+
+  /camelcase/7.0.0:
+    resolution: {integrity: sha512-JToIvOmz6nhGsUhAYScbo2d6Py5wojjNfoxoc2mEVLUdJ70gJK2gnd+ABY1Tc3sVMyK7QDPtN0T/XdlCQWITyQ==}
+    engines: {node: '>=14.16'}
     dev: true
 
   /caniuse-lite/1.0.30001350:

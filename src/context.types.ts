@@ -46,9 +46,12 @@ export interface Context {
   jobRun: JobRunContext & Pick<GithubContext, GithubContextJobRunPropertyKeys>
 }
 
-type JobRun = Awaited<
-  ReturnType<Octokit["rest"]["actions"]["listJobsForWorkflowRunAttempt"]>
->["data"]["jobs"][number]
+export type OctokitActions = Octokit["rest"]["actions"]
+export type ActionsEndpointResponseData<K extends keyof OctokitActions> =
+  Awaited<ReturnType<OctokitActions[K]>>["data"]
+
+type JobRun =
+  ActionsEndpointResponseData<"listJobsForWorkflowRunAttempt">["jobs"][number]
 
 export interface JobRunContext {
   /**

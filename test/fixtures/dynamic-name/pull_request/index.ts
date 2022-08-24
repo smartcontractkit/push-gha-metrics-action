@@ -2,8 +2,8 @@ import {
   getWorkflowRunAttempt1,
   getWorkflowRunAttempt2,
   listJobsForWorkflowRunAttempt1,
-  listJobsForWorkflowRunAttempt2,
 } from "./api"
+import { listJobsForWorkflowRunAttempt2 } from "./api"
 import { context1, context2 } from "./context"
 
 export const fixtures = [
