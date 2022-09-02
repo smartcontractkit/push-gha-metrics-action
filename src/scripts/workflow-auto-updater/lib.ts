@@ -86,7 +86,11 @@ export async function updateWorkflow(
   console.log(`Updating workflow file at path: ${workflowPath}`)
 
   const workflowFile = await fs.readFile(workflowPath, "utf-8")
-  const doc = yaml.parseDocument(workflowFile)
+  const lineCounter = new yaml.LineCounter()
+  const doc = yaml.parseDocument(workflowFile, {
+    lineCounter,
+    keepSourceTokens: true,
+  })
 
   const jobs = doc.getIn(["jobs"])
   if (!yaml.isMap(jobs)) {
@@ -99,11 +103,27 @@ export async function updateWorkflow(
     }
 
     const name = job.value.get("name")
-    const jobName = typeof name === "string" ? name : job.key.value
+    const jobName = typeof name === "string" ? name : (job.key.value as string)
 
     const steps = job.value.get("steps")
     if (!yaml.isSeq(steps)) {
-      throw Error(`Could not access "steps" property within "jobs"`)
+      console.warn(
+        `  WARN: Could not access "steps" property within "jobs", skipping`,
+      )
+      return
+    }
+
+    // Dumb regex match that checks if we have at least one expression within the job name
+    // like "CI ${{ os.runner }}" AND we're in a matrix style job. If we dont detect at least one expression
+    // then we error out, since we wont be able to create a unique job name for the action.
+    if (job.value.get("strategy") && !jobName.match(/^.*\${{[^{}]+}}.*$/)) {
+      const offset = job.srcToken?.key?.offset
+      const linePos = offset && lineCounter.linePos(offset)
+      const line = linePos ? `:${linePos.line}:${linePos.col}` : ""
+      throw Error(
+        `${workflowPath}${line}
+        The job name of "${jobName}" is not unique for the matrix. Create a unique job name using a matrix expression.`,
+      )
     }
 
     const metricsStepId = "collect-gha-metrics"
