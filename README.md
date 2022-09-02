@@ -159,7 +159,7 @@ pnpm i
 ### Unit Tests
 
 ```sh
-pnpm test -- unit
+pnpm test:unit
 ```
 
 ### Integration Tests
@@ -181,7 +181,7 @@ docker-compose up
 Run our integration tests.
 
 ```sh
-pnpm test -- integration
+pnpm test:integration
 ```
 
 #### Teardown
