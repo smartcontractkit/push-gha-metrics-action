@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "esbuild src/index.ts --bundle --platform=node --target=node16 --tsconfig=./tsconfig.build.json --outfile=dist/index.js",
-    "format": "npx prettier --write .",
+    "format": "prettier --write .",
     "update-workflows": "ts-node ./src/scripts/workflow-auto-updater/index.ts",
     "test": "jest"
   },
@@ -26,6 +26,7 @@
     "jest": "^28.1.1",
     "jest-mock-extended": "^2.0.6",
     "nock": "^13.2.6",
+    "prettier": "^2.7.1",
     "ts-jest": "^28.0.5",
     "ts-node": "^10.9.1",
     "typescript": "^4.7.3"
