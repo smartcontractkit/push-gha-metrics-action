@@ -41,7 +41,7 @@ describe("Util tests", () => {
           expect(() =>
             iso8601ToUnixTimeSeconds(new Date(0).toISOString()),
           ).toThrowErrorMatchingInlineSnapshot(
-            `"Invalid timestamp: Got a value of \\"January 1, 1970, 00:00:00 UTC\\" from timestamp value of 1970-01-01T00:00:00.000Z"`,
+            `"Invalid timestamp: Got a value of "January 1, 1970, 00:00:00 UTC" from timestamp value of 1970-01-01T00:00:00.000Z"`,
           )
         })
       })

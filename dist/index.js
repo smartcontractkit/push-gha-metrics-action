@@ -1,38 +1,10 @@
+"use strict";
 var __create = Object.create;
 var __defProp = Object.defineProperty;
-var __defProps = Object.defineProperties;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
-var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
 var __getOwnPropNames = Object.getOwnPropertyNames;
-var __getOwnPropSymbols = Object.getOwnPropertySymbols;
 var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __propIsEnum = Object.prototype.propertyIsEnumerable;
-var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-var __spreadValues = (a, b) => {
-  for (var prop in b || (b = {}))
-    if (__hasOwnProp.call(b, prop))
-      __defNormalProp(a, prop, b[prop]);
-  if (__getOwnPropSymbols)
-    for (var prop of __getOwnPropSymbols(b)) {
-      if (__propIsEnum.call(b, prop))
-        __defNormalProp(a, prop, b[prop]);
-    }
-  return a;
-};
-var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
-var __objRest = (source, exclude) => {
-  var target = {};
-  for (var prop in source)
-    if (__hasOwnProp.call(source, prop) && exclude.indexOf(prop) < 0)
-      target[prop] = source[prop];
-  if (source != null && __getOwnPropSymbols)
-    for (var prop of __getOwnPropSymbols(source)) {
-      if (exclude.indexOf(prop) < 0 && __propIsEnum.call(source, prop))
-        target[prop] = source[prop];
-    }
-  return target;
-};
 var __commonJS = (cb, mod) => function __require() {
   return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
 };
@@ -48,7 +20,10 @@ var __copyProps = (to, from, except, desc) => {
   }
   return to;
 };
-var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target, mod));
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+  mod
+));
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
 // node_modules/.pnpm/@actions+core@1.10.0/node_modules/@actions/core/lib/utils.js
@@ -906,7 +881,10 @@ var require_tunnel = __commonJS({
         connectReq.removeAllListeners();
         socket.removeAllListeners();
         if (res.statusCode !== 200) {
-          debug2("tunneling socket could not be established, statusCode=%d", res.statusCode);
+          debug2(
+            "tunneling socket could not be established, statusCode=%d",
+            res.statusCode
+          );
           socket.destroy();
           var error = new Error("tunneling socket could not be established, statusCode=" + res.statusCode);
           error.code = "ECONNRESET";
@@ -929,7 +907,11 @@ var require_tunnel = __commonJS({
       }
       function onError(cause) {
         connectReq.removeAllListeners();
-        debug2("tunneling socket could not be established, cause=%s\n", cause.message, cause.stack);
+        debug2(
+          "tunneling socket could not be established, cause=%s\n",
+          cause.message,
+          cause.stack
+        );
         var error = new Error("tunneling socket could not be established, cause=" + cause.message);
         error.code = "ECONNRESET";
         options.request.emit("error", error);
@@ -2429,7 +2411,10 @@ var require_before_after_hook = __commonJS({
     var bind = Function.bind;
     var bindable = bind.bind(bind);
     function bindApi(hook, state, name) {
-      var removeHookRef = bindable(removeHook, null).apply(null, name ? [state, name] : [state]);
+      var removeHookRef = bindable(removeHook, null).apply(
+        null,
+        name ? [state, name] : [state]
+      );
       hook.api = { remove: removeHookRef };
       hook.remove = removeHookRef;
       ["before", "error", "after", "wrap"].forEach(function(kind) {
@@ -2457,7 +2442,9 @@ var require_before_after_hook = __commonJS({
     var collectionHookDeprecationMessageDisplayed = false;
     function Hook() {
       if (!collectionHookDeprecationMessageDisplayed) {
-        console.warn('[before-after-hook]: "Hook()" repurposing warning, use "Hook.Collection()". Read more: https://git.io/upgrade-before-after-hook-to-1.4');
+        console.warn(
+          '[before-after-hook]: "Hook()" repurposing warning, use "Hook.Collection()". Read more: https://git.io/upgrade-before-after-hook-to-1.4'
+        );
         collectionHookDeprecationMessageDisplayed = true;
       }
       return HookCollection();
@@ -4755,11 +4742,14 @@ var require_lib3 = __commonJS({
       blob() {
         let ct = this.headers && this.headers.get("content-type") || "";
         return consumeBody.call(this).then(function(buf) {
-          return Object.assign(new Blob([], {
-            type: ct.toLowerCase()
-          }), {
-            [BUFFER]: buf
-          });
+          return Object.assign(
+            new Blob([], {
+              type: ct.toLowerCase()
+            }),
+            {
+              [BUFFER]: buf
+            }
+          );
         });
       },
       json() {
@@ -5816,12 +5806,15 @@ var require_dist_node5 = __commonJS({
       let status;
       let url;
       const fetch = requestOptions.request && requestOptions.request.fetch || nodeFetch;
-      return fetch(requestOptions.url, Object.assign({
-        method: requestOptions.method,
-        body: requestOptions.body,
-        headers: requestOptions.headers,
-        redirect: requestOptions.redirect
-      }, requestOptions.request)).then(async (response) => {
+      return fetch(requestOptions.url, Object.assign(
+        {
+          method: requestOptions.method,
+          body: requestOptions.body,
+          headers: requestOptions.headers,
+          redirect: requestOptions.redirect
+        },
+        requestOptions.request
+      )).then(async (response) => {
         url = response.url;
         status = response.status;
         for (const keyAndValue of response.headers) {
@@ -7312,7 +7305,7 @@ var require_dist_node10 = __commonJS({
     }
     function _objectSpread2(target) {
       for (var i = 1; i < arguments.length; i++) {
-        var source = arguments[i] != null ? arguments[i] : {};
+        var source = null != arguments[i] ? arguments[i] : {};
         i % 2 ? ownKeys(Object(source), true).forEach(function(key) {
           _defineProperty(target, key, source[key]);
         }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function(key) {
@@ -7568,10 +7561,14 @@ var github = __toESM(require_github());
 function iso8601ToUnixTimeSeconds(iso8610Timestamp) {
   const unixMs = Date.parse(iso8610Timestamp);
   if (isNaN(unixMs)) {
-    throw Error(`Invalid timestamp: Could not parse timestamp of value ${iso8610Timestamp}`);
+    throw Error(
+      `Invalid timestamp: Could not parse timestamp of value ${iso8610Timestamp}`
+    );
   }
   if (unixMs === 0) {
-    throw Error(`Invalid timestamp: Got a value of "January 1, 1970, 00:00:00 UTC" from timestamp value of ${iso8610Timestamp}`);
+    throw Error(
+      `Invalid timestamp: Got a value of "January 1, 1970, 00:00:00 UTC" from timestamp value of ${iso8610Timestamp}`
+    );
   }
   return Math.round(unixMs / 1e3);
 }
@@ -7585,18 +7582,27 @@ function unixNowSeconds(override) {
 // src/context.ts
 async function fetchContext(githubClient, rawGithubContext, contextOverrides) {
   const githubContext = getGithubContext(rawGithubContext, contextOverrides);
-  const jobRunContext = await fetchJobRunContext(githubClient, githubContext, contextOverrides);
-  const workflowRunContext = await fetchWorkflowRunContext(githubClient, githubContext);
-  const _a = githubContext, { runAttempt, runId, runNumber, workflowName, jobName } = _a, rest = __objRest(_a, ["runAttempt", "runId", "runNumber", "workflowName", "jobName"]);
-  const mergedJobRunContext = __spreadProps(__spreadValues({}, jobRunContext), {
+  const jobRunContext = await fetchJobRunContext(
+    githubClient,
+    githubContext,
+    contextOverrides
+  );
+  const workflowRunContext = await fetchWorkflowRunContext(
+    githubClient,
+    githubContext
+  );
+  const { runAttempt, runId, runNumber, workflowName, jobName, ...rest } = githubContext;
+  const mergedJobRunContext = {
+    ...jobRunContext,
     jobName
-  });
-  const mergedWorkflowRunContext = __spreadProps(__spreadValues({}, workflowRunContext), {
+  };
+  const mergedWorkflowRunContext = {
+    ...workflowRunContext,
     runAttempt,
     runId,
     runNumber,
     workflowName
-  });
+  };
   return {
     event: rest,
     workflowRun: mergedWorkflowRunContext,
@@ -7613,8 +7619,8 @@ function getGithubContext(rawGithubContext, contextOverrides) {
   }
   const issue = rawGithubContext.issue;
   const repo = rawGithubContext.repo;
-  const restContext = __spreadValues({}, rawGithubContext);
-  const fullContext = __spreadProps(__spreadValues({}, restContext), { issue, repo, runAttempt });
+  const restContext = { ...rawGithubContext };
+  const fullContext = { ...restContext, issue, repo, runAttempt };
   return {
     actor: fullContext.actor,
     eventName: fullContext.eventName,
@@ -7629,19 +7635,26 @@ function getGithubContext(rawGithubContext, contextOverrides) {
   };
 }
 async function fetchJobRunContext(client, githubContext, contextOverrides) {
-  const jobRuns = await client.rest.actions.listJobsForWorkflowRunAttempt(__spreadValues({
+  const jobRuns = await client.rest.actions.listJobsForWorkflowRunAttempt({
     attempt_number: githubContext.runAttempt,
-    run_id: githubContext.runId
-  }, githubContext.repo));
+    run_id: githubContext.runId,
+    ...githubContext.repo
+  });
   const { jobs } = jobRuns.data;
-  const relevantJobs = jobs.filter((j) => j.name === githubContext.jobName && j.status === "in_progress");
+  const relevantJobs = jobs.filter(
+    (j) => j.name === githubContext.jobName && j.status === "in_progress"
+  );
   if (relevantJobs.length > 1) {
-    throw Error(`More than one job found during self-lookup, non-unique matrix job names being used will result in metrics ambiguity`);
+    throw Error(
+      `More than one job found during self-lookup, non-unique matrix job names being used will result in metrics ambiguity`
+    );
   }
   if (relevantJobs.length === 0) {
-    throw Error(`No job for job name: "${githubContext.jobName}" found during self-lookup, invalid job name given?
+    throw Error(
+      `No job for job name: "${githubContext.jobName}" found during self-lookup, invalid job name given?
       Available jobs names + ids: ${jobs.map((j) => `${j.name}|${j.id}`)}
-      `);
+      `
+    );
   }
   const [self] = relevantJobs;
   return {
@@ -7650,18 +7663,23 @@ async function fetchJobRunContext(client, githubContext, contextOverrides) {
     url: self.url,
     startedAt: self.started_at,
     startedAtUnixSeconds: iso8601ToUnixTimeSeconds(self.started_at),
-    estimatedEndedAtUnixSeconds: unixNowSeconds(contextOverrides == null ? void 0 : contextOverrides.estimatedEndedAtUnixSeconds)
+    estimatedEndedAtUnixSeconds: unixNowSeconds(
+      contextOverrides == null ? void 0 : contextOverrides.estimatedEndedAtUnixSeconds
+    )
   };
 }
 async function fetchWorkflowRunContext(client, githubContext) {
-  const workflowRun = await client.rest.actions.getWorkflowRunAttempt(__spreadProps(__spreadValues({}, githubContext.repo), {
+  const workflowRun = await client.rest.actions.getWorkflowRunAttempt({
+    ...githubContext.repo,
     attempt_number: githubContext.runAttempt,
     run_id: githubContext.runId
-  }));
+  });
   const { data } = workflowRun;
   const { url, updated_at, created_at, workflow_url, run_started_at } = data;
   if (!run_started_at) {
-    throw Error(`Could not find "run_started_at" for workflow run attempt runId:${githubContext.runId}|attemptNumber:${githubContext.runAttempt}, github api down / inconsistent?`);
+    throw Error(
+      `Could not find "run_started_at" for workflow run attempt runId:${githubContext.runId}|attemptNumber:${githubContext.runAttempt}, github api down / inconsistent?`
+    );
   }
   const workflowRunContext = {
     url,
@@ -7710,24 +7728,35 @@ function extractStreamFromContext(context2) {
     workflowName,
     actor
   };
-  const streamLabels = __spreadValues(__spreadValues({}, staticLabels), dynamicLabels);
-  core.info(`${extractStreamFromContext.name} Extracted stream labels from context: ${JSON.stringify(streamLabels, null, 1)}`);
+  const streamLabels = { ...staticLabels, ...dynamicLabels };
+  core.info(
+    `${extractStreamFromContext.name} Extracted stream labels from context: ${JSON.stringify(
+      streamLabels,
+      null,
+      1
+    )}`
+  );
   return streamLabels;
 }
 function createLokiLogValueFromContext(context2) {
   const log = JSON.stringify(context2);
   const secondInNanoSeconds = BigInt(1e9);
   const ts = BigInt(context2.jobRun.estimatedEndedAtUnixSeconds) * secondInNanoSeconds;
-  core.debug(`${createLokiLogValueFromContext.name} Created loki log value: ${log}`);
-  core.debug(`${createLokiLogValueFromContext.name} Created loki log timestamp in nanoseconds ${ts}`);
+  core.debug(
+    `${createLokiLogValueFromContext.name} Created loki log value: ${log}`
+  );
+  core.debug(
+    `${createLokiLogValueFromContext.name} Created loki log timestamp in nanoseconds ${ts}`
+  );
   return [ts.toString(), log];
 }
 async function sendLokiRequest(logEntries, requestOptions, dryRun) {
   const serializedLogEntries = JSON.stringify(logEntries);
-  const outgoingHeaders = __spreadProps(__spreadValues({}, requestOptions.headers), {
+  const outgoingHeaders = {
+    ...requestOptions.headers,
     "Content-Type": requestOptions.contentType,
     "Content-Length": serializedLogEntries.length
-  });
+  };
   const options = {
     auth: requestOptions.basicAuth,
     hostname: requestOptions.hostname,
@@ -7745,38 +7774,56 @@ async function sendLokiRequest(logEntries, requestOptions, dryRun) {
     "headers",
     "timeout"
   ];
-  core.debug(`${sendLokiRequest.name} SanitizedRequestOptions: ${JSON.stringify(options, optionsWhitelist, 1)}`);
+  core.debug(
+    `${sendLokiRequest.name} SanitizedRequestOptions: ${JSON.stringify(
+      options,
+      optionsWhitelist,
+      1
+    )}`
+  );
   const lib = requestOptions.protocol === "http" ? import_http.default : import_https.default;
   if (dryRun) {
     return null;
   }
-  const response = await new Promise((resolve, reject) => {
-    const request = lib.request(options, (res) => {
-      const { statusCode, statusMessage, headers: incomingHeaders } = res;
-      core.debug(`${sendLokiRequest.name} Incoming headers ${JSON.stringify(incomingHeaders)}`);
-      let data = "";
-      res.on("data", (d) => data += d);
-      res.on("end", () => {
-        if (statusCode && !(statusCode >= 200 && statusCode < 300)) {
-          const error = Error(`${sendLokiRequest.name} Received non 200 status code. StatusCode: ${statusCode} StatusMessage: ${statusMessage || "N/A"} Body: ${data}`);
-          return reject(error);
-        }
-        resolve({
-          headers: incomingHeaders,
-          data,
-          statusCode,
-          statusMessage
+  const response = await new Promise(
+    (resolve, reject) => {
+      const request = lib.request(options, (res) => {
+        const { statusCode, statusMessage, headers: incomingHeaders } = res;
+        core.debug(
+          `${sendLokiRequest.name} Incoming headers ${JSON.stringify(
+            incomingHeaders
+          )}`
+        );
+        let data = "";
+        res.on("data", (d) => data += d);
+        res.on("end", () => {
+          if (statusCode && !(statusCode >= 200 && statusCode < 300)) {
+            const error = Error(
+              `${sendLokiRequest.name} Received non 200 status code. StatusCode: ${statusCode} StatusMessage: ${statusMessage || "N/A"} Body: ${data}`
+            );
+            return reject(error);
+          }
+          resolve({
+            headers: incomingHeaders,
+            data,
+            statusCode,
+            statusMessage
+          });
         });
       });
-    });
-    request.on("error", (err) => {
-      const contextualError = Error(`${sendLokiRequest.name} Got error during request: ${err.message}`);
-      reject(contextualError);
-    });
-    request.write(serializedLogEntries);
-    request.end();
-  });
-  core.debug(`${sendLokiRequest.name} Response: ${JSON.stringify(response, null, 1)}`);
+      request.on("error", (err) => {
+        const contextualError = Error(
+          `${sendLokiRequest.name} Got error during request: ${err.message}`
+        );
+        reject(contextualError);
+      });
+      request.write(serializedLogEntries);
+      request.end();
+    }
+  );
+  core.debug(
+    `${sendLokiRequest.name} Response: ${JSON.stringify(response, null, 1)}`
+  );
   return response;
 }
 
@@ -7800,7 +7847,11 @@ async function main() {
     const contextOverrides = {
       jobName: getTypedInput("this-job-name") || void 0
     };
-    const context2 = await fetchContext(githubClient, rawContext, contextOverrides);
+    const context2 = await fetchContext(
+      githubClient,
+      rawContext,
+      contextOverrides
+    );
     core2.endGroup();
     core2.startGroup("Loki Log Sending");
     const logEntries = createLokiLogEntriesFromContext(context2);
@@ -7825,7 +7876,9 @@ function getLokiRequestOptions() {
     throw Error(`Port value of ${rawPath} could not be parsed`);
   }
   if (rawProtocol !== "https" && rawProtocol !== "http") {
-    throw Error(`Protocol value of ${rawProtocol} could not be parsed, valid values are "http" or "https"`);
+    throw Error(
+      `Protocol value of ${rawProtocol} could not be parsed, valid values are "http" or "https"`
+    );
   }
   const timeout = parseInt(rawTimeout);
   if (isNaN(timeout)) {
