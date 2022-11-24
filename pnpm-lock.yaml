@@ -11,7 +11,7 @@ specifiers:
   jest: ^29.3.1
   jest-mock-extended: ^3.0.1
   nock: ^13.2.9
-  prettier: ^2.7.1
+  prettier: ^2.8.0
   ts-jest: ^29.0.3
   ts-node: ^10.9.1
   type-fest: ^2.13.1
@@ -33,7 +33,7 @@ devDependencies:
   jest: 29.3.1_odkjkoia5xunhxkdrka32ib6vi
   jest-mock-extended: 3.0.1_4f6uxrzmuwipl5rr3bcogf6k74
   nock: 13.2.9
-  prettier: 2.7.1
+  prettier: 2.8.0
   ts-jest: 29.0.3_j3ws3hnhn3wjao5gyrch5jjpnu
   ts-node: 10.9.1_wup25etrarvlqkprac7h35hj7u
   typescript: 4.9.3
@@ -2423,8 +2423,8 @@ packages:
       find-up: 4.1.0
     dev: true
 
-  /prettier/2.7.1:
-    resolution: {integrity: sha512-ujppO+MkdPqoVINuDFDRLClm7D78qbDt0/NR+wp5FqEZOoTNAjPHWj17QRhu7geIHJfcNhRk1XVQmF8Bp3ye+g==}
+  /prettier/2.8.0:
+    resolution: {integrity: sha512-9Lmg8hTFZKG0Asr/kW9Bp8tJjRVluO8EJQVfY2T7FMw9T5jy4I/Uvx0Rca/XWf50QQ1/SS48+6IJWnrb+2yemA==}
     engines: {node: '>=10.13.0'}
     hasBin: true
     dev: true
