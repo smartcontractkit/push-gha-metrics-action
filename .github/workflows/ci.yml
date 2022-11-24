@@ -48,5 +48,8 @@ jobs:
       - name: Install npm dependencies
         run: pnpm install
 
+      - name: Check for typeerrors
+        run: pnpm build:lint
+
       - name: Run unit tests
         run: pnpm test:unit
