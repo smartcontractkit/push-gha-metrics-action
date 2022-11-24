@@ -4,7 +4,7 @@ specifiers:
   '@actions/core': ^1.10.0
   '@actions/github': ^5.1.1
   '@faker-js/faker': ^7.3.0
-  '@octokit/webhooks-types': ^5.6.0
+  '@octokit/webhooks-types': ^6.7.0
   '@types/jest': ^28.1.1
   '@types/node': ^17.0.41
   esbuild: ^0.14.43
@@ -26,7 +26,7 @@ dependencies:
 
 devDependencies:
   '@faker-js/faker': 7.3.0
-  '@octokit/webhooks-types': 5.6.0
+  '@octokit/webhooks-types': 6.7.0
   '@types/jest': 28.1.1
   '@types/node': 17.0.41
   esbuild: 0.14.43
@@ -762,8 +762,8 @@ packages:
       '@octokit/openapi-types': 12.11.0
     dev: false
 
-  /@octokit/webhooks-types/5.6.0:
-    resolution: {integrity: sha512-y3MqE6N6Ksg1+YV0sXVpW2WP7Y24h7rUp2hDJuzoqWdKGr7owmRDyHC72INwfCYNzura/vsNPXvc6Xbfp4wGGw==}
+  /@octokit/webhooks-types/6.7.0:
+    resolution: {integrity: sha512-bykm7UkSnxmb2uhSfcLM1Pity/LQ6ZBSdzy9HU0vXjR+2g+tzlmRhXb7Go8oj0TlgO+vDrTivGXju6zkzOGKjA==}
     dev: true
 
   /@sinclair/typebox/0.23.5:
