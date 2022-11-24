@@ -1,6 +1,7 @@
 import type { context as RawGithubContext } from "@actions/github"
 import * as types from "./context.types"
 import { iso8601ToUnixTimeSeconds, unixNowSeconds } from "./utils"
+import { WorkflowStepAugmented } from "@octokit/webhooks-types"
 
 /**
  * Fetch the current context, includes relevant information about the triggering event, workflow run, and job run
@@ -27,6 +28,7 @@ export async function fetchContext(
 
   const { runAttempt, runId, runNumber, workflowName, jobName, ...rest } =
     githubContext
+
   const mergedJobRunContext: types.Context["jobRun"] = {
     ...jobRunContext,
     jobName,
@@ -134,10 +136,25 @@ export async function fetchJobRunContext(
   }
   const [self] = relevantJobs
 
+  // This is subject to the eventually consistent API
+  // we may have to introduce retry logic in the
+  // API call, until we are able to fetch the most up to date steps
+  // by checking if we're currently processing _this_ step.
+  const hasFailed =
+    self.steps?.reduce((acc, currentStep) => {
+      // Octokit has wonky typings, the webhook ones are more correct
+      // but we need to add another union for queued steps
+      // @ts-expect-error
+      const step: WorkflowStepAugmented = currentStep
+
+      return acc && step.conclusion === "failure"
+    }, true) ?? false
+
   return {
     id: self.id,
     name: self.name,
     url: self.url,
+    hasFailed,
     startedAt: self.started_at,
     startedAtUnixSeconds: iso8601ToUnixTimeSeconds(self.started_at),
     estimatedEndedAtUnixSeconds: unixNowSeconds(

@@ -72,6 +72,12 @@ export interface JobRunContext {
   startedAt: JobRun["started_at"]
 
   /**
+   * Is true if the job has failed, note that this is in context of a currently
+   * executing job, future steps may fail.
+   */
+  hasFailed: boolean
+
+  /**
    * When the current job was started, in unix time in seconds format
    */
   startedAtUnixSeconds: number
