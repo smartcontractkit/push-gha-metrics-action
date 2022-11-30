@@ -75,7 +75,7 @@ export interface JobRunContext {
    * Is true if the job has failed, note that this is in context of a currently
    * executing job, future steps may fail.
    */
-  hasFailed: boolean
+  hasFailed: number
 
   /**
    * When the current job was started, in unix time in seconds format

@@ -140,7 +140,7 @@ export async function fetchJobRunContext(
   // we may have to introduce retry logic in the
   // API call, until we are able to fetch the most up to date steps
   // by checking if we're currently processing _this_ step.
-  const hasFailed =
+  const hasFailed=
     self.steps?.reduce((acc, currentStep) => {
       // Octokit has wonky typings, the webhook ones are more correct
       // but we need to add another union for queued steps
@@ -154,7 +154,7 @@ export async function fetchJobRunContext(
     id: self.id,
     name: self.name,
     url: self.url,
-    hasFailed,
+    hasFailed: Number(hasFailed),
     startedAt: self.started_at,
     startedAtUnixSeconds: iso8601ToUnixTimeSeconds(self.started_at),
     estimatedEndedAtUnixSeconds: unixNowSeconds(
