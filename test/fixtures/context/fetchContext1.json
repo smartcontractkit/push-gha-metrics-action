@@ -3,7 +3,10 @@
     "actor": "HenryNguyen5",
     "eventName": "pull_request",
     "ref": "refs/pull/21/merge",
-    "repo": { "owner": "mockOwner", "repo": "mockRepo" },
+    "repo": {
+      "owner": "mockOwner",
+      "repo": "mockRepo"
+    },
     "sha": "512d1a168cf626018888b44dc35cdd6e79b9df8a"
   },
   "workflowRun": {
@@ -22,9 +25,9 @@
   },
   "jobRun": {
     "id": 6891428337,
-    "hasFailed": 0,
     "name": "generate-fixtures-name-1",
     "url": "https://api.github.com/repos/smartcontractkit/push-gha-metrics-action/actions/jobs/6891428337",
+    "hasFailed": 0,
     "startedAt": "2022-06-15T01:01:13Z",
     "startedAtUnixSeconds": 1655254873,
     "estimatedEndedAtUnixSeconds": 1655254904,
