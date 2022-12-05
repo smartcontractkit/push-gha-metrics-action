@@ -1,4 +1,5 @@
 import type { context as RawGithubContext } from "@actions/github"
+import * as core from "@actions/core"
 import * as types from "./context.types"
 import { iso8601ToUnixTimeSeconds, unixNowSeconds } from "./utils"
 import { WorkflowStepAugmented } from "@octokit/webhooks-types"
@@ -135,6 +136,7 @@ export async function fetchJobRunContext(
     )
   }
   const [self] = relevantJobs
+  core.info(`steps: ${JSON.stringify(self.steps, null, 1)}`)
 
   // This is subject to the eventually consistent API
   // we may have to introduce retry logic in the
