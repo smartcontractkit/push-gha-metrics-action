@@ -70,6 +70,7 @@ function generateMockContexts(amount = 100, dateRangeInDays = 1) {
           id: Number(faker.random.numeric(9)),
           jobName,
           name: jobName,
+          hasFailed: faker.helpers.arrayElement([1, 0]),
           startedAt: jobStartedAt.toISOString(),
           startedAtUnixSeconds: iso8601ToUnixTimeSeconds(
             jobStartedAt.toISOString(),

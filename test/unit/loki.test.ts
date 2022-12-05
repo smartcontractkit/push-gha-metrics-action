@@ -37,6 +37,7 @@ describe("Loki", () => {
           },
           "jobRun": {
             "estimatedEndedAtUnixSeconds": 1655254904,
+            "hasFailed": 0,
             "id": 6891428337,
             "jobName": "generate-fixtures-name-1",
             "name": "generate-fixtures-name-1",
@@ -96,6 +97,7 @@ describe("Loki", () => {
           },
           "jobRun": {
             "estimatedEndedAtUnixSeconds": 1655254904,
+            "hasFailed": 0,
             "id": 6891428337,
             "jobName": "generate-fixtures-name-1",
             "name": "generate-fixtures-name-1",
