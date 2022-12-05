@@ -7635,6 +7635,7 @@ function getGithubContext(rawGithubContext, contextOverrides) {
   };
 }
 async function fetchJobRunContext(client, githubContext, contextOverrides) {
+  var _a;
   const jobRuns = await client.rest.actions.listJobsForWorkflowRunAttempt({
     attempt_number: githubContext.runAttempt,
     run_id: githubContext.runId,
@@ -7657,10 +7658,15 @@ async function fetchJobRunContext(client, githubContext, contextOverrides) {
     );
   }
   const [self] = relevantJobs;
+  const hasFailed = ((_a = self.steps) == null ? void 0 : _a.reduce((acc, currentStep) => {
+    const step = currentStep;
+    return acc && step.conclusion === "failure";
+  }, true)) ?? false;
   return {
     id: self.id,
     name: self.name,
     url: self.url,
+    hasFailed: Number(hasFailed),
     startedAt: self.started_at,
     startedAtUnixSeconds: iso8601ToUnixTimeSeconds(self.started_at),
     estimatedEndedAtUnixSeconds: unixNowSeconds(
