@@ -7583,6 +7583,7 @@ function unixNowSeconds(override) {
 }
 
 // src/context.ts
+var JobFinalizedSleep = 3e3;
 async function fetchContext(githubClient, rawGithubContext, contextOverrides) {
   const githubContext = getGithubContext(rawGithubContext, contextOverrides);
   const jobRunContext = await fetchJobRunContext(
@@ -7637,16 +7638,20 @@ function getGithubContext(rawGithubContext, contextOverrides) {
     workflowName: fullContext.workflow
   };
 }
+function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 function isJobFailed(steps) {
   for (const step of steps) {
     if (step.conclusion === "failure") {
-      core.info(`job failure found`);
+      core.info(`one of a job steps has failed, reporting as failed`);
       return 1;
     }
   }
   return 0;
 }
 async function fetchJobRunContext(client, githubContext, contextOverrides) {
+  await delay(JobFinalizedSleep);
   const jobRuns = await client.rest.actions.listJobsForWorkflowRunAttempt({
     attempt_number: githubContext.runAttempt,
     run_id: githubContext.runId,
