@@ -164,9 +164,9 @@ async function pollJobData(
     )
   }
   const [job] = relevantJobs
-  if (!isJobFinalized(job.steps! as WorkflowStep[])) {
-    return undefined
-  }
+  // if (!isJobFinalized(job.steps! as WorkflowStep[])) {
+  //   return undefined
+  // }
   return {
     id: job.id,
     name: job.name,
