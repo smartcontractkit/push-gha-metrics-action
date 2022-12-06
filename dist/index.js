@@ -7583,7 +7583,8 @@ function unixNowSeconds(override) {
 }
 
 // src/context.ts
-var JobPollingAttempts = 10;
+var MetricCollectionStepName = "Post Collect Metrics";
+var JobPollingAttempts = 20;
 var JobPollingIntervalMilliseconds = 1e3;
 async function fetchContext(githubClient, rawGithubContext, contextOverrides) {
   const githubContext = getGithubContext(rawGithubContext, contextOverrides);
@@ -7651,6 +7652,19 @@ function isJobFailed(steps) {
   }
   return 0;
 }
+function isJobFinalized(steps) {
+  for (let i = 0; i < steps.length; i++) {
+    if (steps[i].name === MetricCollectionStepName) {
+      const prevStep = steps[i - 1];
+      core.info(`previous step: ${JSON.stringify(prevStep, null, 1)}`);
+      if (steps[i - 1].conclusion !== null) {
+        core.info(`job is finalized`);
+        return true;
+      }
+    }
+  }
+  return false;
+}
 async function pollJobData(client, githubContext, contextOverrides) {
   const jobRuns = await client.rest.actions.listJobsForWorkflowRunAttempt({
     attempt_number: githubContext.runAttempt,
@@ -7674,6 +7688,9 @@ async function pollJobData(client, githubContext, contextOverrides) {
     );
   }
   const [job] = relevantJobs;
+  if (!isJobFinalized(job.steps)) {
+    return void 0;
+  }
   return {
     id: job.id,
     name: job.name,

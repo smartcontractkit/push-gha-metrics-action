@@ -5,7 +5,7 @@ import { iso8601ToUnixTimeSeconds, unixNowSeconds } from "./utils"
 import {WorkflowStep} from "@octokit/webhooks-types"
 
 const MetricCollectionStepName = "Post Collect Metrics"
-const JobPollingAttempts = 10
+const JobPollingAttempts = 20
 const JobPollingIntervalMilliseconds = 1000
 
 /**
@@ -164,9 +164,9 @@ async function pollJobData(
     )
   }
   const [job] = relevantJobs
-  // if (!isJobFinalized(job.steps! as WorkflowStep[])) {
-  //   return undefined
-  // }
+  if (!isJobFinalized(job.steps! as WorkflowStep[])) {
+    return undefined
+  }
   return {
     id: job.id,
     name: job.name,
