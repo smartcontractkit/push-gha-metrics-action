@@ -1,6 +1,6 @@
-import fs from "node:fs/promises"
+import fs from "fs/promises"
 import * as yaml from "yaml"
-import { join } from "node:path"
+import { join } from "path"
 
 /**
  * Given a directory that contains workflow files, update the workflows with our metrics action.

@@ -2,8 +2,8 @@ import {
   getWorkflowFilePathsFrom,
   updateWorkflow,
 } from "@src/scripts/workflow-auto-updater/lib"
-import path from "node:path"
-import { execSync } from "node:child_process"
+import path from "path"
+import { execSync } from "child_process"
 
 function gitRoot() {
   const root = execSync("git rev-parse --show-toplevel")

@@ -1,7 +1,15 @@
 import type { context as RawGithubContext } from "@actions/github"
+import * as core from "@actions/core"
 import * as types from "./context.types"
 import { iso8601ToUnixTimeSeconds, unixNowSeconds } from "./utils"
-import { WorkflowStepAugmented } from "@octokit/webhooks-types"
+import {WorkflowStep} from "@octokit/webhooks-types"
+
+// When this action is tested in different context we found out that there is no criteria
+// on which you can rely to figure out that job is finished
+// some steps with 0s execution time is always in "queued" state even if
+// our action step is the last step, so we have no way to tell if job is succeed or failed
+// because it's still in progress
+const JobFinalizedSleep = 3000
 
 /**
  * Fetch the current context, includes relevant information about the triggering event, workflow run, and job run
@@ -30,7 +38,7 @@ export async function fetchContext(
     githubContext
 
   const mergedJobRunContext: types.Context["jobRun"] = {
-    ...jobRunContext,
+    ...jobRunContext!,
     jobName,
   }
   const mergedWorkflowRunContext: types.Context["workflowRun"] = {
@@ -89,6 +97,20 @@ export function getGithubContext(
   }
 }
 
+function delay(ms: number) {
+  return new Promise( resolve => setTimeout(resolve, ms) );
+}
+
+function isJobFailed(steps: WorkflowStep[]): number {
+    for (const step of steps) {
+      if (step.conclusion === "failure") {
+        core.info(`one of a job steps has failed, reporting as failed`)
+        return 1
+      }
+    }
+  return 0
+}
+
 /**
  * Get the context of the currently executing job run
  *
@@ -100,23 +122,23 @@ export async function fetchJobRunContext(
   client: types.Octokit,
   githubContext: types.GithubContext,
   contextOverrides?: types.ContextOverrides,
-): Promise<types.JobRunContext> {
+): Promise<types.JobRunContext | undefined> {
+  await delay(JobFinalizedSleep)
   const jobRuns = await client.rest.actions.listJobsForWorkflowRunAttempt({
     attempt_number: githubContext.runAttempt,
     run_id: githubContext.runId,
     ...githubContext.repo,
   })
   const { jobs } = jobRuns.data
-
   const relevantJobs = jobs.filter(
-    j => j.name === githubContext.jobName && j.status === "in_progress",
+      j => j.name === githubContext.jobName && j.status === "in_progress",
   )
 
   // This should never happen, as job names reported by the API always have a number post-fixed to them if the default
   // name is not unique within the context of matrix execution
   if (relevantJobs.length > 1) {
     throw Error(
-      `More than one job found during self-lookup, non-unique matrix job names being used will result in metrics ambiguity`,
+        `More than one job found during self-lookup, non-unique matrix job names being used will result in metrics ambiguity`,
     )
   }
 
@@ -127,38 +149,23 @@ export async function fetchJobRunContext(
   // that's executing this workflow run, and what is being reported by github api's
   if (relevantJobs.length === 0) {
     throw Error(
-      `No job for job name: "${
-        githubContext.jobName
-      }" found during self-lookup, invalid job name given?
+        `No job for job name: "${
+            githubContext.jobName
+        }" found during self-lookup, invalid job name given?
       Available jobs names + ids: ${jobs.map(j => `${j.name}|${j.id}`)}
       `,
     )
   }
-  const [self] = relevantJobs
-
-  // This is subject to the eventually consistent API
-  // we may have to introduce retry logic in the
-  // API call, until we are able to fetch the most up to date steps
-  // by checking if we're currently processing _this_ step.
-  const hasFailed=
-    self.steps?.reduce((acc, currentStep) => {
-      // Octokit has wonky typings, the webhook ones are more correct
-      // but we need to add another union for queued steps
-      // @ts-expect-error
-      const step: WorkflowStepAugmented = currentStep
-
-      return acc && step.conclusion === "failure"
-    }, true) ?? false
-
+  const [job] = relevantJobs
   return {
-    id: self.id,
-    name: self.name,
-    url: self.url,
-    hasFailed: Number(hasFailed),
-    startedAt: self.started_at,
-    startedAtUnixSeconds: iso8601ToUnixTimeSeconds(self.started_at),
+    id: job.id,
+    name: job.name,
+    url: job.url,
+    hasFailed: isJobFailed(job.steps! as WorkflowStep[]),
+    startedAt: job.started_at,
+    startedAtUnixSeconds: iso8601ToUnixTimeSeconds(job.started_at),
     estimatedEndedAtUnixSeconds: unixNowSeconds(
-      contextOverrides?.estimatedEndedAtUnixSeconds,
+        contextOverrides?.estimatedEndedAtUnixSeconds,
     ),
   }
 }

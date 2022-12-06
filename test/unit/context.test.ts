@@ -1,8 +1,8 @@
 import type { context } from "@actions/github"
 import { DeepMockProxy, mockDeep, MockProxy } from "jest-mock-extended"
 import * as fixtures from "../fixtures/github"
-import { writeFileSync } from "node:fs"
-import { join } from "node:path"
+import { writeFileSync } from "fs"
+import { join } from "path"
 import {
   fetchWorkflowRunContext,
   fetchJobRunContext,

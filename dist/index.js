@@ -1270,12 +1270,12 @@ var require_lib = __commonJS({
             throw new Error("Client has already been disposed.");
           }
           const parsedUrl = new URL(requestUrl);
-          let info3 = this._prepareRequest(verb, parsedUrl, headers);
+          let info4 = this._prepareRequest(verb, parsedUrl, headers);
           const maxTries = this._allowRetries && RetryableHttpVerbs.includes(verb) ? this._maxRetries + 1 : 1;
           let numTries = 0;
           let response;
           do {
-            response = yield this.requestRaw(info3, data);
+            response = yield this.requestRaw(info4, data);
             if (response && response.message && response.message.statusCode === HttpCodes.Unauthorized) {
               let authenticationHandler;
               for (const handler of this.handlers) {
@@ -1285,7 +1285,7 @@ var require_lib = __commonJS({
                 }
               }
               if (authenticationHandler) {
-                return authenticationHandler.handleAuthentication(this, info3, data);
+                return authenticationHandler.handleAuthentication(this, info4, data);
               } else {
                 return response;
               }
@@ -1308,8 +1308,8 @@ var require_lib = __commonJS({
                   }
                 }
               }
-              info3 = this._prepareRequest(verb, parsedRedirectUrl, headers);
-              response = yield this.requestRaw(info3, data);
+              info4 = this._prepareRequest(verb, parsedRedirectUrl, headers);
+              response = yield this.requestRaw(info4, data);
               redirectsRemaining--;
             }
             if (!response.message.statusCode || !HttpResponseRetryCodes.includes(response.message.statusCode)) {
@@ -1330,7 +1330,7 @@ var require_lib = __commonJS({
         }
         this._disposed = true;
       }
-      requestRaw(info3, data) {
+      requestRaw(info4, data) {
         return __awaiter(this, void 0, void 0, function* () {
           return new Promise((resolve, reject) => {
             function callbackForResult(err, res) {
@@ -1342,16 +1342,16 @@ var require_lib = __commonJS({
                 resolve(res);
               }
             }
-            this.requestRawWithCallback(info3, data, callbackForResult);
+            this.requestRawWithCallback(info4, data, callbackForResult);
           });
         });
       }
-      requestRawWithCallback(info3, data, onResult) {
+      requestRawWithCallback(info4, data, onResult) {
         if (typeof data === "string") {
-          if (!info3.options.headers) {
-            info3.options.headers = {};
+          if (!info4.options.headers) {
+            info4.options.headers = {};
           }
-          info3.options.headers["Content-Length"] = Buffer.byteLength(data, "utf8");
+          info4.options.headers["Content-Length"] = Buffer.byteLength(data, "utf8");
         }
         let callbackCalled = false;
         function handleResult(err, res) {
@@ -1360,7 +1360,7 @@ var require_lib = __commonJS({
             onResult(err, res);
           }
         }
-        const req = info3.httpModule.request(info3.options, (msg) => {
+        const req = info4.httpModule.request(info4.options, (msg) => {
           const res = new HttpClientResponse(msg);
           handleResult(void 0, res);
         });
@@ -1372,7 +1372,7 @@ var require_lib = __commonJS({
           if (socket) {
             socket.end();
           }
-          handleResult(new Error(`Request timeout: ${info3.options.path}`));
+          handleResult(new Error(`Request timeout: ${info4.options.path}`));
         });
         req.on("error", function(err) {
           handleResult(err);
@@ -1394,27 +1394,27 @@ var require_lib = __commonJS({
         return this._getAgent(parsedUrl);
       }
       _prepareRequest(method, requestUrl, headers) {
-        const info3 = {};
-        info3.parsedUrl = requestUrl;
-        const usingSsl = info3.parsedUrl.protocol === "https:";
-        info3.httpModule = usingSsl ? https2 : http2;
+        const info4 = {};
+        info4.parsedUrl = requestUrl;
+        const usingSsl = info4.parsedUrl.protocol === "https:";
+        info4.httpModule = usingSsl ? https2 : http2;
         const defaultPort = usingSsl ? 443 : 80;
-        info3.options = {};
-        info3.options.host = info3.parsedUrl.hostname;
-        info3.options.port = info3.parsedUrl.port ? parseInt(info3.parsedUrl.port) : defaultPort;
-        info3.options.path = (info3.parsedUrl.pathname || "") + (info3.parsedUrl.search || "");
-        info3.options.method = method;
-        info3.options.headers = this._mergeHeaders(headers);
+        info4.options = {};
+        info4.options.host = info4.parsedUrl.hostname;
+        info4.options.port = info4.parsedUrl.port ? parseInt(info4.parsedUrl.port) : defaultPort;
+        info4.options.path = (info4.parsedUrl.pathname || "") + (info4.parsedUrl.search || "");
+        info4.options.method = method;
+        info4.options.headers = this._mergeHeaders(headers);
         if (this.userAgent != null) {
-          info3.options.headers["user-agent"] = this.userAgent;
+          info4.options.headers["user-agent"] = this.userAgent;
         }
-        info3.options.agent = this._getAgent(info3.parsedUrl);
+        info4.options.agent = this._getAgent(info4.parsedUrl);
         if (this.handlers) {
           for (const handler of this.handlers) {
-            handler.prepareRequest(info3.options);
+            handler.prepareRequest(info4.options);
           }
         }
-        return info3;
+        return info4;
       }
       _mergeHeaders(headers) {
         if (this.requestOptions && this.requestOptions.headers) {
@@ -2122,10 +2122,10 @@ Support boolean input list: \`true | True | TRUE | false | False | FALSE\``);
       command_1.issueCommand("notice", utils_1.toCommandProperties(properties), message instanceof Error ? message.toString() : message);
     }
     exports.notice = notice;
-    function info3(message) {
+    function info4(message) {
       process.stdout.write(message + os.EOL);
     }
-    exports.info = info3;
+    exports.info = info4;
     function startGroup2(name) {
       command_1.issue("group", name);
     }
@@ -7554,8 +7554,11 @@ __export(src_exports, {
   main: () => main
 });
 module.exports = __toCommonJS(src_exports);
-var core2 = __toESM(require_core());
+var core3 = __toESM(require_core());
 var github = __toESM(require_github());
+
+// src/context.ts
+var core = __toESM(require_core());
 
 // src/utils.ts
 function iso8601ToUnixTimeSeconds(iso8610Timestamp) {
@@ -7580,6 +7583,7 @@ function unixNowSeconds(override) {
 }
 
 // src/context.ts
+var JobFinalizedSleep = 3e3;
 async function fetchContext(githubClient, rawGithubContext, contextOverrides) {
   const githubContext = getGithubContext(rawGithubContext, contextOverrides);
   const jobRunContext = await fetchJobRunContext(
@@ -7634,8 +7638,20 @@ function getGithubContext(rawGithubContext, contextOverrides) {
     workflowName: fullContext.workflow
   };
 }
+function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+function isJobFailed(steps) {
+  for (const step of steps) {
+    if (step.conclusion === "failure") {
+      core.info(`one of a job steps has failed, reporting as failed`);
+      return 1;
+    }
+  }
+  return 0;
+}
 async function fetchJobRunContext(client, githubContext, contextOverrides) {
-  var _a;
+  await delay(JobFinalizedSleep);
   const jobRuns = await client.rest.actions.listJobsForWorkflowRunAttempt({
     attempt_number: githubContext.runAttempt,
     run_id: githubContext.runId,
@@ -7657,18 +7673,14 @@ async function fetchJobRunContext(client, githubContext, contextOverrides) {
       `
     );
   }
-  const [self] = relevantJobs;
-  const hasFailed = ((_a = self.steps) == null ? void 0 : _a.reduce((acc, currentStep) => {
-    const step = currentStep;
-    return acc && step.conclusion === "failure";
-  }, true)) ?? false;
+  const [job] = relevantJobs;
   return {
-    id: self.id,
-    name: self.name,
-    url: self.url,
-    hasFailed: Number(hasFailed),
-    startedAt: self.started_at,
-    startedAtUnixSeconds: iso8601ToUnixTimeSeconds(self.started_at),
+    id: job.id,
+    name: job.name,
+    url: job.url,
+    hasFailed: isJobFailed(job.steps),
+    startedAt: job.started_at,
+    startedAtUnixSeconds: iso8601ToUnixTimeSeconds(job.started_at),
     estimatedEndedAtUnixSeconds: unixNowSeconds(
       contextOverrides == null ? void 0 : contextOverrides.estimatedEndedAtUnixSeconds
     )
@@ -7701,7 +7713,7 @@ async function fetchWorkflowRunContext(client, githubContext) {
 }
 
 // src/loki.ts
-var core = __toESM(require_core());
+var core2 = __toESM(require_core());
 var import_http = __toESM(require("http"));
 var import_https = __toESM(require("https"));
 function createLokiLogEntriesFromContext(context2) {
@@ -7735,7 +7747,7 @@ function extractStreamFromContext(context2) {
     actor
   };
   const streamLabels = { ...staticLabels, ...dynamicLabels };
-  core.info(
+  core2.info(
     `${extractStreamFromContext.name} Extracted stream labels from context: ${JSON.stringify(
       streamLabels,
       null,
@@ -7748,10 +7760,10 @@ function createLokiLogValueFromContext(context2) {
   const log = JSON.stringify(context2);
   const secondInNanoSeconds = BigInt(1e9);
   const ts = BigInt(context2.jobRun.estimatedEndedAtUnixSeconds) * secondInNanoSeconds;
-  core.debug(
+  core2.debug(
     `${createLokiLogValueFromContext.name} Created loki log value: ${log}`
   );
-  core.debug(
+  core2.debug(
     `${createLokiLogValueFromContext.name} Created loki log timestamp in nanoseconds ${ts}`
   );
   return [ts.toString(), log];
@@ -7780,7 +7792,7 @@ async function sendLokiRequest(logEntries, requestOptions, dryRun) {
     "headers",
     "timeout"
   ];
-  core.debug(
+  core2.debug(
     `${sendLokiRequest.name} SanitizedRequestOptions: ${JSON.stringify(
       options,
       optionsWhitelist,
@@ -7795,7 +7807,7 @@ async function sendLokiRequest(logEntries, requestOptions, dryRun) {
     (resolve, reject) => {
       const request = lib.request(options, (res) => {
         const { statusCode, statusMessage, headers: incomingHeaders } = res;
-        core.debug(
+        core2.debug(
           `${sendLokiRequest.name} Incoming headers ${JSON.stringify(
             incomingHeaders
           )}`
@@ -7827,7 +7839,7 @@ async function sendLokiRequest(logEntries, requestOptions, dryRun) {
       request.end();
     }
   );
-  core.debug(
+  core2.debug(
     `${sendLokiRequest.name} Response: ${JSON.stringify(response, null, 1)}`
   );
   return response;
@@ -7836,16 +7848,16 @@ async function sendLokiRequest(logEntries, requestOptions, dryRun) {
 // src/index.ts
 var isPost = "isPost";
 async function main() {
-  if (!core2.getState(isPost)) {
-    core2.saveState(isPost, true);
-    core2.info("This action no-ops during main execution");
+  if (!core3.getState(isPost)) {
+    core3.saveState(isPost, true);
+    core3.info("This action no-ops during main execution");
     return;
   }
   try {
-    core2.startGroup("Github Context Gathering");
-    const dryRun = core2.getBooleanInput("dry-run", { required: true });
+    core3.startGroup("Github Context Gathering");
+    const dryRun = core3.getBooleanInput("dry-run", { required: true });
     if (dryRun) {
-      core2.info("Dry run enabled");
+      core3.info("Dry run enabled");
     }
     const githubToken = getTypedInput("github-token");
     const githubClient = github.getOctokit(githubToken);
@@ -7858,14 +7870,14 @@ async function main() {
       rawContext,
       contextOverrides
     );
-    core2.endGroup();
-    core2.startGroup("Loki Log Sending");
+    core3.endGroup();
+    core3.startGroup("Loki Log Sending");
     const logEntries = createLokiLogEntriesFromContext(context2);
     await sendLokiRequest(logEntries, getLokiRequestOptions(), dryRun);
-    core2.endGroup();
+    core3.endGroup();
   } catch (err) {
-    core2.endGroup();
-    core2.setFailed(`Got error ${err}, failing action`);
+    core3.endGroup();
+    core3.setFailed(`Got error ${err}, failing action`);
   }
 }
 main();
@@ -7902,7 +7914,7 @@ function getLokiRequestOptions() {
   };
 }
 function getTypedInput(inputKey, required = true) {
-  return core2.getInput(inputKey, { required, trimWhitespace: true });
+  return core3.getInput(inputKey, { required, trimWhitespace: true });
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
