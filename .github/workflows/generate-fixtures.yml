@@ -41,10 +41,6 @@ jobs:
         id: dummy-step-2
         run: echo "test test test"
 
-      - name: Dummy step 3 failed
-        id: dummy-step-3
-        run: sdfs
-
   generate-fixtures:
     name: generate-fixtures-name-${{ matrix.name }}
     runs-on: ubuntu-latest

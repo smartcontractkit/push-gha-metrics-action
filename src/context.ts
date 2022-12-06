@@ -5,6 +5,7 @@ import { iso8601ToUnixTimeSeconds, unixNowSeconds } from "./utils"
 import {WorkflowStep} from "@octokit/webhooks-types"
 
 const MetricCollectionStepName = "Post Collect Metrics"
+const JobPollingAttempts = 10
 const JobPollingIntervalMilliseconds = 1000
 
 /**
@@ -192,7 +193,7 @@ export async function fetchJobRunContext(
   contextOverrides?: types.ContextOverrides,
 ): Promise<types.JobRunContext | undefined> {
 
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < JobPollingAttempts; i++) {
     const jobRunContext = await pollJobData(client, githubContext, contextOverrides)
     if (jobRunContext != undefined) {
       return jobRunContext

@@ -7584,6 +7584,7 @@ function unixNowSeconds(override) {
 
 // src/context.ts
 var MetricCollectionStepName = "Post Collect Metrics";
+var JobPollingAttempts = 10;
 var JobPollingIntervalMilliseconds = 1e3;
 async function fetchContext(githubClient, rawGithubContext, contextOverrides) {
   const githubContext = getGithubContext(rawGithubContext, contextOverrides);
@@ -7703,7 +7704,7 @@ async function pollJobData(client, githubContext, contextOverrides) {
   };
 }
 async function fetchJobRunContext(client, githubContext, contextOverrides) {
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < JobPollingAttempts; i++) {
     const jobRunContext = await pollJobData(client, githubContext, contextOverrides);
     if (jobRunContext != void 0) {
       return jobRunContext;
