@@ -7583,9 +7583,6 @@ function unixNowSeconds(override) {
 }
 
 // src/context.ts
-var MetricCollectionStepName = "Post Collect Metrics";
-var JobPollingAttempts = 20;
-var JobPollingIntervalMilliseconds = 1e3;
 async function fetchContext(githubClient, rawGithubContext, contextOverrides) {
   const githubContext = getGithubContext(rawGithubContext, contextOverrides);
   const jobRunContext = await fetchJobRunContext(
@@ -7640,9 +7637,6 @@ function getGithubContext(rawGithubContext, contextOverrides) {
     workflowName: fullContext.workflow
   };
 }
-function delay(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
 function isJobFailed(steps) {
   for (const step of steps) {
     if (step.conclusion === "failure") {
@@ -7652,20 +7646,7 @@ function isJobFailed(steps) {
   }
   return 0;
 }
-function isJobFinalized(steps) {
-  for (let i = 0; i < steps.length; i++) {
-    if (steps[i].name === MetricCollectionStepName) {
-      const prevStep = steps[i - 1];
-      core.info(`previous step: ${JSON.stringify(prevStep, null, 1)}`);
-      if (steps[i - 1].conclusion !== null) {
-        core.info(`job is finalized`);
-        return true;
-      }
-    }
-  }
-  return false;
-}
-async function pollJobData(client, githubContext, contextOverrides) {
+async function fetchJobRunContext(client, githubContext, contextOverrides) {
   const jobRuns = await client.rest.actions.listJobsForWorkflowRunAttempt({
     attempt_number: githubContext.runAttempt,
     run_id: githubContext.runId,
@@ -7688,9 +7669,6 @@ async function pollJobData(client, githubContext, contextOverrides) {
     );
   }
   const [job] = relevantJobs;
-  if (!isJobFinalized(job.steps)) {
-    return void 0;
-  }
   return {
     id: job.id,
     name: job.name,
@@ -7702,16 +7680,6 @@ async function pollJobData(client, githubContext, contextOverrides) {
       contextOverrides == null ? void 0 : contextOverrides.estimatedEndedAtUnixSeconds
     )
   };
-}
-async function fetchJobRunContext(client, githubContext, contextOverrides) {
-  for (let i = 0; i < JobPollingAttempts; i++) {
-    const jobRunContext = await pollJobData(client, githubContext, contextOverrides);
-    if (jobRunContext != void 0) {
-      return jobRunContext;
-    }
-    await delay(JobPollingIntervalMilliseconds);
-  }
-  throw Error(`JobRun context is not finalized until timeout, job name: ${githubContext.jobName}`);
 }
 async function fetchWorkflowRunContext(client, githubContext) {
   const workflowRun = await client.rest.actions.getWorkflowRunAttempt({

@@ -108,28 +108,89 @@ function isJobFailed(steps: WorkflowStep[]): number {
   return 0
 }
 
-// checks if job is finalized, when all steps except our Post Collect Metrics have not null conclusion
-function isJobFinalized(steps: WorkflowStep[]): boolean {
-  for (let i = 0; i < steps.length; i ++) {
-    if (steps[i].name === MetricCollectionStepName) {
-      const prevStep = steps[i-1]
-      core.info(`previous step: ${JSON.stringify(prevStep, null, 1)}`)
-      if (steps[i-1].conclusion !== null) {
-        core.info(`job is finalized`)
-        return true
-      }
-    }
-  }
-  return false
-}
+// // checks if job is finalized, when all steps except our Post Collect Metrics have not null conclusion
+// function isJobFinalized(steps: WorkflowStep[]): boolean {
+//   for (let i = 0; i < steps.length; i ++) {
+//     if (steps[i].name === MetricCollectionStepName) {
+//       const prevStep = steps[i-1]
+//       core.info(`previous step: ${JSON.stringify(prevStep, null, 1)}`)
+//       if (steps[i-1].conclusion !== null) {
+//         core.info(`job is finalized`)
+//         return true
+//       }
+//     }
+//   }
+//   return false
+// }
 
 // poll job data until job is
 // 1. relevant, we need only current job
 // 2. finalized, all steps before Post Collect Metrics are finished
-async function pollJobData(
-    client: types.Octokit,
-    githubContext: types.GithubContext,
-    contextOverrides?: types.ContextOverrides
+// async function pollJobData(
+//     client: types.Octokit,
+//     githubContext: types.GithubContext,
+//     contextOverrides?: types.ContextOverrides
+// ): Promise<types.JobRunContext | undefined> {
+  // const jobRuns = await client.rest.actions.listJobsForWorkflowRunAttempt({
+  //   attempt_number: githubContext.runAttempt,
+  //   run_id: githubContext.runId,
+  //   ...githubContext.repo,
+  // })
+  // const { jobs } = jobRuns.data
+  // const relevantJobs = jobs.filter(
+  //     j => j.name === githubContext.jobName && j.status === "in_progress",
+  // )
+  //
+  // // This should never happen, as job names reported by the API always have a number post-fixed to them if the default
+  // // name is not unique within the context of matrix execution
+  // if (relevantJobs.length > 1) {
+  //   throw Error(
+  //       `More than one job found during self-lookup, non-unique matrix job names being used will result in metrics ambiguity`,
+  //   )
+  // }
+  //
+  // // Non-exhaustive situations where this could happen in order of likelihood:
+  // // 1. Invalid job name given for a lookup
+  // // 2. could be nullable if the run is queued, but has not started yet which
+  // // can occur due to eventual consistency between the current runner
+  // // that's executing this workflow run, and what is being reported by github api's
+  // if (relevantJobs.length === 0) {
+  //   throw Error(
+  //       `No job for job name: "${
+  //           githubContext.jobName
+  //       }" found during self-lookup, invalid job name given?
+  //     Available jobs names + ids: ${jobs.map(j => `${j.name}|${j.id}`)}
+  //     `,
+  //   )
+  // }
+  // const [job] = relevantJobs
+  // // if (!isJobFinalized(job.steps! as WorkflowStep[])) {
+  // //   return undefined
+  // // }
+  // return {
+  //   id: job.id,
+  //   name: job.name,
+  //   url: job.url,
+  //   hasFailed: isJobFailed(job.steps! as WorkflowStep[]),
+  //   startedAt: job.started_at,
+  //   startedAtUnixSeconds: iso8601ToUnixTimeSeconds(job.started_at),
+  //   estimatedEndedAtUnixSeconds: unixNowSeconds(
+  //       contextOverrides?.estimatedEndedAtUnixSeconds,
+  //   ),
+  // }
+// }
+
+/**
+ * Get the context of the currently executing job run
+ *
+ * @see https://github.community/t/get-action-job-id/17365/10
+ * @param client
+ * @param githubContext
+ */
+export async function fetchJobRunContext(
+  client: types.Octokit,
+  githubContext: types.GithubContext,
+  contextOverrides?: types.ContextOverrides,
 ): Promise<types.JobRunContext | undefined> {
   const jobRuns = await client.rest.actions.listJobsForWorkflowRunAttempt({
     attempt_number: githubContext.runAttempt,
@@ -164,9 +225,9 @@ async function pollJobData(
     )
   }
   const [job] = relevantJobs
-  if (!isJobFinalized(job.steps! as WorkflowStep[])) {
-    return undefined
-  }
+  // if (!isJobFinalized(job.steps! as WorkflowStep[])) {
+  //   return undefined
+  // }
   return {
     id: job.id,
     name: job.name,
@@ -178,29 +239,6 @@ async function pollJobData(
         contextOverrides?.estimatedEndedAtUnixSeconds,
     ),
   }
-}
-
-/**
- * Get the context of the currently executing job run
- *
- * @see https://github.community/t/get-action-job-id/17365/10
- * @param client
- * @param githubContext
- */
-export async function fetchJobRunContext(
-  client: types.Octokit,
-  githubContext: types.GithubContext,
-  contextOverrides?: types.ContextOverrides,
-): Promise<types.JobRunContext | undefined> {
-
-  for (let i = 0; i < JobPollingAttempts; i++) {
-    const jobRunContext = await pollJobData(client, githubContext, contextOverrides)
-    if (jobRunContext != undefined) {
-      return jobRunContext
-    }
-    await delay(JobPollingIntervalMilliseconds)
-  }
-  throw Error(`JobRun context is not finalized until timeout, job name: ${githubContext.jobName}`)
 }
 
 /**

@@ -30,16 +30,21 @@ jobs:
       - name: Dummy step 1
         uses: actions/checkout@v3
 
+      - name: Dummy step 2
+        id: dummy-step-2
+        run: echo "test test test"
+
+      - name: Dummy step 3 failed
+        id: dummy-step-3
+        run: sdfs
+
       - name: Collect Metrics
+        if: always()
         uses: ./
         with:
           basic-auth: ${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: ${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: my dummy job
-
-      - name: Dummy step 2
-        id: dummy-step-2
-        run: echo "test test test"
 
   generate-fixtures:
     name: generate-fixtures-name-${{ matrix.name }}
