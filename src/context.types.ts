@@ -62,9 +62,14 @@ export interface JobRunContext {
   name: JobRun["name"]
 
   /**
-   * The url linking back to the job run
+   * The url linking back to the job API response
    */
   url: JobRun["url"]
+
+  /**
+   * The url linking back to the job run (HTML version)
+   */
+  html_url: JobRun["html_url"]
 
   /**
    * When the current job was started, in ISO-8061 format

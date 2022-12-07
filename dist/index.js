@@ -7678,6 +7678,7 @@ async function fetchJobRunContext(client, githubContext, contextOverrides) {
     id: job.id,
     name: job.name,
     url: job.url,
+    html_url: job.html_url,
     hasFailed: isJobFailed(job.steps),
     startedAt: job.started_at,
     startedAtUnixSeconds: iso8601ToUnixTimeSeconds(job.started_at),
