@@ -161,6 +161,7 @@ export async function fetchJobRunContext(
     id: job.id,
     name: job.name,
     url: job.url,
+    html_url: job.html_url,
     hasFailed: isJobFailed(job.steps! as WorkflowStep[]),
     startedAt: job.started_at,
     startedAtUnixSeconds: iso8601ToUnixTimeSeconds(job.started_at),

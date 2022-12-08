@@ -15,6 +15,7 @@ exports[`Context Event Pull Requests 0 Job Attempts fetchContext should work 1`]
   "jobRun": {
     "estimatedEndedAtUnixSeconds": 1655254904,
     "hasFailed": 0,
+    "html_url": "https://github.com/smartcontractkit/push-gha-metrics-action/runs/6891428337?check_suite_focus=true",
     "id": 6891428337,
     "jobName": "generate-fixtures-name-1",
     "name": "generate-fixtures-name-1",
@@ -49,6 +50,7 @@ exports[`Context Event Pull Requests 0 Job Attempts fetchJobRunContext should wo
 {
   "estimatedEndedAtUnixSeconds": 1655254904,
   "hasFailed": 0,
+  "html_url": "https://github.com/smartcontractkit/push-gha-metrics-action/runs/6891428337?check_suite_focus=true",
   "id": 6891428337,
   "name": "generate-fixtures-name-1",
   "startedAt": "2022-06-15T01:01:13Z",
@@ -105,6 +107,7 @@ exports[`Context Event Pull Requests 1 Job Attempts fetchContext should work 1`]
   "jobRun": {
     "estimatedEndedAtUnixSeconds": 1655500786,
     "hasFailed": 0,
+    "html_url": "https://github.com/smartcontractkit/push-gha-metrics-action/runs/6942977656?check_suite_focus=true",
     "id": 6942977656,
     "jobName": "generate-fixtures-name-1",
     "name": "generate-fixtures-name-1",
@@ -139,6 +142,7 @@ exports[`Context Event Pull Requests 1 Job Attempts fetchJobRunContext should wo
 {
   "estimatedEndedAtUnixSeconds": 1655500786,
   "hasFailed": 0,
+  "html_url": "https://github.com/smartcontractkit/push-gha-metrics-action/runs/6942977656?check_suite_focus=true",
   "id": 6942977656,
   "name": "generate-fixtures-name-1",
   "startedAt": "2022-06-17T21:19:17Z",

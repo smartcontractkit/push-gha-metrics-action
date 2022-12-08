@@ -79,6 +79,7 @@ function generateMockContexts(amount = 100, dateRangeInDays = 1) {
             iso8601ToUnixTimeSeconds(jobStartedAt.toISOString()) +
             faker.datatype.number({ min: 20, max: 60 * 5 }),
           url: faker.internet.url(),
+          html_url: faker.internet.url(),
         },
         workflowRun: {
           createdAt: workflowCreatedAt,
