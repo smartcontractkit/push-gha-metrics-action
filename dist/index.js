@@ -7741,6 +7741,7 @@ function extractStreamFromContext(context2) {
   };
   const dynamicLabels = {
     eventName,
+    ref: event.ref,
     repo: repo.repo,
     owner: repo.owner,
     jobName,
