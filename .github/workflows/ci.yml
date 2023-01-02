@@ -39,7 +39,7 @@ jobs:
           echo "::set-output name=pnpm_cache_dir::$(pnpm store path)"
 
       - name: Cache npm artifacts
-        uses: actions/cache@c3f1317a9e7b1ef106c153ac8c0f00fed3ddbc0d #v3.0.4
+        uses: actions/cache@4723a57e26efda3a62cbde1812113b730952852d #v3.2.2
         with:
           key: ${{ runner.os }}-pnpm-cache
           path: |
