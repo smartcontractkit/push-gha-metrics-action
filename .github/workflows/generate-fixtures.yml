@@ -94,7 +94,7 @@ jobs:
             fs.writeFileSync(path.join(process.env.dumpPath, 'context.json'), JSON.stringify(context))
 
       - name: Upload fixtures
-        uses: actions/upload-artifact@v3.1.0
+        uses: actions/upload-artifact@v3.1.2
         with:
           name: ${{ env.payload-name }}
           path: ${{ env.test-dir }}${{ env.fixture-path }}
