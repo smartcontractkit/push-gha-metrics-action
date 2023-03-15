@@ -3,6 +3,7 @@
 # Table of Contents
 
 - [About](#about)
+- [Permissions](#permissions)
 - [Usage](#usage)
 - [Development](#development)
   - [Requirements](#requirements)
@@ -95,6 +96,18 @@ sequenceDiagram
     F->>F: Visualize metrics
 
 ```
+
+# Permissions
+
+This action requires the following permissions:
+
+```yaml
+permions:
+  actions: read
+```
+
+Make sure you explicitly grant this permission to the github action's token if
+you have the `permissions` key set in your workflow.
 
 # Usage
 
