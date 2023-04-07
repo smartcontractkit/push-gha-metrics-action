@@ -25,6 +25,22 @@ describe("Loki", () => {
       )
       expect(JSON.parse(value)).toMatchInlineSnapshot(`
         {
+          "data": {
+            "goTestResults": {
+              "Test Suite Result": {
+                "Action": "fail",
+                "Elapsed": 551.993,
+              },
+              "Test5NodesPlus2MiningGethsReorgEnv": {
+                "Action": "fail",
+                "Elapsed": 522.96,
+              },
+              "TestMinResources5NodesEnvWithBlockscout": {
+                "Action": "pass",
+                "Elapsed": 506.4,
+              },
+            },
+          },
           "event": {
             "actor": "HenryNguyen5",
             "eventName": "pull_request",
@@ -85,6 +101,22 @@ describe("Loki", () => {
       )
       expect(JSON.parse(value)).toMatchInlineSnapshot(`
         {
+          "data": {
+            "goTestResults": {
+              "Test Suite Result": {
+                "Action": "fail",
+                "Elapsed": 551.993,
+              },
+              "Test5NodesPlus2MiningGethsReorgEnv": {
+                "Action": "fail",
+                "Elapsed": 522.96,
+              },
+              "TestMinResources5NodesEnvWithBlockscout": {
+                "Action": "pass",
+                "Elapsed": 506.4,
+              },
+            },
+          },
           "event": {
             "actor": "HenryNguyen5",
             "eventName": "pull_request",

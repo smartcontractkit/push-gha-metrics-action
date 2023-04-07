@@ -102,7 +102,7 @@ sequenceDiagram
 This action requires the following permissions:
 
 ```yaml
-permions:
+permissions:
   actions: read
 ```
 

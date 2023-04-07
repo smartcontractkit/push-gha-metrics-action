@@ -5,6 +5,7 @@ import { fetchContext } from "./context"
 import * as loki from "./loki"
 import * as lokiTypes from "./loki.types"
 import * as contextTypes from "./context.types"
+import * as fs from "fs"
 
 const isPost = "isPost"
 
@@ -34,6 +35,21 @@ export async function main() {
       rawContext,
       contextOverrides,
     )
+    core.endGroup()
+
+    core.startGroup("Load json files into context")
+    const files = core.getInput("json-files-to-include")
+    if (files !== "") {
+      const filesJson = JSON.parse(files)
+      // loop through and load each file into context with the name and files json contents
+      for (const file of filesJson) {
+        const name = file.name
+        const filepath = file.path
+        const data = fs.readFileSync(filepath, "utf8")
+        const jsonData = JSON.parse(data)
+        context.data[name] = jsonData
+      }
+    }
     core.endGroup()
 
     core.startGroup("Loki Log Sending")

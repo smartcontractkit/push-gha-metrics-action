@@ -2,6 +2,7 @@
 
 exports[`Context Event Pull Requests 0 Job Attempts fetchContext should work 1`] = `
 {
+  "data": {},
   "event": {
     "actor": "HenryNguyen5",
     "eventName": "pull_request",
@@ -92,6 +93,7 @@ exports[`Context Event Pull Requests 0 Job Attempts getGithubContext should retu
 
 exports[`Context Event Pull Requests 1 Job Attempts fetchContext should work 1`] = `
 {
+  "data": {},
   "event": {
     "actor": "HenryNguyen5",
     "eventName": "pull_request",

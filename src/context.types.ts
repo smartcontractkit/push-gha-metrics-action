@@ -44,6 +44,10 @@ export interface Context {
    * The current job run context
    */
   jobRun: JobRunContext & Pick<GithubContext, GithubContextJobRunPropertyKeys>
+  /**
+   * Other data
+   */
+  data: any
 }
 
 type JobRun = Awaited<

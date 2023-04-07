@@ -32,5 +32,21 @@
     "startedAtUnixSeconds": 1655254873,
     "estimatedEndedAtUnixSeconds": 1655254904,
     "jobName": "generate-fixtures-name-1"
+  },
+  "data" : {
+    "goTestResults": {
+      "TestMinResources5NodesEnvWithBlockscout": {
+        "Action": "pass",
+        "Elapsed": 506.4
+      },
+      "Test5NodesPlus2MiningGethsReorgEnv": {
+        "Action": "fail",
+        "Elapsed": 522.96
+      },
+      "Test Suite Result": {
+        "Action": "fail",
+        "Elapsed": 551.993
+      }
+    }
   }
 }
