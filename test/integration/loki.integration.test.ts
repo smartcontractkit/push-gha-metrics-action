@@ -96,6 +96,7 @@ function generateMockContexts(amount = 100, dateRangeInDays = 1) {
           workflowName,
           workflowUrl: faker.internet.url(),
         },
+        data: {}
       }
 
       return ctx

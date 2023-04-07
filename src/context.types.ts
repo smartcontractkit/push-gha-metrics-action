@@ -47,7 +47,7 @@ export interface Context {
   /**
    * Other data
    */
-  data: any
+  data: any | undefined
 }
 
 type JobRun = Awaited<
