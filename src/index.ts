@@ -45,9 +45,14 @@ export async function main() {
       for (const file of filesJson) {
         const name = file.name
         const filepath = file.path
-        const data = fs.readFileSync(filepath, "utf8")
-        const jsonData = JSON.parse(data)
-        context.data[name] = jsonData
+        try {
+          const data = fs.readFileSync(filepath, "utf8")
+          const jsonData = JSON.parse(data)
+          context.data[name] = jsonData
+        } catch (error) {
+          console.log("Could not read the file: " + filepath)
+          console.log("ignoring and moving on.")
+        }
       }
     }
     core.endGroup()
