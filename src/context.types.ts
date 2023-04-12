@@ -1,4 +1,5 @@
 import type { getOctokit } from "@actions/github"
+import { TestResultsOutput } from "./testResults/testResults.types"
 
 export type Octokit = ReturnType<typeof getOctokit>
 
@@ -45,9 +46,9 @@ export interface Context {
    */
   jobRun: JobRunContext & Pick<GithubContext, GithubContextJobRunPropertyKeys>
   /**
-   * Other data
+   * Test Results Data if any is provided
    */
-  data: any | undefined
+  testResults?: TestResultsOutput
 }
 
 type JobRun = Awaited<

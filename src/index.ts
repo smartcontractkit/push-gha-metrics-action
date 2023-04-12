@@ -6,6 +6,13 @@ import * as loki from "./loki"
 import * as lokiTypes from "./loki.types"
 import * as contextTypes from "./context.types"
 import * as fs from "fs"
+import {
+  TestResultsFileMetadata,
+  TestResultsFileMetadataSchema,
+  TestResultsOutput,
+} from "./testResults/testResults.types"
+import { getTestReultsData } from "./testResults/testResults"
+import { z } from "zod"
 
 const isPost = "isPost"
 
@@ -38,21 +45,16 @@ export async function main() {
     core.endGroup()
 
     core.startGroup("Load json files into context")
-    const files = core.getInput("json-files-to-include")
-    if (files !== "") {
-      const filesJson = JSON.parse(files)
-      // loop through and load each file into context with the name and files json contents
-      for (const file of filesJson) {
-        const name = file.name
-        const filepath = file.path
-        try {
-          const data = fs.readFileSync(filepath, "utf8")
-          const jsonData = JSON.parse(data)
-          context.data[name] = jsonData
-        } catch (error) {
-          console.log("Could not read the file: " + filepath)
-          console.log("ignoring and moving on.")
-        }
+    const testResultFile: string = getTypedInput("test-results-file")
+    let metadata: TestResultsFileMetadata
+    if (testResultFile !== "") {
+      try {
+        metadata = TestResultsFileMetadataSchema.parse(testResultFile)
+        const data: TestResultsOutput = getTestReultsData(metadata)
+        context.testResults = data
+      } catch (error) {
+        core.warning(JSON.stringify(error))
+        core.warning("ignoring and moving on.")
       }
     }
     core.endGroup()
@@ -107,7 +109,11 @@ function getLokiRequestOptions(): lokiTypes.LokiRequestOptions {
 
 function getTypedInput(
   inputKey: keyof KebabCasedProperties<
-    lokiTypes.LokiRequestOptions & { githubToken: never; thisJobName: never }
+    lokiTypes.LokiRequestOptions & {
+      githubToken: never
+      thisJobName: never
+      testResultsFile: never
+    }
   >,
   required = true,
 ) {

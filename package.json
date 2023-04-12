@@ -8,6 +8,7 @@
     "build:lint": "tsc",
     "format": "prettier --write .",
     "test:unit": "jest unit",
+    "test:unit:updateSnapshots": "jest unit --updateSnapshot",
     "test:integration": "jest integration",
     "update-workflows": "ts-node ./src/scripts/workflow-auto-updater/index.ts",
     "test": "jest"
@@ -18,7 +19,8 @@
     "@actions/core": "^1.10.0",
     "@actions/github": "^5.1.1",
     "type-fest": "^3.2.0",
-    "yaml": "^2.1.3"
+    "yaml": "^2.1.3",
+    "zod": "^3.21.4"
   },
   "devDependencies": {
     "@faker-js/faker": "^7.6.0",

@@ -48,12 +48,12 @@ inputs:
     default: "3000"
     description:
       The timeout in milliseconds to use when sending requests to loki
-  json-files-to-include:
+  test-results-file:
     required: false
     default: ""
     description: |
-      Json files to attach to the output logs,
-      example: [{"name":"goTestResults","path":"./go_test_results_path.json"}]
+      Json test result file to attach to the output logs, available types: go
+      example: {"testType":"go","filePath":"./go_test_results_path.json"}
 
 runs:
   using: "node16"
