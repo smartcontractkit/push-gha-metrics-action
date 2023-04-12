@@ -11,7 +11,7 @@ import {
   TestResultsFileMetadataSchema,
   TestResultsOutput,
 } from "./testResults/testResults.types"
-import { getTestReultsData } from "./testResults/testResults"
+import { getTestResultsData } from "./testResults/testResults"
 import { z } from "zod"
 
 const isPost = "isPost"
@@ -50,7 +50,7 @@ export async function main() {
     if (testResultFile !== "") {
       try {
         metadata = TestResultsFileMetadataSchema.parse(testResultFile)
-        const data: TestResultsOutput = getTestReultsData(metadata)
+        const data: TestResultsOutput = getTestResultsData(metadata)
         context.testResults = data
       } catch (error) {
         core.warning(JSON.stringify(error))

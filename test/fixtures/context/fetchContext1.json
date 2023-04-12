@@ -33,20 +33,21 @@
     "estimatedEndedAtUnixSeconds": 1655254904,
     "jobName": "generate-fixtures-name-1"
   },
-  "data" : {
-    "goTestResults": {
-      "TestMinResources5NodesEnvWithBlockscout": {
-        "Action": "pass",
-        "Elapsed": 506.4
+  "testResults": {
+    "tests": [
+      {
+        "name": "TestMinResources5NodesEnvWithBlockscout",
+        "status": "pass",
+        "elapsed": 506.4
       },
-      "Test5NodesPlus2MiningGethsReorgEnv": {
-        "Action": "fail",
-        "Elapsed": 522.96
-      },
-      "Test Suite Result": {
-        "Action": "fail",
-        "Elapsed": 551.993
+      {
+        "name": "Test5NodesPlus2MiningGethsReorgEnv",
+        "status": "fail",
+        "elapsed": 522.96
       }
-    }
+    ],
+    "status": "fail",
+    "elapsed": 551.993,
+    "testType": "go"
   }
 }

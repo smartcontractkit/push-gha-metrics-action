@@ -3,16 +3,15 @@ import * as fs from "fs"
 import { TestResultsFileMetadata, TestResultsOutput } from "./testResults.types"
 import { parseGoTestResults } from "./go/goResultsParser"
 
-export function getTestReultsData(file: TestResultsFileMetadata): TestResultsOutput {
+export function getTestResultsData(file: TestResultsFileMetadata): TestResultsOutput {
   let resultData: TestResultsOutput = {} as TestResultsOutput
 
   try {
-    const data = fs.readFileSync(file.filePath, "utf8")
-    const jsonData = JSON.parse(data)
+    const fileData = fs.readFileSync(file.filePath, "utf8")
 
     switch (file.testType) {
       case "go":
-        resultData= parseGoTestResults(jsonData)
+        resultData= parseGoTestResults(fileData)
         break;
       default:
         core.warning("Unknown test type: " + file.testType)

@@ -8,7 +8,6 @@
     "build:lint": "tsc",
     "format": "prettier --write .",
     "test:unit": "jest unit",
-    "test:unit:updateSnapshots": "jest unit --updateSnapshot",
     "test:integration": "jest integration",
     "update-workflows": "ts-node ./src/scripts/workflow-auto-updater/index.ts",
     "test": "jest"

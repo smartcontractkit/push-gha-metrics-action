@@ -18,7 +18,7 @@ const StatusType = z.enum(["pass", "fail"])
 // An individual test result
 export interface TestResultsTest {
     name: string
-    status: "pass" | "fail"
+    status: string
     elapsed: number
 }
 export const TestResultsTestSchema = z.object({
@@ -30,7 +30,7 @@ export const TestResultsTestSchema = z.object({
 // The output for the test results
 export interface TestResultsOutput {
     tests: TestResultsTest[]
-    status: "pass" | "fail"
+    status: string
     elapsed: number
     testType: string
 }

@@ -25,22 +25,6 @@ describe("Loki", () => {
       )
       expect(JSON.parse(value)).toMatchInlineSnapshot(`
         {
-          "data": {
-            "goTestResults": {
-              "Test Suite Result": {
-                "Action": "fail",
-                "Elapsed": 551.993,
-              },
-              "Test5NodesPlus2MiningGethsReorgEnv": {
-                "Action": "fail",
-                "Elapsed": 522.96,
-              },
-              "TestMinResources5NodesEnvWithBlockscout": {
-                "Action": "pass",
-                "Elapsed": 506.4,
-              },
-            },
-          },
           "event": {
             "actor": "HenryNguyen5",
             "eventName": "pull_request",
@@ -60,6 +44,23 @@ describe("Loki", () => {
             "startedAt": "2022-06-15T01:01:13Z",
             "startedAtUnixSeconds": 1655254873,
             "url": "https://api.github.com/repos/smartcontractkit/push-gha-metrics-action/actions/jobs/6891428337",
+          },
+          "testResults": {
+            "elapsed": 551.993,
+            "status": "fail",
+            "testType": "go",
+            "tests": [
+              {
+                "elapsed": 506.4,
+                "name": "TestMinResources5NodesEnvWithBlockscout",
+                "status": "pass",
+              },
+              {
+                "elapsed": 522.96,
+                "name": "Test5NodesPlus2MiningGethsReorgEnv",
+                "status": "fail",
+              },
+            ],
           },
           "workflowRun": {
             "createdAt": "2022-06-15T01:01:00Z",
@@ -101,22 +102,6 @@ describe("Loki", () => {
       )
       expect(JSON.parse(value)).toMatchInlineSnapshot(`
         {
-          "data": {
-            "goTestResults": {
-              "Test Suite Result": {
-                "Action": "fail",
-                "Elapsed": 551.993,
-              },
-              "Test5NodesPlus2MiningGethsReorgEnv": {
-                "Action": "fail",
-                "Elapsed": 522.96,
-              },
-              "TestMinResources5NodesEnvWithBlockscout": {
-                "Action": "pass",
-                "Elapsed": 506.4,
-              },
-            },
-          },
           "event": {
             "actor": "HenryNguyen5",
             "eventName": "pull_request",
@@ -136,6 +121,23 @@ describe("Loki", () => {
             "startedAt": "2022-06-15T01:01:13Z",
             "startedAtUnixSeconds": 1655254873,
             "url": "https://api.github.com/repos/smartcontractkit/push-gha-metrics-action/actions/jobs/6891428337",
+          },
+          "testResults": {
+            "elapsed": 551.993,
+            "status": "fail",
+            "testType": "go",
+            "tests": [
+              {
+                "elapsed": 506.4,
+                "name": "TestMinResources5NodesEnvWithBlockscout",
+                "status": "pass",
+              },
+              {
+                "elapsed": 522.96,
+                "name": "Test5NodesPlus2MiningGethsReorgEnv",
+                "status": "fail",
+              },
+            ],
           },
           "workflowRun": {
             "createdAt": "2022-06-15T01:01:00Z",
