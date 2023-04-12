@@ -35,8 +35,12 @@ export function parseGoTestResults(fileData: string): TestResultsOutput {
   return output
 }
 
-// Go test results are output in a JSON array but not wrapped in an array
-// so we need to convert it to a valid JSON array
+/**
+ * Go test results are output in a JSON array but not wrapped in an array
+ * so we need to convert it to a valid JSON array
+ * @param {string} fileData The file data as a JSON object per line
+ * @returns {string[]} The parsed line data as a JSON array
+ */
 export function convertDataToArray(fileData: string): string[] {
   // Split the content by newline characters
   const lines = fileData.split("\n").filter(line => line.trim() !== "")

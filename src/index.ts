@@ -5,14 +5,12 @@ import { fetchContext } from "./context"
 import * as loki from "./loki"
 import * as lokiTypes from "./loki.types"
 import * as contextTypes from "./context.types"
-import * as fs from "fs"
 import {
   TestResultsFileMetadata,
   TestResultsFileMetadataSchema,
   TestResultsOutput,
 } from "./testResults/testResults.types"
 import { getTestResultsData } from "./testResults/testResults"
-import { z } from "zod"
 
 const isPost = "isPost"
 
@@ -44,7 +42,7 @@ export async function main() {
     )
     core.endGroup()
 
-    core.startGroup("Load json files into context")
+    core.startGroup("Load test results into context if present")
     const testResultFile: string = getTypedInput("test-results-file")
     let metadata: TestResultsFileMetadata
     if (testResultFile !== "") {
