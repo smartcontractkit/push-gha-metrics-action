@@ -1,8 +1,8 @@
-import { getTestResultsData } from "@src/testResults/testResults"
+import { getTestResultSummary } from "@src/testResultSummary"
 import {
   TestResultsFileMetadata,
-  TestResultsOutput,
-} from "@src/testResults/testResults.types"
+  SummarizedTestResults,
+} from "@src/testResultSummary/types"
 
 describe("Test Results Parsing", () => {
   it("should parse a go test results file", async () => {
@@ -10,7 +10,7 @@ describe("Test Results Parsing", () => {
       testType: "go",
       filePath: "./test/fixtures/testResults/go_test_results_input.json",
     }
-    const data: TestResultsOutput = getTestResultsData(metadata)
+    const data: SummarizedTestResults = getTestResultSummary(metadata)
     expect(data).toMatchSnapshot()
   })
 })

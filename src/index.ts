@@ -8,9 +8,9 @@ import * as contextTypes from "./context.types"
 import {
   TestResultsFileMetadata,
   TestResultsFileMetadataSchema,
-  TestResultsOutput,
-} from "./testResults/testResults.types"
-import { getTestResultsData } from "./testResults/testResults"
+  SummarizedTestResults,
+} from "./testResultSummary/types"
+import { getTestResultSummary } from "./testResultSummary"
 
 const isPost = "isPost"
 
@@ -48,7 +48,7 @@ export async function main() {
     if (testResultFile !== "") {
       try {
         metadata = TestResultsFileMetadataSchema.parse(testResultFile)
-        const data: TestResultsOutput = getTestResultsData(metadata)
+        const data: SummarizedTestResults = getTestResultSummary(metadata)
         context.testResults = data
       } catch (error) {
         core.warning(JSON.stringify(error))
