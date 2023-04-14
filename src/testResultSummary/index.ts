@@ -23,5 +23,7 @@ export function getTestResultSummary(
   }
 
   // if we get here, we failed to handle all the cases
-  throw Error("Could not get test results data")
+  throw Error(
+    `Could not get test results at "${fileMetadata.filePath}" of type "${fileMetadata.testType}"`,
+  )
 }

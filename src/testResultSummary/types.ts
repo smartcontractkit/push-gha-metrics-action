@@ -1,7 +1,8 @@
 import { z } from "zod"
 
 /**
- * Metadata describing a file that contains the results of a test of a specific type
+ * Metadata describing a file that contains test results
+ * for a specific test type
  */
 const TestType = z.enum(["go" /*, "solidity"*/])
 export const TestResultsFileMetadataSchema = z.object({
@@ -12,21 +13,28 @@ export type TestResultsFileMetadata = z.infer<
   typeof TestResultsFileMetadataSchema
 >
 
+/**
+ * The subschema for the test results that we want to handle
+ * when generating the test result summary
+ */
 const handledTestStatuses = z.enum(["pass", "fail"])
 type HandledTestStatuses = z.infer<typeof handledTestStatuses>
-
-// I'd like to map this directly to the test result we want, but
-// https://github.com/colinhacks/zod/issues/2315 breaks discriminated unions
-// when you use `transform`
 export const handledTestResultsSchema = z.object({
   Test: z.string().min(1).optional(),
   Action: handledTestStatuses,
   Elapsed: z.number().nonnegative(),
 })
 
-// I'd like to map this directly to the test result we want, but
-// https://github.com/colinhacks/zod/issues/2315 breaks discriminated unions
-// when you use `transform`
+/**
+ * A partial representation of the possible a single test log outputted by
+ * https://pkg.go.dev/cmd/test2json
+ *
+ * Ideally, we would use `transform` to map the parsed test result to the
+ * fields we want to use in the test result summary, but that breaks
+ * discriminated unions.
+ *
+ * @see https://github.com/colinhacks/zod/issues/2315
+ */
 const TestResultSchema = z.discriminatedUnion("Action", [
   handledTestResultsSchema,
   z.object({
@@ -47,6 +55,10 @@ const TestResultSchema = z.discriminatedUnion("Action", [
   }),
 ])
 
+/**
+ * A representation of a file containing all test logs of
+ * the JSONL format outputted by https://pkg.go.dev/cmd/test2json
+ */
 export const TestResultsSchema = z.array(TestResultSchema)
 
 export interface MappedTestResult {
@@ -56,7 +68,7 @@ export interface MappedTestResult {
 }
 
 /**
- * The output for the test results
+ * The summarization of a test run
  */
 export interface SummarizedTestResults {
   /**

@@ -9,6 +9,8 @@ import {
 /**
  * Parse a go test results file data into the expeted output while ignoring
  * any data we do not want to be streamed to Loki
+ *
+ * @see https://pkg.go.dev/cmd/test2json
  */
 export function parseGoTestResults(fileData: string): SummarizedTestResults {
   const tests = parseToTestResults(fileData)
