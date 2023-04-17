@@ -4,8 +4,10 @@ import {
 } from "../../src/utils"
 import { Context } from "../../src/context.types"
 import mockContext from "../fixtures/context/fetchContext1.json"
+
 describe("Util tests", () => {
   // Taken from context.test.ts snapshots
+  // @ts-ignore
   const context: Context = mockContext
 
   const { jobRun, workflowRun } = context

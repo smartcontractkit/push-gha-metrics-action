@@ -11,6 +11,7 @@ import mockContext from "../fixtures/context/fetchContext1.json"
 
 describe("Loki", () => {
   // Taken from context.test.ts snapshots
+  // @ts-expect-error
   const context: Context = mockContext
 
   describe(createLokiLogEntriesFromContext.name, () => {

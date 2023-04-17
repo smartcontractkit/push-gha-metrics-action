@@ -1,5 +1,5 @@
 import type { getOctokit } from "@actions/github"
-import { TestResultsOutput } from "./testResults/testResults.types"
+import { SummarizedTestResults } from "./testResultSummary/types"
 
 export type Octokit = ReturnType<typeof getOctokit>
 
@@ -48,7 +48,7 @@ export interface Context {
   /**
    * Test Results Data if any is provided
    */
-  testResults?: TestResultsOutput
+  testResults?: SummarizedTestResults
 }
 
 type JobRun = Awaited<
