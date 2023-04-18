@@ -54,6 +54,12 @@ const TestResultSchema = z.discriminatedUnion("Action", [
   z.object({
     Action: z.literal("start"),
   }),
+  z.object({
+    Action: z.literal("pause"),
+  }),
+  z.object({
+    Action: z.literal("cont"),
+  }),
 ])
 
 /**
