@@ -11464,6 +11464,12 @@ var TestResultSchema = z.discriminatedUnion("Action", [
   }),
   z.object({
     Action: z.literal("start")
+  }),
+  z.object({
+    Action: z.literal("pause")
+  }),
+  z.object({
+    Action: z.literal("cont")
   })
 ]);
 var TestResultsSchema = z.array(TestResultSchema);
@@ -11547,14 +11553,19 @@ async function main() {
     core4.endGroup();
     core4.startGroup("Load test results into context if present");
     const testResultFile = getTypedInput("test-results-file", false);
-    let metadata;
+    let metadata = void 0;
+    let mdObject;
     if (testResultFile !== "") {
       try {
-        metadata = TestResultsFileMetadataSchema.parse(testResultFile);
+        mdObject = JSON.parse(testResultFile);
+        metadata = TestResultsFileMetadataSchema.parse(mdObject);
         const data = getTestResultSummary(metadata);
         context2.testResults = data;
       } catch (error) {
-        core4.warning(JSON.stringify(error));
+        core4.warning("input: " + testResultFile);
+        core4.warning("json parsed: " + JSON.stringify(mdObject));
+        core4.warning("zod parsed: " + JSON.stringify(metadata));
+        core4.warning("error: " + JSON.stringify(error));
         core4.warning("ignoring and moving on.");
       }
     }

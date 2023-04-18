@@ -44,14 +44,19 @@ export async function main() {
 
     core.startGroup("Load test results into context if present")
     const testResultFile: string = getTypedInput("test-results-file", false)
-    let metadata: TestResultsFileMetadata
+    let metadata: TestResultsFileMetadata | undefined = undefined
+    let mdObject
     if (testResultFile !== "") {
       try {
-        metadata = TestResultsFileMetadataSchema.parse(testResultFile)
+        mdObject = JSON.parse(testResultFile)
+        metadata = TestResultsFileMetadataSchema.parse(mdObject)
         const data: SummarizedTestResults = getTestResultSummary(metadata)
         context.testResults = data
       } catch (error) {
-        core.warning(JSON.stringify(error))
+        core.warning("input: " + testResultFile)
+        core.warning("json parsed: " + JSON.stringify(mdObject))
+        core.warning("zod parsed: " + JSON.stringify(metadata))
+        core.warning("error: " + JSON.stringify(error))
         core.warning("ignoring and moving on.")
       }
     }
