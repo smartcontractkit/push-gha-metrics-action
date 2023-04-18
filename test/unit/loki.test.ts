@@ -7,11 +7,10 @@ import {
 import { Context } from "../../src/context.types"
 import { LokiRequestOptions } from "../../src/loki.types"
 import nock from "nock"
-import mockContext from "../fixtures/context/fetchContext1.json"
+import { mockContext } from "../fixtures/context/fetchContext1"
 
 describe("Loki", () => {
   // Taken from context.test.ts snapshots
-  // @ts-expect-error
   const context: Context = mockContext
 
   describe(createLokiLogEntriesFromContext.name, () => {

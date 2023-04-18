@@ -1,4 +1,6 @@
-{
+import { Context } from "@src/context.types";
+
+export const mockContext: Context = {
   "event": {
     "actor": "HenryNguyen5",
     "eventName": "pull_request",
