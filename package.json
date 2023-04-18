@@ -5,8 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "esbuild src/index.ts --bundle --platform=node --target=node16 --tsconfig=./tsconfig.build.json --outfile=dist/index.js",
-    "build:lint": "tsc",
-    "lint": "eslint --ext ts .",
+    "build:lint": "tsc && eslint --ext ts .",
     "format": "prettier --write .",
     "test:unit": "jest unit",
     "test:integration": "jest integration",
