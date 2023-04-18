@@ -43,7 +43,7 @@ export async function main() {
     core.endGroup()
 
     core.startGroup("Load test results into context if present")
-    const testResultFile: string = getTypedInput("test-results-file")
+    const testResultFile: string = getTypedInput("test-results-file", false)
     let metadata: TestResultsFileMetadata
     if (testResultFile !== "") {
       try {

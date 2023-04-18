@@ -11546,7 +11546,7 @@ async function main() {
     );
     core4.endGroup();
     core4.startGroup("Load test results into context if present");
-    const testResultFile = getTypedInput("test-results-file");
+    const testResultFile = getTypedInput("test-results-file", false);
     let metadata;
     if (testResultFile !== "") {
       try {
