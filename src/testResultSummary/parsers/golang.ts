@@ -2,6 +2,7 @@ import { z } from "zod"
 import {
   SummarizedTestResults,
   MappedTestResult,
+  TestResult,
   TestResultsSchema,
   handledTestResultsSchema,
 } from "../types"
@@ -13,7 +14,7 @@ import {
  * @see https://pkg.go.dev/cmd/test2json
  */
 export function parseGoTestResults(fileData: string): SummarizedTestResults {
-  const tests = parseToTestResults(fileData)
+  const tests: TestResult[] = parseToTestResults(fileData)
 
   // Filter out any tests that we do not want to be streamed to Loki
   // and map the remaining tests to the expected output
@@ -47,7 +48,7 @@ export function parseGoTestResults(fileData: string): SummarizedTestResults {
   }
 }
 
-export function parseToTestResults(fileData: string) {
+export function parseToTestResults(fileData: string): TestResult[] {
   // Split the content by newline characters
   const lines = fileData.split("\n").filter(line => line.trim() !== "")
 

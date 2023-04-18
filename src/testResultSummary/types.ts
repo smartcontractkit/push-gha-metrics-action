@@ -35,6 +35,7 @@ export const handledTestResultsSchema = z.object({
  *
  * @see https://github.com/colinhacks/zod/issues/2315
  */
+export type TestResult = z.infer<typeof TestResultSchema>
 const TestResultSchema = z.discriminatedUnion("Action", [
   handledTestResultsSchema,
   z.object({
