@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Test Results Parsing should parse a go test results file 1`] = `
+exports[`Test Results Parsing should parse a go test results file input 1`] = `
 {
   "elapsed": 551.993,
   "status": "fail",

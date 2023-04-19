@@ -886,18 +886,18 @@ var require_tunnel = __commonJS({
             res.statusCode
           );
           socket.destroy();
-          var error = new Error("tunneling socket could not be established, statusCode=" + res.statusCode);
-          error.code = "ECONNRESET";
-          options.request.emit("error", error);
+          var error3 = new Error("tunneling socket could not be established, statusCode=" + res.statusCode);
+          error3.code = "ECONNRESET";
+          options.request.emit("error", error3);
           self.removeSocket(placeholder);
           return;
         }
         if (head.length > 0) {
           debug2("got illegal response body from proxy");
           socket.destroy();
-          var error = new Error("got illegal response body from proxy");
-          error.code = "ECONNRESET";
-          options.request.emit("error", error);
+          var error3 = new Error("got illegal response body from proxy");
+          error3.code = "ECONNRESET";
+          options.request.emit("error", error3);
           self.removeSocket(placeholder);
           return;
         }
@@ -912,9 +912,9 @@ var require_tunnel = __commonJS({
           cause.message,
           cause.stack
         );
-        var error = new Error("tunneling socket could not be established, cause=" + cause.message);
-        error.code = "ECONNRESET";
-        options.request.emit("error", error);
+        var error3 = new Error("tunneling socket could not be established, cause=" + cause.message);
+        error3.code = "ECONNRESET";
+        options.request.emit("error", error3);
         self.removeSocket(placeholder);
       }
     };
@@ -1706,12 +1706,12 @@ var require_oidc_utils = __commonJS({
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
           const httpclient = OidcClient.createHttpClient();
-          const res = yield httpclient.getJson(id_token_url).catch((error) => {
+          const res = yield httpclient.getJson(id_token_url).catch((error3) => {
             throw new Error(`Failed to get ID Token. 
  
-        Error Code : ${error.statusCode}
+        Error Code : ${error3.statusCode}
  
-        Error Message: ${error.result.message}`);
+        Error Message: ${error3.result.message}`);
           });
           const id_token = (_a = res.result) === null || _a === void 0 ? void 0 : _a.value;
           if (!id_token) {
@@ -1732,8 +1732,8 @@ var require_oidc_utils = __commonJS({
             const id_token = yield OidcClient.getCall(id_token_url);
             core_1.setSecret(id_token);
             return id_token;
-          } catch (error) {
-            throw new Error(`Error message: ${error.message}`);
+          } catch (error3) {
+            throw new Error(`Error message: ${error3.message}`);
           }
         });
       }
@@ -2099,7 +2099,7 @@ Support boolean input list: \`true | True | TRUE | false | False | FALSE\``);
     exports.setCommandEcho = setCommandEcho;
     function setFailed2(message) {
       process.exitCode = ExitCode.Failure;
-      error(message);
+      error3(message);
     }
     exports.setFailed = setFailed2;
     function isDebug() {
@@ -2110,14 +2110,14 @@ Support boolean input list: \`true | True | TRUE | false | False | FALSE\``);
       command_1.issueCommand("debug", {}, message);
     }
     exports.debug = debug2;
-    function error(message, properties = {}) {
+    function error3(message, properties = {}) {
       command_1.issueCommand("error", utils_1.toCommandProperties(properties), message instanceof Error ? message.toString() : message);
     }
-    exports.error = error;
-    function warning3(message, properties = {}) {
+    exports.error = error3;
+    function warning2(message, properties = {}) {
       command_1.issueCommand("warning", utils_1.toCommandProperties(properties), message instanceof Error ? message.toString() : message);
     }
-    exports.warning = warning3;
+    exports.warning = warning2;
     function notice(message, properties = {}) {
       command_1.issueCommand("notice", utils_1.toCommandProperties(properties), message instanceof Error ? message.toString() : message);
     }
@@ -2370,8 +2370,8 @@ var require_add = __commonJS({
       }
       if (kind === "error") {
         hook = function(method, options) {
-          return Promise.resolve().then(method.bind(null, options)).catch(function(error) {
-            return orig(error, options);
+          return Promise.resolve().then(method.bind(null, options)).catch(function(error3) {
+            return orig(error3, options);
           });
         };
       }
@@ -3058,21 +3058,21 @@ var require_tr46 = __commonJS({
         label = punycode.toUnicode(label);
         processing_option = PROCESSING_OPTIONS.NONTRANSITIONAL;
       }
-      var error = false;
+      var error3 = false;
       if (normalize(label) !== label || label[3] === "-" && label[4] === "-" || label[0] === "-" || label[label.length - 1] === "-" || label.indexOf(".") !== -1 || label.search(combiningMarksRegex) === 0) {
-        error = true;
+        error3 = true;
       }
       var len = countSymbols(label);
       for (var i = 0; i < len; ++i) {
         var status = findStatus(label.codePointAt(i));
         if (processing === PROCESSING_OPTIONS.TRANSITIONAL && status[1] !== "valid" || processing === PROCESSING_OPTIONS.NONTRANSITIONAL && status[1] !== "valid" && status[1] !== "deviation") {
-          error = true;
+          error3 = true;
           break;
         }
       }
       return {
         label,
-        error
+        error: error3
       };
     }
     function processing(domain_name, useSTD3, processing_option) {
@@ -4722,8 +4722,8 @@ var require_lib3 = __commonJS({
       this.timeout = timeout;
       if (body instanceof Stream) {
         body.on("error", function(err) {
-          const error = err.name === "AbortError" ? err : new FetchError(`Invalid response body while trying to fetch ${_this.url}: ${err.message}`, "system", err);
-          _this[INTERNALS].error = error;
+          const error3 = err.name === "AbortError" ? err : new FetchError(`Invalid response body while trying to fetch ${_this.url}: ${err.message}`, "system", err);
+          _this[INTERNALS].error = error3;
         });
       }
     }
@@ -5453,14 +5453,14 @@ var require_lib3 = __commonJS({
         const signal = request.signal;
         let response = null;
         const abort = function abort2() {
-          let error = new AbortError("The user aborted a request.");
-          reject(error);
+          let error3 = new AbortError("The user aborted a request.");
+          reject(error3);
           if (request.body && request.body instanceof Stream.Readable) {
-            request.body.destroy(error);
+            request.body.destroy(error3);
           }
           if (!response || !response.body)
             return;
-          response.body.emit("error", error);
+          response.body.emit("error", error3);
         };
         if (signal && signal.aborted) {
           abort();
@@ -5855,7 +5855,7 @@ var require_dist_node5 = __commonJS({
         }
         if (status >= 400) {
           const data = await getResponseData(response);
-          const error = new requestError.RequestError(toErrorMessage(data), status, {
+          const error3 = new requestError.RequestError(toErrorMessage(data), status, {
             response: {
               url,
               status,
@@ -5864,7 +5864,7 @@ var require_dist_node5 = __commonJS({
             },
             request: requestOptions
           });
-          throw error;
+          throw error3;
         }
         return getResponseData(response);
       }).then((data) => {
@@ -5874,10 +5874,10 @@ var require_dist_node5 = __commonJS({
           headers,
           data
         };
-      }).catch((error) => {
-        if (error instanceof requestError.RequestError)
-          throw error;
-        throw new requestError.RequestError(error.message, 500, {
+      }).catch((error3) => {
+        if (error3 instanceof requestError.RequestError)
+          throw error3;
+        throw new requestError.RequestError(error3.message, 500, {
           request: requestOptions
         });
       });
@@ -7378,9 +7378,9 @@ var require_dist_node10 = __commonJS({
               return {
                 value: normalizedResponse
               };
-            } catch (error) {
-              if (error.status !== 409)
-                throw error;
+            } catch (error3) {
+              if (error3.status !== 409)
+                throw error3;
               url = "";
               return {
                 value: {
@@ -7745,8 +7745,8 @@ var require_ZodError = __commonJS({
           return issue.message;
         };
         const fieldErrors = { _errors: [] };
-        const processError = (error) => {
-          for (const issue of error.issues) {
+        const processError = (error3) => {
+          for (const issue of error3.issues) {
             if (issue.code === "invalid_union") {
               issue.unionErrors.map(processError);
             } else if (issue.code === "invalid_return_type") {
@@ -7804,8 +7804,8 @@ var require_ZodError = __commonJS({
     };
     exports.ZodError = ZodError2;
     ZodError2.create = (issues) => {
-      const error = new ZodError2(issues);
-      return error;
+      const error3 = new ZodError2(issues);
+      return error3;
     };
   }
 });
@@ -8124,8 +8124,8 @@ var require_types = __commonJS({
           get error() {
             if (this._error)
               return this._error;
-            const error = new ZodError_1.ZodError(ctx.common.issues);
-            this._error = error;
+            const error3 = new ZodError_1.ZodError(ctx.common.issues);
+            this._error = error3;
             return this._error;
           }
         };
@@ -10443,7 +10443,7 @@ var require_types = __commonJS({
           });
           return parseUtil_1.INVALID;
         }
-        function makeArgsIssue(args, error) {
+        function makeArgsIssue(args, error3) {
           return (0, parseUtil_1.makeIssue)({
             data: args,
             path: ctx.path,
@@ -10455,11 +10455,11 @@ var require_types = __commonJS({
             ].filter((x) => !!x),
             issueData: {
               code: ZodError_1.ZodIssueCode.invalid_arguments,
-              argumentsError: error
+              argumentsError: error3
             }
           });
         }
-        function makeReturnsIssue(returns, error) {
+        function makeReturnsIssue(returns, error3) {
           return (0, parseUtil_1.makeIssue)({
             data: returns,
             path: ctx.path,
@@ -10471,7 +10471,7 @@ var require_types = __commonJS({
             ].filter((x) => !!x),
             issueData: {
               code: ZodError_1.ZodIssueCode.invalid_return_type,
-              returnTypeError: error
+              returnTypeError: error3
             }
           });
         }
@@ -10479,15 +10479,15 @@ var require_types = __commonJS({
         const fn = ctx.data;
         if (this._def.returns instanceof ZodPromise2) {
           return (0, parseUtil_1.OK)(async (...args) => {
-            const error = new ZodError_1.ZodError([]);
+            const error3 = new ZodError_1.ZodError([]);
             const parsedArgs = await this._def.args.parseAsync(args, params).catch((e) => {
-              error.addIssue(makeArgsIssue(args, e));
-              throw error;
+              error3.addIssue(makeArgsIssue(args, e));
+              throw error3;
             });
             const result = await fn(...parsedArgs);
             const parsedReturns = await this._def.returns._def.type.parseAsync(result, params).catch((e) => {
-              error.addIssue(makeReturnsIssue(result, e));
-              throw error;
+              error3.addIssue(makeReturnsIssue(result, e));
+              throw error3;
             });
             return parsedReturns;
           });
@@ -11394,16 +11394,16 @@ var require_ValidationError = __commonJS({
       }
       return issue.message;
     }
-    function fromZodError2(zodError, options = {}) {
+    function fromZodError3(zodError, options = {}) {
       const { maxIssuesInMessage = 99, issueSeparator = "; ", unionSeparator = ", or ", prefixSeparator = ": ", prefix = "Validation error" } = options;
       const reason = zodError.errors.slice(0, maxIssuesInMessage).map((issue) => fromZodIssue(issue, issueSeparator, unionSeparator)).join(issueSeparator);
       const message = reason ? [prefix, reason].join(prefixSeparator) : prefix;
       return new ValidationError(message, zodError.errors);
     }
-    exports.fromZodError = fromZodError2;
+    exports.fromZodError = fromZodError3;
     var toValidationError = (options = {}) => (err) => {
       if (err instanceof zod.ZodError) {
-        return fromZodError2(err, options);
+        return fromZodError3(err, options);
       }
       if (err instanceof Error) {
         return err;
@@ -11716,10 +11716,10 @@ async function sendLokiRequest(logEntries, requestOptions, dryRun) {
         res.on("data", (d) => data += d);
         res.on("end", () => {
           if (statusCode && !(statusCode >= 200 && statusCode < 300)) {
-            const error = Error(
+            const error3 = Error(
               `${sendLokiRequest.name} Received non 200 status code. StatusCode: ${statusCode} StatusMessage: ${statusMessage || "N/A"} Body: ${data}`
             );
-            return reject(error);
+            return reject(error3);
           }
           resolve({
             headers: incomingHeaders,
@@ -11925,8 +11925,8 @@ var ZodError = class extends Error {
       return issue.message;
     };
     const fieldErrors = { _errors: [] };
-    const processError = (error) => {
-      for (const issue of error.issues) {
+    const processError = (error3) => {
+      for (const issue of error3.issues) {
         if (issue.code === "invalid_union") {
           issue.unionErrors.map(processError);
         } else if (issue.code === "invalid_return_type") {
@@ -11983,8 +11983,8 @@ var ZodError = class extends Error {
   }
 };
 ZodError.create = (issues) => {
-  const error = new ZodError(issues);
-  return error;
+  const error3 = new ZodError(issues);
+  return error3;
 };
 var errorMap = (issue, _ctx) => {
   let message;
@@ -12221,8 +12221,8 @@ var handleResult = (ctx, result) => {
       get error() {
         if (this._error)
           return this._error;
-        const error = new ZodError(ctx.common.issues);
-        this._error = error;
+        const error3 = new ZodError(ctx.common.issues);
+        this._error = error3;
         return this._error;
       }
     };
@@ -14522,7 +14522,7 @@ var ZodFunction = class extends ZodType {
       });
       return INVALID;
     }
-    function makeArgsIssue(args, error) {
+    function makeArgsIssue(args, error3) {
       return makeIssue({
         data: args,
         path: ctx.path,
@@ -14534,11 +14534,11 @@ var ZodFunction = class extends ZodType {
         ].filter((x) => !!x),
         issueData: {
           code: ZodIssueCode.invalid_arguments,
-          argumentsError: error
+          argumentsError: error3
         }
       });
     }
-    function makeReturnsIssue(returns, error) {
+    function makeReturnsIssue(returns, error3) {
       return makeIssue({
         data: returns,
         path: ctx.path,
@@ -14550,7 +14550,7 @@ var ZodFunction = class extends ZodType {
         ].filter((x) => !!x),
         issueData: {
           code: ZodIssueCode.invalid_return_type,
-          returnTypeError: error
+          returnTypeError: error3
         }
       });
     }
@@ -14558,15 +14558,15 @@ var ZodFunction = class extends ZodType {
     const fn = ctx.data;
     if (this._def.returns instanceof ZodPromise) {
       return OK(async (...args) => {
-        const error = new ZodError([]);
+        const error3 = new ZodError([]);
         const parsedArgs = await this._def.args.parseAsync(args, params).catch((e) => {
-          error.addIssue(makeArgsIssue(args, e));
-          throw error;
+          error3.addIssue(makeArgsIssue(args, e));
+          throw error3;
         });
         const result = await fn(...parsedArgs);
         const parsedReturns = await this._def.returns._def.type.parseAsync(result, params).catch((e) => {
-          error.addIssue(makeReturnsIssue(result, e));
-          throw error;
+          error3.addIssue(makeReturnsIssue(result, e));
+          throw error3;
         });
         return parsedReturns;
       });
@@ -15408,24 +15408,28 @@ function parseToTestResults(fileData) {
 }
 
 // src/testResultSummary/index.ts
+var import_zod_validation_error = __toESM(require_cjs());
 function getTestResultSummary(fileMetadata) {
   try {
     const fileData = fs.readFileSync(fileMetadata.filePath, "utf8");
     switch (fileMetadata.testType) {
       case "go":
         return parseGoTestResults(fileData);
+      default:
+        throw Error("Unknown test type: " + fileMetadata.testType);
     }
-  } catch (error) {
-    core3.warning("Could not read the file: " + fileMetadata.filePath);
-    core3.warning("ignoring and moving on.");
+  } catch (error3) {
+    if (error3 instanceof ZodError) {
+      const validationError = (0, import_zod_validation_error.fromZodError)(error3);
+      core3.error(validationError);
+    }
+    core3.error("Could not read the file: " + fileMetadata.filePath);
+    throw error3;
   }
-  throw Error(
-    `Could not get test results at "${fileMetadata.filePath}" of type "${fileMetadata.testType}"`
-  );
 }
 
 // src/index.ts
-var import_zod_validation_error = __toESM(require_cjs());
+var import_zod_validation_error2 = __toESM(require_cjs());
 var isPost = "isPost";
 async function main() {
   if (!core4.getState(isPost)) {
@@ -15453,7 +15457,7 @@ async function main() {
       let testResultsFileObject;
       try {
         testResultsFileObject = JSON.parse(testResultFile);
-      } catch (error) {
+      } catch (error3) {
         core4.warning("Invalid json in test-results-file: " + testResultFile);
       }
       let metadata;
@@ -15461,14 +15465,12 @@ async function main() {
         metadata = TestResultsFileMetadataSchema.parse(testResultsFileObject);
         const data = getTestResultSummary(metadata);
         context2.testResults = data;
-      } catch (error) {
-        if (error instanceof ZodError) {
-          const validationError = (0, import_zod_validation_error.fromZodError)(error);
-          core4.warning(validationError);
-        } else {
-          core4.warning("error: " + JSON.stringify(error));
+      } catch (error3) {
+        if (error3 instanceof ZodError) {
+          const validationError = (0, import_zod_validation_error2.fromZodError)(error3);
+          core4.error(validationError);
         }
-        core4.warning("ignoring and moving on.");
+        throw error3;
       }
     }
     core4.endGroup();

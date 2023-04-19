@@ -58,11 +58,9 @@ export async function main() {
       } catch (error) {
         if (error instanceof ZodError) {
           const validationError = fromZodError(error as ZodError)
-          core.warning(validationError)
-        } else {
-          core.warning('error: ' + JSON.stringify(error))
+          core.error(validationError)
         }
-        core.warning('ignoring and moving on.')
+        throw error
       }
     }
     core.endGroup()
