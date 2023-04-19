@@ -1,68 +1,73 @@
-import * as core from "@actions/core"
-import * as github from "@actions/github"
-import { KebabCasedProperties } from "type-fest"
-import { fetchContext } from "./context"
-import * as loki from "./loki"
-import * as lokiTypes from "./loki.types"
-import * as contextTypes from "./context.types"
+import * as core from '@actions/core'
+import * as github from '@actions/github'
+import { KebabCasedProperties } from 'type-fest'
+import { fetchContext } from './context'
+import * as loki from './loki'
+import * as lokiTypes from './loki.types'
+import * as contextTypes from './context.types'
 import {
   TestResultsFileMetadata,
   TestResultsFileMetadataSchema,
   SummarizedTestResults,
-} from "./testResultSummary/types"
-import { getTestResultSummary } from "./testResultSummary"
+} from './testResultSummary/types'
+import { getTestResultSummary } from './testResultSummary'
+import { fromZodError } from 'zod-validation-error'
+import { ZodError } from 'zod'
 
-const isPost = "isPost"
+const isPost = 'isPost'
 
 export async function main() {
   if (!core.getState(isPost)) {
     core.saveState(isPost, true)
-    core.info("This action no-ops during main execution")
+    core.info('This action no-ops during main execution')
     return
   }
 
   try {
-    core.startGroup("Github Context Gathering")
-    const dryRun = core.getBooleanInput("dry-run", { required: true })
+    core.startGroup('Github Context Gathering')
+    const dryRun = core.getBooleanInput('dry-run', { required: true })
     if (dryRun) {
-      core.info("Dry run enabled")
+      core.info('Dry run enabled')
     }
 
-    const githubToken = getTypedInput("github-token")
+    const githubToken = getTypedInput('github-token')
     const githubClient = github.getOctokit(githubToken)
     const rawContext = github.context
     const contextOverrides: contextTypes.ContextOverrides = {
-      jobName: getTypedInput("this-job-name") || undefined,
+      jobName: getTypedInput('this-job-name') || undefined,
     }
 
-    const context = await fetchContext(
-      githubClient,
-      rawContext,
-      contextOverrides,
-    )
+    const context = await fetchContext(githubClient, rawContext, contextOverrides)
     core.endGroup()
 
-    core.startGroup("Load test results into context if present")
-    const testResultFile: string = getTypedInput("test-results-file", false)
-    let metadata: TestResultsFileMetadata | undefined = undefined
-    let mdObject
-    if (testResultFile !== "") {
+    core.startGroup('Load test results into context if present')
+    const testResultFile: string = getTypedInput('test-results-file', false)
+
+    if (testResultFile !== '') {
+      let testResultsFileObject
       try {
-        mdObject = JSON.parse(testResultFile)
-        metadata = TestResultsFileMetadataSchema.parse(mdObject)
+        testResultsFileObject = JSON.parse(testResultFile)
+      } catch (error) {
+        core.warning('Invalid json in test-results-file: ' + testResultFile)
+      }
+      let metadata: TestResultsFileMetadata
+      try {
+        metadata = TestResultsFileMetadataSchema.parse(testResultsFileObject)
         const data: SummarizedTestResults = getTestResultSummary(metadata)
         context.testResults = data
       } catch (error) {
-        core.warning("input: " + testResultFile)
-        core.warning("json parsed: " + JSON.stringify(mdObject))
-        core.warning("zod parsed: " + JSON.stringify(metadata))
-        core.warning("error: " + JSON.stringify(error))
-        core.warning("ignoring and moving on.")
+        if (error instanceof ZodError) {
+          const validationError = fromZodError(error as ZodError)
+          core.warning(validationError)
+        } else {
+          core.warning('error: ' + JSON.stringify(error))
+        }
+        core.warning('ignoring and moving on.')
       }
     }
     core.endGroup()
 
-    core.startGroup("Loki Log Sending")
+    core.startGroup('Loki Log Sending')
     const logEntries = loki.createLokiLogEntriesFromContext(context)
     await loki.sendLokiRequest(logEntries, getLokiRequestOptions(), dryRun)
     core.endGroup()
@@ -74,20 +79,20 @@ export async function main() {
 main()
 
 function getLokiRequestOptions(): lokiTypes.LokiRequestOptions {
-  const rawBasicAuth = getTypedInput("basic-auth", false)
-  const rawHostname = getTypedInput("hostname")
-  const rawProtocol = getTypedInput("protocol")
-  const rawPort = getTypedInput("port")
-  const rawPath = getTypedInput("path")
-  const rawTimeout = getTypedInput("timeout")
-  const rawContentType = "application/json"
+  const rawBasicAuth = getTypedInput('basic-auth', false)
+  const rawHostname = getTypedInput('hostname')
+  const rawProtocol = getTypedInput('protocol')
+  const rawPort = getTypedInput('port')
+  const rawPath = getTypedInput('path')
+  const rawTimeout = getTypedInput('timeout')
+  const rawContentType = 'application/json'
 
   const port = parseInt(rawPort)
   if (isNaN(port)) {
     throw Error(`Port value of ${rawPath} could not be parsed`)
   }
 
-  if (rawProtocol !== "https" && rawProtocol !== "http") {
+  if (rawProtocol !== 'https' && rawProtocol !== 'http') {
     throw Error(
       `Protocol value of ${rawProtocol} could not be parsed, valid values are "http" or "https"`,
     )
