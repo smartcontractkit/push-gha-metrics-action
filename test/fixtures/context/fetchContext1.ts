@@ -35,22 +35,5 @@ export const mockContext: Context = {
     startedAtUnixSeconds: 1655254873,
     estimatedEndedAtUnixSeconds: 1655254904,
     jobName: 'generate-fixtures-name-1',
-    testResults: {
-      tests: [
-        {
-          name: 'TestMinResources5NodesEnvWithBlockscout',
-          status: 'pass',
-          elapsed: 506.4,
-        },
-        {
-          name: 'Test5NodesPlus2MiningGethsReorgEnv',
-          status: 'fail',
-          elapsed: 522.96,
-        },
-      ],
-      status: 'fail',
-      elapsed: 551.993,
-      testType: 'go',
-    },
   },
 }

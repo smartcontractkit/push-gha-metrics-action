@@ -11615,14 +11615,19 @@ async function fetchWorkflowRunContext(client, githubContext) {
 var core2 = __toESM(require_core());
 var import_http = __toESM(require("http"));
 var import_https = __toESM(require("https"));
-function createLokiLogEntriesFromContext(context2) {
+function createLokiLogEntriesFromContext(context2, testResults) {
+  const values = [];
   const stream = extractStreamFromContext(context2);
-  const value = createLokiLogValueFromContext(context2);
+  values.push(createLokiLogValueFromContext(context2));
+  testResults.forEach((test) => {
+    const v = createLokiLogValueFromTestResult(test, context2);
+    values.push(v);
+  });
   const logEntries = {
     streams: [
       {
         stream,
-        values: [value]
+        values
       }
     ]
   };
@@ -11659,9 +11664,23 @@ function createLokiLogValueFromContext(context2) {
   const log = JSON.stringify(context2);
   const secondInNanoSeconds = BigInt(1e9);
   const ts = BigInt(context2.jobRun.estimatedEndedAtUnixSeconds) * secondInNanoSeconds;
+  core2.debug(`${createLokiLogValueFromContext.name} Created loki log value: ${log}`);
   core2.debug(
-    `${createLokiLogValueFromContext.name} Created loki log value: ${log}`
+    `${createLokiLogValueFromContext.name} Created loki log timestamp in nanoseconds ${ts}`
   );
+  return [ts.toString(), log];
+}
+function createLokiLogValueFromTestResult(testResult, context2) {
+  testResult.jobName = context2.jobRun.jobName;
+  testResult.repo = context2.event.repo.repo;
+  testResult.jobRunId = context2.jobRun.id;
+  const test = {
+    test: testResult
+  };
+  const log = JSON.stringify(test);
+  const secondInNanoSeconds = BigInt(1e9);
+  const ts = BigInt(context2.jobRun.estimatedEndedAtUnixSeconds) * secondInNanoSeconds;
+  core2.debug(`${createLokiLogValueFromContext.name} Created loki log value: ${log}`);
   core2.debug(
     `${createLokiLogValueFromContext.name} Created loki log timestamp in nanoseconds ${ts}`
   );
@@ -11702,45 +11721,37 @@ async function sendLokiRequest(logEntries, requestOptions, dryRun) {
   if (dryRun) {
     return null;
   }
-  const response = await new Promise(
-    (resolve, reject) => {
-      const request = lib.request(options, (res) => {
-        const { statusCode, statusMessage, headers: incomingHeaders } = res;
-        core2.debug(
-          `${sendLokiRequest.name} Incoming headers ${JSON.stringify(
-            incomingHeaders
-          )}`
-        );
-        let data = "";
-        res.on("data", (d) => data += d);
-        res.on("end", () => {
-          if (statusCode && !(statusCode >= 200 && statusCode < 300)) {
-            const error3 = Error(
-              `${sendLokiRequest.name} Received non 200 status code. StatusCode: ${statusCode} StatusMessage: ${statusMessage || "N/A"} Body: ${data}`
-            );
-            return reject(error3);
-          }
-          resolve({
-            headers: incomingHeaders,
-            data,
-            statusCode,
-            statusMessage
-          });
+  const response = await new Promise((resolve, reject) => {
+    const request = lib.request(options, (res) => {
+      const { statusCode, statusMessage, headers: incomingHeaders } = res;
+      core2.debug(`${sendLokiRequest.name} Incoming headers ${JSON.stringify(incomingHeaders)}`);
+      let data = "";
+      res.on("data", (d) => data += d);
+      res.on("end", () => {
+        if (statusCode && !(statusCode >= 200 && statusCode < 300)) {
+          const error3 = Error(
+            `${sendLokiRequest.name} Received non 200 status code. StatusCode: ${statusCode} StatusMessage: ${statusMessage || "N/A"} Body: ${data}`
+          );
+          return reject(error3);
+        }
+        resolve({
+          headers: incomingHeaders,
+          data,
+          statusCode,
+          statusMessage
         });
       });
-      request.on("error", (err) => {
-        const contextualError = Error(
-          `${sendLokiRequest.name} Got error during request: ${err.message}`
-        );
-        reject(contextualError);
-      });
-      request.write(serializedLogEntries);
-      request.end();
-    }
-  );
-  core2.debug(
-    `${sendLokiRequest.name} Response: ${JSON.stringify(response, null, 1)}`
-  );
+    });
+    request.on("error", (err) => {
+      const contextualError = Error(
+        `${sendLokiRequest.name} Got error during request: ${err.message}`
+      );
+      reject(contextualError);
+    });
+    request.write(serializedLogEntries);
+    request.end();
+  });
+  core2.debug(`${sendLokiRequest.name} Response: ${JSON.stringify(response, null, 1)}`);
   return response;
 }
 
@@ -15382,26 +15393,17 @@ function parseGoTestResults(fileData) {
   const filteredTests = tests.filter(
     (t) => handledTestResultsSchema.safeParse(t).success
   );
-  const handledTests2 = {};
+  const handledTests = [];
   filteredTests.forEach((t) => {
     if (t.Test !== void 0) {
-      const temp = {
+      handledTests.push({
+        name: t.Test,
         status: t.Action,
         elapsed: t.Elapsed
-      };
-      handledTests2[t.Test] = temp;
+      });
     }
   });
-  const lastTest = filteredTests.at(-1);
-  if (!lastTest) {
-    throw Error("No tests found in file");
-  }
-  return {
-    elapsed: lastTest.Elapsed,
-    status: lastTest.Action,
-    tests: handledTests2,
-    testType: "go"
-  };
+  return handledTests;
 }
 function parseToTestResults(fileData) {
   const lines = fileData.split("\n").filter((line) => line.trim() !== "");
@@ -15455,6 +15457,7 @@ async function main() {
     core4.endGroup();
     core4.startGroup("Load test results into context if present");
     const testResultFile = getTypedInput("test-results-file", false);
+    let testResults = [];
     if (testResultFile !== "") {
       let testResultsFileObject;
       try {
@@ -15465,8 +15468,7 @@ async function main() {
       let metadata;
       try {
         metadata = TestResultsFileMetadataSchema.parse(testResultsFileObject);
-        const data = getTestResultSummary(metadata);
-        context2.jobRun.testResults = data;
+        testResults = getTestResultSummary(metadata);
       } catch (error3) {
         if (error3 instanceof ZodError) {
           const validationError = (0, import_zod_validation_error2.fromZodError)(error3);
@@ -15477,7 +15479,7 @@ async function main() {
     }
     core4.endGroup();
     core4.startGroup("Loki Log Sending");
-    const logEntries = createLokiLogEntriesFromContext(context2);
+    const logEntries = createLokiLogEntriesFromContext(context2, testResults);
     await sendLokiRequest(logEntries, getLokiRequestOptions(), dryRun);
     core4.endGroup();
   } catch (err) {

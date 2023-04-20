@@ -70,30 +70,15 @@ const TestResultSchema = z.discriminatedUnion("Action", [
 export const TestResultsSchema = z.array(TestResultSchema)
 
 export interface MappedTestResult {
+  name: string
   status: HandledTestStatuses
   elapsed: number
+  jobRunId?: number
+  jobName?: string
+  repo?: string
 }
 
-/**
- * The summarization of a test run
- */
-export interface SummarizedTestResults {
-  /**
-   * The individual test results
-   */
-  // tests: MappedTestResult[]
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  tests: any
-  /**
-   * The status of the test run, if any test fails the status is "fail"
-   */
+export interface MappedTestResult2 {
   status: HandledTestStatuses
-  /**
-   * The total elapsed time of all tests
-   */
   elapsed: number
-  /**
-   * The type of test that was run, by language
-   */
-  testType: z.infer<typeof TestType>
 }

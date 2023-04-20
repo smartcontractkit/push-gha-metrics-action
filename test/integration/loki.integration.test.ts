@@ -79,7 +79,6 @@ function generateMockContexts(amount = 100, dateRangeInDays = 1) {
             iso8601ToUnixTimeSeconds(jobStartedAt.toISOString()) +
             faker.datatype.number({ min: 20, max: 60 * 5 }),
           url: faker.internet.url(),
-          testResults: undefined,
         },
         workflowRun: {
           createdAt: workflowCreatedAt,
@@ -108,7 +107,7 @@ describe("Loki", () => {
 
   describe(sendLokiRequest.name, () => {
     it.each(contexts)("should send a successful request %#", async c => {
-      const logEntries = createLokiLogEntriesFromContext(c)
+      const logEntries = createLokiLogEntriesFromContext(c, [])
       const requestOptions: LokiRequestOptions = {
         contentType: "application/json",
         headers: {},

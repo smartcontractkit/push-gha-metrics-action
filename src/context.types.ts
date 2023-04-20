@@ -1,5 +1,4 @@
 import type { getOctokit } from "@actions/github"
-import { SummarizedTestResults } from "./testResultSummary/types"
 
 export type Octokit = ReturnType<typeof getOctokit>
 
@@ -87,11 +86,6 @@ export interface JobRunContext {
    * Whe the current job was ended, estimated by taking the post-action cleanup step timestamp of this current action
    */
   estimatedEndedAtUnixSeconds: number
-
-  /**
-   * The test results for the current job run if any
-   */
-  testResults?: SummarizedTestResults
 }
 
 export interface WorkflowRunContext {

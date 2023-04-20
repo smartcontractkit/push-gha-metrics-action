@@ -1,6 +1,6 @@
 import * as core from "@actions/core"
 import * as fs from "fs"
-import { TestResultsFileMetadata, SummarizedTestResults } from "./types"
+import { TestResultsFileMetadata, MappedTestResult } from "./types"
 import { parseGoTestResults } from "./parsers/golang"
 import { ZodError } from "zod"
 import { fromZodError } from 'zod-validation-error'
@@ -10,7 +10,7 @@ import { fromZodError } from 'zod-validation-error'
  */
 export function getTestResultSummary(
   fileMetadata: TestResultsFileMetadata,
-): SummarizedTestResults {
+): MappedTestResult[] {
   try {
     const fileData = fs.readFileSync(fileMetadata.filePath, "utf8")
 

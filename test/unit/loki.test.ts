@@ -17,7 +17,7 @@ describe('Loki', () => {
     it('should create loki log entries from context', () => {
       const {
         streams: [{ stream, values }],
-      } = createLokiLogEntriesFromContext(context)
+      } = createLokiLogEntriesFromContext(context, [])
       const [ts, value] = values[0]
 
       expect(BigInt(ts)).toBeLessThanOrEqual(BigInt(Date.now()) * BigInt(1_000_000))
@@ -41,23 +41,6 @@ describe('Loki', () => {
             "name": "generate-fixtures-name-1",
             "startedAt": "2022-06-15T01:01:13Z",
             "startedAtUnixSeconds": 1655254873,
-            "testResults": {
-              "elapsed": 551.993,
-              "status": "fail",
-              "testType": "go",
-              "tests": [
-                {
-                  "elapsed": 506.4,
-                  "name": "TestMinResources5NodesEnvWithBlockscout",
-                  "status": "pass",
-                },
-                {
-                  "elapsed": 522.96,
-                  "name": "Test5NodesPlus2MiningGethsReorgEnv",
-                  "status": "fail",
-                },
-              ],
-            },
             "url": "https://api.github.com/repos/smartcontractkit/push-gha-metrics-action/actions/jobs/6891428337",
           },
           "workflowRun": {
@@ -116,23 +99,6 @@ describe('Loki', () => {
             "name": "generate-fixtures-name-1",
             "startedAt": "2022-06-15T01:01:13Z",
             "startedAtUnixSeconds": 1655254873,
-            "testResults": {
-              "elapsed": 551.993,
-              "status": "fail",
-              "testType": "go",
-              "tests": [
-                {
-                  "elapsed": 506.4,
-                  "name": "TestMinResources5NodesEnvWithBlockscout",
-                  "status": "pass",
-                },
-                {
-                  "elapsed": 522.96,
-                  "name": "Test5NodesPlus2MiningGethsReorgEnv",
-                  "status": "fail",
-                },
-              ],
-            },
             "url": "https://api.github.com/repos/smartcontractkit/push-gha-metrics-action/actions/jobs/6891428337",
           },
           "workflowRun": {
@@ -178,7 +144,7 @@ describe('Loki', () => {
     }
 
     it('should send a successful dry run request', async () => {
-      const logEntries = createLokiLogEntriesFromContext(context)
+      const logEntries = createLokiLogEntriesFromContext(context, [])
       const requestOptions: LokiRequestOptions = {
         contentType: 'application/json',
         headers: {},
@@ -228,7 +194,7 @@ describe('Loki', () => {
           ],
         )
 
-      const logEntries = createLokiLogEntriesFromContext(context)
+      const logEntries = createLokiLogEntriesFromContext(context, [])
       const requestOptions: LokiRequestOptions = {
         contentType: 'application/json',
         headers: {},
@@ -268,7 +234,7 @@ describe('Loki', () => {
         })
         .reply(204, '', ['Date', 'Thu, 23 Jun 2022 22:17:16 GMT', 'Connection', 'close'])
 
-      const logEntries = createLokiLogEntriesFromContext(context)
+      const logEntries = createLokiLogEntriesFromContext(context, [])
       const requestOptions: LokiRequestOptions = {
         contentType: 'application/json',
         headers: {},

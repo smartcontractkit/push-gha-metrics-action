@@ -8,7 +8,7 @@ import * as contextTypes from './context.types'
 import {
   TestResultsFileMetadata,
   TestResultsFileMetadataSchema,
-  SummarizedTestResults,
+  MappedTestResult,
 } from './testResultSummary/types'
 import { getTestResultSummary } from './testResultSummary'
 import { fromZodError } from 'zod-validation-error'
@@ -42,6 +42,7 @@ export async function main() {
 
     core.startGroup('Load test results into context if present')
     const testResultFile: string = getTypedInput('test-results-file', false)
+    let testResults: MappedTestResult[] = []
 
     if (testResultFile !== '') {
       let testResultsFileObject
@@ -53,8 +54,7 @@ export async function main() {
       let metadata: TestResultsFileMetadata
       try {
         metadata = TestResultsFileMetadataSchema.parse(testResultsFileObject)
-        const data: SummarizedTestResults = getTestResultSummary(metadata)
-        context.jobRun.testResults = data
+        testResults = getTestResultSummary(metadata)
       } catch (error) {
         if (error instanceof ZodError) {
           const validationError = fromZodError(error as ZodError)
@@ -66,7 +66,7 @@ export async function main() {
     core.endGroup()
 
     core.startGroup('Loki Log Sending')
-    const logEntries = loki.createLokiLogEntriesFromContext(context)
+    const logEntries = loki.createLokiLogEntriesFromContext(context, testResults)
     await loki.sendLokiRequest(logEntries, getLokiRequestOptions(), dryRun)
     core.endGroup()
   } catch (err) {

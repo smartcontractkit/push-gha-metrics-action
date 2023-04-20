@@ -1,8 +1,8 @@
 import { getTestResultSummary } from "@src/testResultSummary"
 import {
   TestResultsFileMetadata,
-  SummarizedTestResults,
   TestResultsFileMetadataSchema,
+  MappedTestResult,
 } from "@src/testResultSummary/types"
 
 describe("Test Results Parsing", () => {
@@ -10,7 +10,7 @@ describe("Test Results Parsing", () => {
     const asInputString = '{"testType":"go","filePath":"./test/fixtures/testResults/go_test_results_input.json"}'
     const inputAsObject = JSON.parse(asInputString)
     const metadata: TestResultsFileMetadata = TestResultsFileMetadataSchema.parse(inputAsObject)
-    const data: SummarizedTestResults = getTestResultSummary(metadata)
+    const data: MappedTestResult[] = getTestResultSummary(metadata)
     expect(data).toMatchSnapshot()
   })
 })

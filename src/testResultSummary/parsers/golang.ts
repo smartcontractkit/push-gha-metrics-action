@@ -1,5 +1,4 @@
 import {
-  SummarizedTestResults,
   TestResult,
   TestResultsSchema,
   handledTestResultsSchema,
@@ -13,7 +12,7 @@ import {
  *
  * @see https://pkg.go.dev/cmd/test2json
  */
-export function parseGoTestResults(fileData: string): SummarizedTestResults {
+export function parseGoTestResults(fileData: string): MappedTestResult[] {
   const tests: TestResult[] = parseToTestResults(fileData)
 
   // Filter out any tests that we do not want to be streamed to Loki
@@ -22,29 +21,18 @@ export function parseGoTestResults(fileData: string): SummarizedTestResults {
     (t): t is HandledTestResults => handledTestResultsSchema.safeParse(t).success,
   )
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handledTests2: any = {}
+  const handledTests: MappedTestResult[] = []
   filteredTests.forEach((t) => {
     if (t.Test !== undefined) {
-      const temp = {
+      handledTests.push({
+        name: t.Test,
         status: t.Action,
         elapsed: t.Elapsed,
-      } satisfies MappedTestResult
-
-      handledTests2[t.Test] = temp
+      } satisfies MappedTestResult)
     }
   })
-  // The last test in the array is the summary of the test run
-  const lastTest = filteredTests.at(-1)
-  if (!lastTest) {
-    throw Error('No tests found in file')
-  }
 
-  return {
-    elapsed: lastTest.Elapsed,
-    status: lastTest.Action,
-    tests: handledTests2,
-    testType: 'go',
-  }
+  return handledTests
 }
 
 export function parseToTestResults(fileData: string): TestResult[] {
