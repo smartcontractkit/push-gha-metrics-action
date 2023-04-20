@@ -54,7 +54,7 @@ export async function main() {
       try {
         metadata = TestResultsFileMetadataSchema.parse(testResultsFileObject)
         const data: SummarizedTestResults = getTestResultSummary(metadata)
-        context.testResults = data
+        context.jobRun.testResults = data
       } catch (error) {
         if (error instanceof ZodError) {
           const validationError = fromZodError(error as ZodError)

@@ -11509,8 +11509,7 @@ async function fetchContext(githubClient, rawGithubContext, contextOverrides) {
   return {
     event: rest,
     workflowRun: mergedWorkflowRunContext,
-    jobRun: mergedJobRunContext,
-    testResults: void 0
+    jobRun: mergedJobRunContext
   };
 }
 function getGithubContext(rawGithubContext, contextOverrides) {
@@ -15464,7 +15463,7 @@ async function main() {
       try {
         metadata = TestResultsFileMetadataSchema.parse(testResultsFileObject);
         const data = getTestResultSummary(metadata);
-        context2.testResults = data;
+        context2.jobRun.testResults = data;
       } catch (error3) {
         if (error3 instanceof ZodError) {
           const validationError = (0, import_zod_validation_error2.fromZodError)(error3);

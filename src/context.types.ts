@@ -45,10 +45,6 @@ export interface Context {
    * The current job run context
    */
   jobRun: JobRunContext & Pick<GithubContext, GithubContextJobRunPropertyKeys>
-  /**
-   * Test Results Data if any is provided
-   */
-  testResults?: SummarizedTestResults
 }
 
 type JobRun = Awaited<
@@ -91,6 +87,11 @@ export interface JobRunContext {
    * Whe the current job was ended, estimated by taking the post-action cleanup step timestamp of this current action
    */
   estimatedEndedAtUnixSeconds: number
+
+  /**
+   * The test results for the current job run if any
+   */
+  testResults?: SummarizedTestResults
 }
 
 export interface WorkflowRunContext {

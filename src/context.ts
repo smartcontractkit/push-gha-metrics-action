@@ -53,7 +53,6 @@ export async function fetchContext(
     event: rest,
     workflowRun: mergedWorkflowRunContext,
     jobRun: mergedJobRunContext,
-    testResults: undefined,
   }
 }
 
