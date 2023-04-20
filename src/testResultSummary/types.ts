@@ -19,6 +19,7 @@ export type TestResultsFileMetadata = z.infer<
  */
 const handledTestStatuses = z.enum(["pass", "fail"])
 type HandledTestStatuses = z.infer<typeof handledTestStatuses>
+export type HandledTestResults = z.infer<typeof handledTestResultsSchema>
 export const handledTestResultsSchema = z.object({
   Test: z.string().min(1).optional(),
   Action: handledTestStatuses,
@@ -69,7 +70,6 @@ const TestResultSchema = z.discriminatedUnion("Action", [
 export const TestResultsSchema = z.array(TestResultSchema)
 
 export interface MappedTestResult {
-  name?: string
   status: HandledTestStatuses
   elapsed: number
 }
@@ -81,7 +81,9 @@ export interface SummarizedTestResults {
   /**
    * The individual test results
    */
-  tests: MappedTestResult[]
+  // tests: MappedTestResult[]
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  tests: any
   /**
    * The status of the test run, if any test fails the status is "fail"
    */

@@ -15379,24 +15379,27 @@ var fs = __toESM(require("fs"));
 // src/testResultSummary/parsers/golang.ts
 function parseGoTestResults(fileData) {
   const tests = parseToTestResults(fileData);
-  const handledTests = tests.filter(
+  const filteredTests = tests.filter(
     (t) => handledTestResultsSchema.safeParse(t).success
-  ).map(
-    (t) => ({
-      name: t.Test,
-      status: t.Action,
-      elapsed: t.Elapsed
-    })
   );
-  const lastTest = handledTests.at(-1);
+  const handledTests2 = {};
+  filteredTests.forEach((t) => {
+    if (t.Test !== void 0) {
+      const temp = {
+        status: t.Action,
+        elapsed: t.Elapsed
+      };
+      handledTests2[t.Test] = temp;
+    }
+  });
+  const lastTest = filteredTests.at(-1);
   if (!lastTest) {
     throw Error("No tests found in file");
   }
-  const restOfHandledTests = handledTests.slice(0, -1);
   return {
-    elapsed: lastTest.elapsed,
-    status: lastTest.status,
-    tests: restOfHandledTests,
+    elapsed: lastTest.Elapsed,
+    status: lastTest.Action,
+    tests: handledTests2,
     testType: "go"
   };
 }

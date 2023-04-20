@@ -1,11 +1,11 @@
-import { z } from "zod"
 import {
   SummarizedTestResults,
-  MappedTestResult,
   TestResult,
   TestResultsSchema,
   handledTestResultsSchema,
-} from "../types"
+  MappedTestResult,
+  HandledTestResults,
+} from '../types'
 
 /**
  * Parse a go test results file data into the expeted output while ignoring
@@ -18,42 +18,41 @@ export function parseGoTestResults(fileData: string): SummarizedTestResults {
 
   // Filter out any tests that we do not want to be streamed to Loki
   // and map the remaining tests to the expected output
-  const handledTests: SummarizedTestResults["tests"] = tests
-    .filter(
-      (t): t is z.infer<typeof handledTestResultsSchema> =>
-        handledTestResultsSchema.safeParse(t).success,
-    )
-    .map(
-      t =>
-        ({
-          name: t.Test,
-          status: t.Action,
-          elapsed: t.Elapsed,
-        } satisfies MappedTestResult),
-    )
+  const filteredTests = tests.filter(
+    (t): t is HandledTestResults => handledTestResultsSchema.safeParse(t).success,
+  )
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handledTests2: any = {}
+  filteredTests.forEach((t) => {
+    if (t.Test !== undefined) {
+      const temp = {
+        status: t.Action,
+        elapsed: t.Elapsed,
+      } satisfies MappedTestResult
 
+      handledTests2[t.Test] = temp
+    }
+  })
   // The last test in the array is the summary of the test run
-  const lastTest = handledTests.at(-1)
+  const lastTest = filteredTests.at(-1)
   if (!lastTest) {
-    throw Error("No tests found in file")
+    throw Error('No tests found in file')
   }
-  // Remove the last test from the array, which is the summary of the test run
-  const restOfHandledTests = handledTests.slice(0, -1)
 
   return {
-    elapsed: lastTest.elapsed,
-    status: lastTest.status,
-    tests: restOfHandledTests,
-    testType: "go",
+    elapsed: lastTest.Elapsed,
+    status: lastTest.Action,
+    tests: handledTests2,
+    testType: 'go',
   }
 }
 
 export function parseToTestResults(fileData: string): TestResult[] {
   // Split the content by newline characters
-  const lines = fileData.split("\n").filter(line => line.trim() !== "")
+  const lines = fileData.split('\n').filter((line) => line.trim() !== '')
 
   // Parse each line as a JSON object and collect the parsed objects in an array
-  const jsonArray = lines.map(line => JSON.parse(line))
+  const jsonArray = lines.map((line) => JSON.parse(line))
 
   return TestResultsSchema.parse(jsonArray)
 }

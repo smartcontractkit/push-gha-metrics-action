@@ -5,17 +5,15 @@ exports[`Test Results Parsing should parse a go test results file input 1`] = `
   "elapsed": 551.993,
   "status": "fail",
   "testType": "go",
-  "tests": [
-    {
-      "elapsed": 506.4,
-      "name": "TestMinResources5NodesEnvWithBlockscout",
-      "status": "pass",
-    },
-    {
+  "tests": {
+    "Test5NodesPlus2MiningGethsReorgEnv": {
       "elapsed": 522.96,
-      "name": "Test5NodesPlus2MiningGethsReorgEnv",
       "status": "fail",
     },
-  ],
+    "TestMinResources5NodesEnvWithBlockscout": {
+      "elapsed": 506.4,
+      "status": "pass",
+    },
+  },
 }
 `;
