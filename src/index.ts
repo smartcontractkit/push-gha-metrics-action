@@ -6,13 +6,9 @@ import * as loki from './loki'
 import * as lokiTypes from './loki.types'
 import * as contextTypes from './context.types'
 import {
-  TestResultsFileMetadata,
-  TestResultsFileMetadataSchema,
   MappedTestResult,
 } from './testResultSummary/types'
 import { getTestResultSummary } from './testResultSummary'
-import { fromZodError } from 'zod-validation-error'
-import { ZodError } from 'zod'
 
 const isPost = 'isPost'
 
@@ -44,24 +40,8 @@ export async function main() {
     const testResultFile: string = getTypedInput('test-results-file', false)
     let testResults: MappedTestResult[] = []
 
-    if (testResultFile !== '') {
-      let testResultsFileObject
-      try {
-        testResultsFileObject = JSON.parse(testResultFile)
-      } catch (error) {
-        core.warning('Invalid json in test-results-file: ' + testResultFile)
-      }
-      let metadata: TestResultsFileMetadata
-      try {
-        metadata = TestResultsFileMetadataSchema.parse(testResultsFileObject)
-        testResults = getTestResultSummary(metadata)
-      } catch (error) {
-        if (error instanceof ZodError) {
-          const validationError = fromZodError(error as ZodError)
-          core.error(validationError)
-        }
-        throw error
-      }
+    if (testResultFile) {
+        testResults = getTestResultSummary(testResultFile)
     }
     core.endGroup()
 

@@ -886,18 +886,18 @@ var require_tunnel = __commonJS({
             res.statusCode
           );
           socket.destroy();
-          var error3 = new Error("tunneling socket could not be established, statusCode=" + res.statusCode);
-          error3.code = "ECONNRESET";
-          options.request.emit("error", error3);
+          var error2 = new Error("tunneling socket could not be established, statusCode=" + res.statusCode);
+          error2.code = "ECONNRESET";
+          options.request.emit("error", error2);
           self.removeSocket(placeholder);
           return;
         }
         if (head.length > 0) {
           debug2("got illegal response body from proxy");
           socket.destroy();
-          var error3 = new Error("got illegal response body from proxy");
-          error3.code = "ECONNRESET";
-          options.request.emit("error", error3);
+          var error2 = new Error("got illegal response body from proxy");
+          error2.code = "ECONNRESET";
+          options.request.emit("error", error2);
           self.removeSocket(placeholder);
           return;
         }
@@ -912,9 +912,9 @@ var require_tunnel = __commonJS({
           cause.message,
           cause.stack
         );
-        var error3 = new Error("tunneling socket could not be established, cause=" + cause.message);
-        error3.code = "ECONNRESET";
-        options.request.emit("error", error3);
+        var error2 = new Error("tunneling socket could not be established, cause=" + cause.message);
+        error2.code = "ECONNRESET";
+        options.request.emit("error", error2);
         self.removeSocket(placeholder);
       }
     };
@@ -1706,12 +1706,12 @@ var require_oidc_utils = __commonJS({
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
           const httpclient = OidcClient.createHttpClient();
-          const res = yield httpclient.getJson(id_token_url).catch((error3) => {
+          const res = yield httpclient.getJson(id_token_url).catch((error2) => {
             throw new Error(`Failed to get ID Token. 
  
-        Error Code : ${error3.statusCode}
+        Error Code : ${error2.statusCode}
  
-        Error Message: ${error3.result.message}`);
+        Error Message: ${error2.result.message}`);
           });
           const id_token = (_a = res.result) === null || _a === void 0 ? void 0 : _a.value;
           if (!id_token) {
@@ -1732,8 +1732,8 @@ var require_oidc_utils = __commonJS({
             const id_token = yield OidcClient.getCall(id_token_url);
             core_1.setSecret(id_token);
             return id_token;
-          } catch (error3) {
-            throw new Error(`Error message: ${error3.message}`);
+          } catch (error2) {
+            throw new Error(`Error message: ${error2.message}`);
           }
         });
       }
@@ -2099,7 +2099,7 @@ Support boolean input list: \`true | True | TRUE | false | False | FALSE\``);
     exports.setCommandEcho = setCommandEcho;
     function setFailed2(message) {
       process.exitCode = ExitCode.Failure;
-      error3(message);
+      error2(message);
     }
     exports.setFailed = setFailed2;
     function isDebug() {
@@ -2110,14 +2110,14 @@ Support boolean input list: \`true | True | TRUE | false | False | FALSE\``);
       command_1.issueCommand("debug", {}, message);
     }
     exports.debug = debug2;
-    function error3(message, properties = {}) {
+    function error2(message, properties = {}) {
       command_1.issueCommand("error", utils_1.toCommandProperties(properties), message instanceof Error ? message.toString() : message);
     }
-    exports.error = error3;
-    function warning2(message, properties = {}) {
+    exports.error = error2;
+    function warning(message, properties = {}) {
       command_1.issueCommand("warning", utils_1.toCommandProperties(properties), message instanceof Error ? message.toString() : message);
     }
-    exports.warning = warning2;
+    exports.warning = warning;
     function notice(message, properties = {}) {
       command_1.issueCommand("notice", utils_1.toCommandProperties(properties), message instanceof Error ? message.toString() : message);
     }
@@ -2370,8 +2370,8 @@ var require_add = __commonJS({
       }
       if (kind === "error") {
         hook = function(method, options) {
-          return Promise.resolve().then(method.bind(null, options)).catch(function(error3) {
-            return orig(error3, options);
+          return Promise.resolve().then(method.bind(null, options)).catch(function(error2) {
+            return orig(error2, options);
           });
         };
       }
@@ -3058,21 +3058,21 @@ var require_tr46 = __commonJS({
         label = punycode.toUnicode(label);
         processing_option = PROCESSING_OPTIONS.NONTRANSITIONAL;
       }
-      var error3 = false;
+      var error2 = false;
       if (normalize(label) !== label || label[3] === "-" && label[4] === "-" || label[0] === "-" || label[label.length - 1] === "-" || label.indexOf(".") !== -1 || label.search(combiningMarksRegex) === 0) {
-        error3 = true;
+        error2 = true;
       }
       var len = countSymbols(label);
       for (var i = 0; i < len; ++i) {
         var status = findStatus(label.codePointAt(i));
         if (processing === PROCESSING_OPTIONS.TRANSITIONAL && status[1] !== "valid" || processing === PROCESSING_OPTIONS.NONTRANSITIONAL && status[1] !== "valid" && status[1] !== "deviation") {
-          error3 = true;
+          error2 = true;
           break;
         }
       }
       return {
         label,
-        error: error3
+        error: error2
       };
     }
     function processing(domain_name, useSTD3, processing_option) {
@@ -4722,8 +4722,8 @@ var require_lib3 = __commonJS({
       this.timeout = timeout;
       if (body instanceof Stream) {
         body.on("error", function(err) {
-          const error3 = err.name === "AbortError" ? err : new FetchError(`Invalid response body while trying to fetch ${_this.url}: ${err.message}`, "system", err);
-          _this[INTERNALS].error = error3;
+          const error2 = err.name === "AbortError" ? err : new FetchError(`Invalid response body while trying to fetch ${_this.url}: ${err.message}`, "system", err);
+          _this[INTERNALS].error = error2;
         });
       }
     }
@@ -5453,14 +5453,14 @@ var require_lib3 = __commonJS({
         const signal = request.signal;
         let response = null;
         const abort = function abort2() {
-          let error3 = new AbortError("The user aborted a request.");
-          reject(error3);
+          let error2 = new AbortError("The user aborted a request.");
+          reject(error2);
           if (request.body && request.body instanceof Stream.Readable) {
-            request.body.destroy(error3);
+            request.body.destroy(error2);
           }
           if (!response || !response.body)
             return;
-          response.body.emit("error", error3);
+          response.body.emit("error", error2);
         };
         if (signal && signal.aborted) {
           abort();
@@ -5855,7 +5855,7 @@ var require_dist_node5 = __commonJS({
         }
         if (status >= 400) {
           const data = await getResponseData(response);
-          const error3 = new requestError.RequestError(toErrorMessage(data), status, {
+          const error2 = new requestError.RequestError(toErrorMessage(data), status, {
             response: {
               url,
               status,
@@ -5864,7 +5864,7 @@ var require_dist_node5 = __commonJS({
             },
             request: requestOptions
           });
-          throw error3;
+          throw error2;
         }
         return getResponseData(response);
       }).then((data) => {
@@ -5874,10 +5874,10 @@ var require_dist_node5 = __commonJS({
           headers,
           data
         };
-      }).catch((error3) => {
-        if (error3 instanceof requestError.RequestError)
-          throw error3;
-        throw new requestError.RequestError(error3.message, 500, {
+      }).catch((error2) => {
+        if (error2 instanceof requestError.RequestError)
+          throw error2;
+        throw new requestError.RequestError(error2.message, 500, {
           request: requestOptions
         });
       });
@@ -7378,9 +7378,9 @@ var require_dist_node10 = __commonJS({
               return {
                 value: normalizedResponse
               };
-            } catch (error3) {
-              if (error3.status !== 409)
-                throw error3;
+            } catch (error2) {
+              if (error2.status !== 409)
+                throw error2;
               url = "";
               return {
                 value: {
@@ -7745,8 +7745,8 @@ var require_ZodError = __commonJS({
           return issue.message;
         };
         const fieldErrors = { _errors: [] };
-        const processError = (error3) => {
-          for (const issue of error3.issues) {
+        const processError = (error2) => {
+          for (const issue of error2.issues) {
             if (issue.code === "invalid_union") {
               issue.unionErrors.map(processError);
             } else if (issue.code === "invalid_return_type") {
@@ -7804,8 +7804,8 @@ var require_ZodError = __commonJS({
     };
     exports.ZodError = ZodError2;
     ZodError2.create = (issues) => {
-      const error3 = new ZodError2(issues);
-      return error3;
+      const error2 = new ZodError2(issues);
+      return error2;
     };
   }
 });
@@ -8124,8 +8124,8 @@ var require_types = __commonJS({
           get error() {
             if (this._error)
               return this._error;
-            const error3 = new ZodError_1.ZodError(ctx.common.issues);
-            this._error = error3;
+            const error2 = new ZodError_1.ZodError(ctx.common.issues);
+            this._error = error2;
             return this._error;
           }
         };
@@ -10443,7 +10443,7 @@ var require_types = __commonJS({
           });
           return parseUtil_1.INVALID;
         }
-        function makeArgsIssue(args, error3) {
+        function makeArgsIssue(args, error2) {
           return (0, parseUtil_1.makeIssue)({
             data: args,
             path: ctx.path,
@@ -10455,11 +10455,11 @@ var require_types = __commonJS({
             ].filter((x) => !!x),
             issueData: {
               code: ZodError_1.ZodIssueCode.invalid_arguments,
-              argumentsError: error3
+              argumentsError: error2
             }
           });
         }
-        function makeReturnsIssue(returns, error3) {
+        function makeReturnsIssue(returns, error2) {
           return (0, parseUtil_1.makeIssue)({
             data: returns,
             path: ctx.path,
@@ -10471,7 +10471,7 @@ var require_types = __commonJS({
             ].filter((x) => !!x),
             issueData: {
               code: ZodError_1.ZodIssueCode.invalid_return_type,
-              returnTypeError: error3
+              returnTypeError: error2
             }
           });
         }
@@ -10479,15 +10479,15 @@ var require_types = __commonJS({
         const fn = ctx.data;
         if (this._def.returns instanceof ZodPromise2) {
           return (0, parseUtil_1.OK)(async (...args) => {
-            const error3 = new ZodError_1.ZodError([]);
+            const error2 = new ZodError_1.ZodError([]);
             const parsedArgs = await this._def.args.parseAsync(args, params).catch((e) => {
-              error3.addIssue(makeArgsIssue(args, e));
-              throw error3;
+              error2.addIssue(makeArgsIssue(args, e));
+              throw error2;
             });
             const result = await fn(...parsedArgs);
             const parsedReturns = await this._def.returns._def.type.parseAsync(result, params).catch((e) => {
-              error3.addIssue(makeReturnsIssue(result, e));
-              throw error3;
+              error2.addIssue(makeReturnsIssue(result, e));
+              throw error2;
             });
             return parsedReturns;
           });
@@ -11394,16 +11394,16 @@ var require_ValidationError = __commonJS({
       }
       return issue.message;
     }
-    function fromZodError3(zodError, options = {}) {
+    function fromZodError2(zodError, options = {}) {
       const { maxIssuesInMessage = 99, issueSeparator = "; ", unionSeparator = ", or ", prefixSeparator = ": ", prefix = "Validation error" } = options;
       const reason = zodError.errors.slice(0, maxIssuesInMessage).map((issue) => fromZodIssue(issue, issueSeparator, unionSeparator)).join(issueSeparator);
       const message = reason ? [prefix, reason].join(prefixSeparator) : prefix;
       return new ValidationError(message, zodError.errors);
     }
-    exports.fromZodError = fromZodError3;
+    exports.fromZodError = fromZodError2;
     var toValidationError = (options = {}) => (err) => {
       if (err instanceof zod.ZodError) {
-        return fromZodError3(err, options);
+        return fromZodError2(err, options);
       }
       if (err instanceof Error) {
         return err;
@@ -11729,10 +11729,10 @@ async function sendLokiRequest(logEntries, requestOptions, dryRun) {
       res.on("data", (d) => data += d);
       res.on("end", () => {
         if (statusCode && !(statusCode >= 200 && statusCode < 300)) {
-          const error3 = Error(
+          const error2 = Error(
             `${sendLokiRequest.name} Received non 200 status code. StatusCode: ${statusCode} StatusMessage: ${statusMessage || "N/A"} Body: ${data}`
           );
-          return reject(error3);
+          return reject(error2);
         }
         resolve({
           headers: incomingHeaders,
@@ -11754,6 +11754,10 @@ async function sendLokiRequest(logEntries, requestOptions, dryRun) {
   core2.debug(`${sendLokiRequest.name} Response: ${JSON.stringify(response, null, 1)}`);
   return response;
 }
+
+// src/testResultSummary/index.ts
+var core3 = __toESM(require_core());
+var fs = __toESM(require("fs"));
 
 // node_modules/.pnpm/zod@3.21.4/node_modules/zod/lib/index.mjs
 var util;
@@ -11935,8 +11939,8 @@ var ZodError = class extends Error {
       return issue.message;
     };
     const fieldErrors = { _errors: [] };
-    const processError = (error3) => {
-      for (const issue of error3.issues) {
+    const processError = (error2) => {
+      for (const issue of error2.issues) {
         if (issue.code === "invalid_union") {
           issue.unionErrors.map(processError);
         } else if (issue.code === "invalid_return_type") {
@@ -11993,8 +11997,8 @@ var ZodError = class extends Error {
   }
 };
 ZodError.create = (issues) => {
-  const error3 = new ZodError(issues);
-  return error3;
+  const error2 = new ZodError(issues);
+  return error2;
 };
 var errorMap = (issue, _ctx) => {
   let message;
@@ -12231,8 +12235,8 @@ var handleResult = (ctx, result) => {
       get error() {
         if (this._error)
           return this._error;
-        const error3 = new ZodError(ctx.common.issues);
-        this._error = error3;
+        const error2 = new ZodError(ctx.common.issues);
+        this._error = error2;
         return this._error;
       }
     };
@@ -14532,7 +14536,7 @@ var ZodFunction = class extends ZodType {
       });
       return INVALID;
     }
-    function makeArgsIssue(args, error3) {
+    function makeArgsIssue(args, error2) {
       return makeIssue({
         data: args,
         path: ctx.path,
@@ -14544,11 +14548,11 @@ var ZodFunction = class extends ZodType {
         ].filter((x) => !!x),
         issueData: {
           code: ZodIssueCode.invalid_arguments,
-          argumentsError: error3
+          argumentsError: error2
         }
       });
     }
-    function makeReturnsIssue(returns, error3) {
+    function makeReturnsIssue(returns, error2) {
       return makeIssue({
         data: returns,
         path: ctx.path,
@@ -14560,7 +14564,7 @@ var ZodFunction = class extends ZodType {
         ].filter((x) => !!x),
         issueData: {
           code: ZodIssueCode.invalid_return_type,
-          returnTypeError: error3
+          returnTypeError: error2
         }
       });
     }
@@ -14568,15 +14572,15 @@ var ZodFunction = class extends ZodType {
     const fn = ctx.data;
     if (this._def.returns instanceof ZodPromise) {
       return OK(async (...args) => {
-        const error3 = new ZodError([]);
+        const error2 = new ZodError([]);
         const parsedArgs = await this._def.args.parseAsync(args, params).catch((e) => {
-          error3.addIssue(makeArgsIssue(args, e));
-          throw error3;
+          error2.addIssue(makeArgsIssue(args, e));
+          throw error2;
         });
         const result = await fn(...parsedArgs);
         const parsedReturns = await this._def.returns._def.type.parseAsync(result, params).catch((e) => {
-          error3.addIssue(makeReturnsIssue(result, e));
-          throw error3;
+          error2.addIssue(makeReturnsIssue(result, e));
+          throw error2;
         });
         return parsedReturns;
       });
@@ -15383,10 +15387,6 @@ var TestResultSchema = z.discriminatedUnion("Action", [
 ]);
 var TestResultsSchema = z.array(TestResultSchema);
 
-// src/testResultSummary/index.ts
-var core3 = __toESM(require_core());
-var fs = __toESM(require("fs"));
-
 // src/testResultSummary/parsers/golang.ts
 function parseGoTestResults(fileData) {
   const tests = parseToTestResults(fileData);
@@ -15413,7 +15413,8 @@ function parseToTestResults(fileData) {
 
 // src/testResultSummary/index.ts
 var import_zod_validation_error = __toESM(require_cjs());
-function getTestResultSummary(fileMetadata) {
+function getTestResultSummary(testResultsFileMetadataRaw) {
+  const fileMetadata = getTestResultsFileMetadata(testResultsFileMetadataRaw);
   try {
     const fileData = fs.readFileSync(fileMetadata.filePath, "utf8");
     switch (fileMetadata.testType) {
@@ -15422,18 +15423,30 @@ function getTestResultSummary(fileMetadata) {
       default:
         throw Error("Unknown test type: " + fileMetadata.testType);
     }
-  } catch (error3) {
-    if (error3 instanceof ZodError) {
-      const validationError = (0, import_zod_validation_error.fromZodError)(error3);
+  } catch (error2) {
+    if (error2 instanceof ZodError) {
+      const validationError = (0, import_zod_validation_error.fromZodError)(error2);
       core3.error(validationError);
     }
     core3.error("Could not read the file: " + fileMetadata.filePath);
-    throw error3;
+    throw error2;
+  }
+}
+function getTestResultsFileMetadata(testResultsFile) {
+  try {
+    const testResultsFileObject = JSON.parse(testResultsFile);
+    return TestResultsFileMetadataSchema.parse(testResultsFileObject);
+  } catch (error2) {
+    if (error2 instanceof ZodError) {
+      const validationError = (0, import_zod_validation_error.fromZodError)(error2);
+      core3.error(validationError);
+    }
+    core3.error("Invalid test-results-file input: " + testResultsFile);
+    throw error2;
   }
 }
 
 // src/index.ts
-var import_zod_validation_error2 = __toESM(require_cjs());
 var isPost = "isPost";
 async function main() {
   if (!core4.getState(isPost)) {
@@ -15458,24 +15471,8 @@ async function main() {
     core4.startGroup("Load test results into context if present");
     const testResultFile = getTypedInput("test-results-file", false);
     let testResults = [];
-    if (testResultFile !== "") {
-      let testResultsFileObject;
-      try {
-        testResultsFileObject = JSON.parse(testResultFile);
-      } catch (error3) {
-        core4.warning("Invalid json in test-results-file: " + testResultFile);
-      }
-      let metadata;
-      try {
-        metadata = TestResultsFileMetadataSchema.parse(testResultsFileObject);
-        testResults = getTestResultSummary(metadata);
-      } catch (error3) {
-        if (error3 instanceof ZodError) {
-          const validationError = (0, import_zod_validation_error2.fromZodError)(error3);
-          core4.error(validationError);
-        }
-        throw error3;
-      }
+    if (testResultFile) {
+      testResults = getTestResultSummary(testResultFile);
     }
     core4.endGroup();
     core4.startGroup("Loki Log Sending");
