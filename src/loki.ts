@@ -107,10 +107,8 @@ export function createLokiLogValueFromTestResult(
   testResult.jobName = context.jobRun.jobName
   testResult.repo = context.event.repo.repo
   testResult.jobRunId = context.jobRun.id
-  const test = {
-    test: testResult,
-  }
-  const log = JSON.stringify(test)
+
+  const log = JSON.stringify(testResult)
   const secondInNanoSeconds = BigInt(1e9)
   const ts = BigInt(context.jobRun.estimatedEndedAtUnixSeconds) * secondInNanoSeconds
 

@@ -77,8 +77,3 @@ export interface MappedTestResult {
   jobName?: string
   repo?: string
 }
-
-export interface MappedTestResult2 {
-  status: HandledTestStatuses
-  elapsed: number
-}

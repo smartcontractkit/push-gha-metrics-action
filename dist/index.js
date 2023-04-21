@@ -11674,10 +11674,7 @@ function createLokiLogValueFromTestResult(testResult, context2) {
   testResult.jobName = context2.jobRun.jobName;
   testResult.repo = context2.event.repo.repo;
   testResult.jobRunId = context2.jobRun.id;
-  const test = {
-    test: testResult
-  };
-  const log = JSON.stringify(test);
+  const log = JSON.stringify(testResult);
   const secondInNanoSeconds = BigInt(1e9);
   const ts = BigInt(context2.jobRun.estimatedEndedAtUnixSeconds) * secondInNanoSeconds;
   core2.debug(`${createLokiLogValueFromContext.name} Created loki log value: ${log}`);
