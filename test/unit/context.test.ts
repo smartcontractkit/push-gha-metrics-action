@@ -1,15 +1,15 @@
-import type { context } from '@actions/github'
-import { DeepMockProxy, mockDeep, MockProxy } from 'jest-mock-extended'
-import * as fixtures from '../fixtures/github'
-import { writeFileSync } from 'fs'
-import { join } from 'path'
+import type { context } from "@actions/github"
+import { DeepMockProxy, mockDeep, MockProxy } from "jest-mock-extended"
+import * as fixtures from "../fixtures/github"
+import { writeFileSync } from "fs"
+import { join } from "path"
 import {
   fetchWorkflowRunContext,
   fetchJobRunContext,
   getGithubContext,
   fetchContext,
-} from '../../src/context'
-import type { ContextOverrides, Octokit } from '../../src/context.types'
+} from "../../src/context"
+import type { ContextOverrides, Octokit } from "../../src/context.types"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function mockResponse(data: any): any {
@@ -21,29 +21,32 @@ function mockResponse(data: any): any {
   }
 }
 
-describe('Context', () => {
+describe("Context", () => {
   let mockContext: MockProxy<typeof context>
   let mockClient: DeepMockProxy<Octokit>
   let mockContextOverrides: ContextOverrides
   const env = JSON.parse(JSON.stringify(process.env))
 
-  describe('Event', () => {
-    describe('Pull Requests', () => {
+  describe("Event", () => {
+    describe("Pull Requests", () => {
       beforeEach(() => {
         process.env = env
         mockClient = mockDeep<Octokit>()
       })
 
-      describe.each(fixtures.pullRequest.fixtures)('%# Job Attempts', (f) => {
+      describe.each(fixtures.pullRequest.fixtures)("%# Job Attempts", f => {
         beforeEach(() => {
           // make the ended at timestamp be 30 seconds after the one of the jobs in the current workflow started
           const estimatedEndedAtUnixSeconds =
-            Math.floor(Date.parse(f.api.listJobsForWorkflowRunAttempt.jobs[0].started_at) / 1000) +
-            30
+            Math.floor(
+              Date.parse(
+                f.api.listJobsForWorkflowRunAttempt.jobs[0].started_at,
+              ) / 1000,
+            ) + 30
 
           mockContextOverrides = {
             estimatedEndedAtUnixSeconds,
-            jobName: 'generate-fixtures-name-1',
+            jobName: "generate-fixtures-name-1",
           }
 
           mockClient.rest.actions.getWorkflowRunAttempt.mockResolvedValue(
@@ -61,36 +64,40 @@ describe('Context', () => {
           // So we add our own to test if we're properly creating a JSON obj based off of
           // https://github.com/actions/toolkit/blob/main/packages/github/src/context.ts
           get issue(): { owner: string; repo: string; number: number } {
-            return { owner: 'mockOwner', repo: 'mockRepo', number: 1 }
+            return { owner: "mockOwner", repo: "mockRepo", number: 1 }
           },
           get repo(): { owner: string; repo: string } {
-            return { owner: 'mockOwner', repo: 'mockRepo' }
+            return { owner: "mockOwner", repo: "mockRepo" }
           },
         }
 
         describe(getGithubContext.name, () => {
-          it('should handle required env vars', () => {
+          it("should handle required env vars", () => {
             delete process.env.GITHUB_EVENT_PATH
             delete process.env.GITHUB_RUN_ATTEMPT
 
-            expect(() => getGithubContext(mockContext)).toThrowErrorMatchingInlineSnapshot(
+            expect(() =>
+              getGithubContext(mockContext),
+            ).toThrowErrorMatchingInlineSnapshot(
               `"GITHUB_EVENT_PATH must exist to obtain context"`,
             )
 
-            process.env.GITHUB_EVENT_PATH = './my-event-path'
+            process.env.GITHUB_EVENT_PATH = "./my-event-path"
 
-            expect(() => getGithubContext(mockContext)).toThrowErrorMatchingInlineSnapshot(
+            expect(() =>
+              getGithubContext(mockContext),
+            ).toThrowErrorMatchingInlineSnapshot(
               `"GITHUB_RUN_ATTEMPT must exist to get workflow run attempt"`,
             )
 
-            process.env.GITHUB_RUN_ATTEMPT = '1'
+            process.env.GITHUB_RUN_ATTEMPT = "1"
 
             expect(() => getGithubContext(mockContext)).not.toThrowError()
           })
 
-          it('should return a correctly hydrated context', () => {
-            process.env.GITHUB_RUN_ATTEMPT = '1'
-            process.env.GITHUB_EVENT_PATH = './my-event-path'
+          it("should return a correctly hydrated context", () => {
+            process.env.GITHUB_RUN_ATTEMPT = "1"
+            process.env.GITHUB_EVENT_PATH = "./my-event-path"
             const result = getGithubContext(mockContext, {})
             // Have to serialize / parse otherwise snapshotting fails
             // most likely due to how we mock this object
@@ -99,9 +106,9 @@ describe('Context', () => {
         })
 
         describe(fetchJobRunContext.name, () => {
-          it('should error out when a job lookup fails', async () => {
-            process.env.GITHUB_RUN_ATTEMPT = '1'
-            process.env.GITHUB_EVENT_PATH = './my-event-path'
+          it("should error out when a job lookup fails", async () => {
+            process.env.GITHUB_RUN_ATTEMPT = "1"
+            process.env.GITHUB_EVENT_PATH = "./my-event-path"
             const githubContext = getGithubContext(mockContext)
             expect.assertions(1)
 
@@ -110,19 +117,26 @@ describe('Context', () => {
             ).rejects.toMatchSnapshot()
           })
 
-          it('should work when a matching job name is found', async () => {
-            process.env.GITHUB_RUN_ATTEMPT = '1'
-            process.env.GITHUB_EVENT_PATH = './my-event-path'
+          it("should work when a matching job name is found", async () => {
+            process.env.GITHUB_RUN_ATTEMPT = "1"
+            process.env.GITHUB_EVENT_PATH = "./my-event-path"
             // jobName was grabbed by looking through the fixtures
-            const githubContext = getGithubContext(mockContext, mockContextOverrides)
+            const githubContext = getGithubContext(
+              mockContext,
+              mockContextOverrides,
+            )
 
-            const result = await fetchJobRunContext(mockClient, githubContext, mockContextOverrides)
+            const result = await fetchJobRunContext(
+              mockClient,
+              githubContext,
+              mockContextOverrides,
+            )
             expect(result).toMatchSnapshot()
           })
         })
 
-        describe('fetchWorkflowRunContext', () => {
-          it('should error when run_started_at is null', async () => {
+        describe("fetchWorkflowRunContext", () => {
+          it("should error when run_started_at is null", async () => {
             mockClient.rest.actions.getWorkflowRunAttempt.mockResolvedValueOnce(
               mockResponse({
                 ...getWorkflowRunAttempt,
@@ -136,17 +150,24 @@ describe('Context', () => {
             ).rejects.toMatchSnapshot()
           })
 
-          it('should work', async () => {
+          it("should work", async () => {
             const githubContext = getGithubContext(mockContext)
-            const workflowRunContext = await fetchWorkflowRunContext(mockClient, githubContext)
+            const workflowRunContext = await fetchWorkflowRunContext(
+              mockClient,
+              githubContext,
+            )
 
             expect(workflowRunContext).toMatchSnapshot()
           })
         })
 
-        describe('fetchContext', () => {
-          it('should work', async () => {
-            const res = await fetchContext(mockClient, mockContext, mockContextOverrides)
+        describe("fetchContext", () => {
+          it("should work", async () => {
+            const res = await fetchContext(
+              mockClient,
+              mockContext,
+              mockContextOverrides,
+            )
 
             const stringifiedRes = JSON.stringify(res)
             expect(JSON.parse(stringifiedRes)).toMatchSnapshot()
@@ -156,7 +177,7 @@ describe('Context', () => {
              * to update them
              */
             if (process.env.UPDATE_CONTEXT_FIXTURE) {
-              const snapshotPath = '../fixtures/context'
+              const snapshotPath = "../fixtures/context"
               writeFileSync(
                 join(__dirname, snapshotPath, `fetchContext${f.index}.json`),
                 stringifiedRes,
