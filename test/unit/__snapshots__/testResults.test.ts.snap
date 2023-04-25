@@ -1,0 +1,16 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Test Results Parsing should parse a go test results file input 1`] = `
+[
+  {
+    "elapsed": 506.4,
+    "name": "TestMinResources5NodesEnvWithBlockscout",
+    "status": "pass",
+  },
+  {
+    "elapsed": 522.96,
+    "name": "Test5NodesPlus2MiningGethsReorgEnv",
+    "status": "fail",
+  },
+]
+`;

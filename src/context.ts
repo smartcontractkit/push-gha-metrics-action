@@ -38,7 +38,7 @@ export async function fetchContext(
     githubContext
 
   const mergedJobRunContext: types.Context["jobRun"] = {
-    ...jobRunContext!,
+    ...jobRunContext,
     jobName,
   }
   const mergedWorkflowRunContext: types.Context["workflowRun"] = {
@@ -122,7 +122,7 @@ export async function fetchJobRunContext(
   client: types.Octokit,
   githubContext: types.GithubContext,
   contextOverrides?: types.ContextOverrides,
-): Promise<types.JobRunContext | undefined> {
+): Promise<types.JobRunContext> {
   await delay(JobFinalizedSleep)
   const jobRuns = await client.rest.actions.listJobsForWorkflowRunAttempt({
     attempt_number: githubContext.runAttempt,
@@ -161,7 +161,7 @@ export async function fetchJobRunContext(
     id: job.id,
     name: job.name,
     url: job.url,
-    hasFailed: isJobFailed(job.steps! as WorkflowStep[]),
+    hasFailed: isJobFailed(job.steps as WorkflowStep[]),
     startedAt: job.started_at,
     startedAtUnixSeconds: iso8601ToUnixTimeSeconds(job.started_at),
     estimatedEndedAtUnixSeconds: unixNowSeconds(

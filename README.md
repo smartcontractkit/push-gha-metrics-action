@@ -102,7 +102,7 @@ sequenceDiagram
 This action requires the following permissions:
 
 ```yaml
-permions:
+permissions:
   actions: read
 ```
 
@@ -323,7 +323,7 @@ on:
 
 jobs:
   B:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
 
@@ -337,7 +337,7 @@ jobs:
 
   C:
     needs: [B]
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
 

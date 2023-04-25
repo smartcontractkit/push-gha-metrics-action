@@ -3,26 +3,24 @@ import {
   createLokiLogValueFromContext,
   extractStreamFromContext,
   sendLokiRequest,
-} from "../../src/loki"
-import { Context } from "../../src/context.types"
-import { LokiRequestOptions } from "../../src/loki.types"
-import nock from "nock"
-import mockContext from "../fixtures/context/fetchContext1.json"
+} from '../../src/loki'
+import { Context } from '../../src/context.types'
+import { LokiRequestOptions } from '../../src/loki.types'
+import nock from 'nock'
+import { mockContext } from '../fixtures/context/fetchContext1'
 
-describe("Loki", () => {
+describe('Loki', () => {
   // Taken from context.test.ts snapshots
   const context: Context = mockContext
 
   describe(createLokiLogEntriesFromContext.name, () => {
-    it("should create loki log entries from context", () => {
+    it('should create loki log entries from context', () => {
       const {
         streams: [{ stream, values }],
-      } = createLokiLogEntriesFromContext(context)
+      } = createLokiLogEntriesFromContext(context, [])
       const [ts, value] = values[0]
 
-      expect(BigInt(ts)).toBeLessThanOrEqual(
-        BigInt(Date.now()) * BigInt(1_000_000),
-      )
+      expect(BigInt(ts)).toBeLessThanOrEqual(BigInt(Date.now()) * BigInt(1_000_000))
       expect(JSON.parse(value)).toMatchInlineSnapshot(`
         {
           "event": {
@@ -77,12 +75,10 @@ describe("Loki", () => {
   })
 
   describe(createLokiLogValueFromContext.name, () => {
-    it("should create a log value from context", () => {
+    it('should create a log value from context', () => {
       const [ts, value] = createLokiLogValueFromContext(context)
 
-      expect(BigInt(ts)).toBeLessThanOrEqual(
-        BigInt(Date.now()) * BigInt(1_000_000),
-      )
+      expect(BigInt(ts)).toBeLessThanOrEqual(BigInt(Date.now()) * BigInt(1_000_000))
       expect(JSON.parse(value)).toMatchInlineSnapshot(`
         {
           "event": {
@@ -125,7 +121,7 @@ describe("Loki", () => {
   })
 
   describe(extractStreamFromContext.name, () => {
-    it("should generate a stream object from a github context", () => {
+    it('should generate a stream object from a github context', () => {
       const stream = extractStreamFromContext(context)
       expect(stream).toMatchInlineSnapshot(`
         {
@@ -147,35 +143,35 @@ describe("Loki", () => {
       // nock.recorder.rec();
     }
 
-    it("should send a successful dry run request", async () => {
-      const logEntries = createLokiLogEntriesFromContext(context)
+    it('should send a successful dry run request', async () => {
+      const logEntries = createLokiLogEntriesFromContext(context, [])
       const requestOptions: LokiRequestOptions = {
-        contentType: "application/json",
+        contentType: 'application/json',
         headers: {},
-        hostname: "localhost",
-        path: "/loki/api/v1/push",
+        hostname: 'localhost',
+        path: '/loki/api/v1/push',
         port: 3030,
-        protocol: "http",
+        protocol: 'http',
         timeout: 1000,
       }
       const response = await sendLokiRequest(logEntries, requestOptions, true)
       expect(response).toBeNull()
     })
 
-    it("should throw on a non 200 status code", async () => {
-      nock("http://localhost:3030", { encodedQueryParams: true })
-        .post("/loki/api/v1/push", {
+    it('should throw on a non 200 status code', async () => {
+      nock('http://localhost:3030', { encodedQueryParams: true })
+        .post('/loki/api/v1/push', {
           streams: [
             {
               stream: {
-                host: "github.com",
-                application: "push-gha-metrics-action",
-                eventName: "pull_request",
-                repo: "mockRepo",
-                owner: "mockOwner",
-                jobName: "generate-fixtures-name-1",
-                workflowName: "Push Metrics CI",
-                actor: "HenryNguyen5",
+                host: 'github.com',
+                application: 'push-gha-metrics-action',
+                eventName: 'pull_request',
+                repo: 'mockRepo',
+                owner: 'mockOwner',
+                jobName: 'generate-fixtures-name-1',
+                workflowName: 'Push Metrics CI',
+                actor: 'HenryNguyen5',
               },
               values: [[/^\d+$/, /.*/]],
             },
@@ -185,27 +181,27 @@ describe("Loki", () => {
           400,
           'entry for stream \'{actor="HenryNguyen5", eventName="pull_request", jobName="generate-fixtures-name-1", owner="mockOwner", repo="mockRepo", workflowName="Push Metrics CI"}\' has timestamp too old: 1970-01-03T12:22:04Z, oldest acceptable timestamp is: 2022-06-16T22:19:04Z\n',
           [
-            "Content-Type",
-            "text/plain; charset=utf-8",
-            "X-Content-Type-Options",
-            "nosniff",
-            "Date",
-            "Thu, 23 Jun 2022 22:19:04 GMT",
-            "Content-Length",
-            "270",
-            "Connection",
-            "close",
+            'Content-Type',
+            'text/plain; charset=utf-8',
+            'X-Content-Type-Options',
+            'nosniff',
+            'Date',
+            'Thu, 23 Jun 2022 22:19:04 GMT',
+            'Content-Length',
+            '270',
+            'Connection',
+            'close',
           ],
         )
 
-      const logEntries = createLokiLogEntriesFromContext(context)
+      const logEntries = createLokiLogEntriesFromContext(context, [])
       const requestOptions: LokiRequestOptions = {
-        contentType: "application/json",
+        contentType: 'application/json',
         headers: {},
-        hostname: "localhost",
-        path: "/loki/api/v1/push",
+        hostname: 'localhost',
+        path: '/loki/api/v1/push',
         port: 3030,
-        protocol: "http",
+        protocol: 'http',
         timeout: 1000,
       }
 
@@ -217,40 +213,35 @@ describe("Loki", () => {
       `)
     })
 
-    it("should send a successful request", async () => {
-      nock("http://localhost:3030", { encodedQueryParams: true })
-        .post("/loki/api/v1/push", {
+    it('should send a successful request', async () => {
+      nock('http://localhost:3030', { encodedQueryParams: true })
+        .post('/loki/api/v1/push', {
           streams: [
             {
               stream: {
-                host: "github.com",
-                application: "push-gha-metrics-action",
-                eventName: "pull_request",
-                repo: "mockRepo",
-                owner: "mockOwner",
-                jobName: "generate-fixtures-name-1",
-                workflowName: "Push Metrics CI",
-                actor: "HenryNguyen5",
+                host: 'github.com',
+                application: 'push-gha-metrics-action',
+                eventName: 'pull_request',
+                repo: 'mockRepo',
+                owner: 'mockOwner',
+                jobName: 'generate-fixtures-name-1',
+                workflowName: 'Push Metrics CI',
+                actor: 'HenryNguyen5',
               },
               values: [[/^\d+$/, /.*/]],
             },
           ],
         })
-        .reply(204, "", [
-          "Date",
-          "Thu, 23 Jun 2022 22:17:16 GMT",
-          "Connection",
-          "close",
-        ])
+        .reply(204, '', ['Date', 'Thu, 23 Jun 2022 22:17:16 GMT', 'Connection', 'close'])
 
-      const logEntries = createLokiLogEntriesFromContext(context)
+      const logEntries = createLokiLogEntriesFromContext(context, [])
       const requestOptions: LokiRequestOptions = {
-        contentType: "application/json",
+        contentType: 'application/json',
         headers: {},
-        hostname: "localhost",
-        path: "/loki/api/v1/push",
+        hostname: 'localhost',
+        path: '/loki/api/v1/push',
         port: 3030,
-        protocol: "http",
+        protocol: 'http',
         timeout: 1000,
       }
       const response = await sendLokiRequest(logEntries, requestOptions, false)

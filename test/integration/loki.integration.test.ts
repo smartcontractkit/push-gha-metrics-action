@@ -107,7 +107,7 @@ describe("Loki", () => {
 
   describe(sendLokiRequest.name, () => {
     it.each(contexts)("should send a successful request %#", async c => {
-      const logEntries = createLokiLogEntriesFromContext(c)
+      const logEntries = createLokiLogEntriesFromContext(c, [])
       const requestOptions: LokiRequestOptions = {
         contentType: "application/json",
         headers: {},

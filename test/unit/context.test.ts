@@ -11,6 +11,7 @@ import {
 } from "../../src/context"
 import type { ContextOverrides, Octokit } from "../../src/context.types"
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function mockResponse(data: any): any {
   return {
     headers: {},
