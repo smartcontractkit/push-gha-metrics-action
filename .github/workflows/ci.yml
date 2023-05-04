@@ -11,14 +11,14 @@ jobs:
     steps:
       - name: Collect Metrics
         id: collect-gha-metrics
-        uses: smartcontractkit/push-gha-metrics-action@v1
+        uses: smartcontractkit/push-gha-metrics-action@8163dcea2f01a0a8fec84b284406ff7af1d2e1c0
         with:
           basic-auth: ${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: ${{ secrets.GRAFANA_CLOUD_HOST }}
           this-job-name: Unit tests
 
       - name: Checkout source
-        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b #v3.0.2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
@@ -28,7 +28,7 @@ jobs:
           node-version: 16
 
       - name: Install pnpm
-        uses: pnpm/action-setup@10693b3829bf86eb2572aef5f3571dcf5ca9287d #v2.2.2
+        uses: pnpm/action-setup@c3b53f6a16e57305370b4ae5a540c2077a1d50dd #v2.2.4
         with:
           version: ^6.32.2
           run_install: false
@@ -39,7 +39,7 @@ jobs:
           echo "::set-output name=pnpm_cache_dir::$(pnpm store path)"
 
       - name: Cache npm artifacts
-        uses: actions/cache@c3f1317a9e7b1ef106c153ac8c0f00fed3ddbc0d #v3.0.4
+        uses: actions/cache@v3
         with:
           key: ${{ runner.os }}-pnpm-cache
           path: |
