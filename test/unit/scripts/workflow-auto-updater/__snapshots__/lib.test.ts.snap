@@ -2198,7 +2198,7 @@ jobs:
           ADAPTERS_LIST="$(yarn get-changed-adapters "\${CHANGED_FILES_NAME}")"
 
           # export adapters from this step
-          echo "::set-output name=ADAPTERS_LIST::\${ADAPTERS_LIST}"
+          echo "ADAPTERS_LIST=\${ADAPTERS_LIST}" >> $GITHUB_OUTPUT
       - name: Remove adapters that have no fluxconfig
         id: adapters-list
         env:
@@ -2217,7 +2217,7 @@ jobs:
           done
           ADAPTERS_LIST="$(echo \${ADAPTERS_LIST} | xargs)"
           # export adapters from this step
-          echo "::set-output name=ADAPTERS_LIST::\${ADAPTERS_LIST}"
+          echo "ADAPTERS_LIST=\${ADAPTERS_LIST}" >> $GITHUB_OUTPUT
       - name: Build adapters
         env:
           PR_NUMBER: \${{ steps.findPr.outputs.pr }}
