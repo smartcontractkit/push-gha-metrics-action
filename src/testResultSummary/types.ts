@@ -72,6 +72,8 @@ export const TestResultsSchema = z.array(TestResultSchema)
 export interface MappedTestResult {
   name: string
   status: HandledTestStatuses
+  statusInt?: number
+  sha?: string
   elapsed: number
   jobRunId?: number
   jobName?: string

@@ -108,6 +108,10 @@ export function createLokiLogValueFromTestResult(
   testResult.repo = context.event.repo.repo
   testResult.jobRunId = context.jobRun.id
 
+  // status is either "pass" or "fail"
+  testResult.statusInt = testResult.status == "pass"? 1 : 0
+  testResult.sha = context.event.sha
+
   const log = JSON.stringify(testResult)
   const secondInNanoSeconds = BigInt(1e9)
   const ts = BigInt(context.jobRun.estimatedEndedAtUnixSeconds) * secondInNanoSeconds
