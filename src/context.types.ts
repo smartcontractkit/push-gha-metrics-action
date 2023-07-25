@@ -44,6 +44,10 @@ export interface Context {
    * The current job run context
    */
   jobRun: JobRunContext & Pick<GithubContext, GithubContextJobRunPropertyKeys>
+  /**
+   * Optional additional information provided when pushing metrics
+   */
+  additionalInformation?: string
 }
 
 type JobRun = Awaited<

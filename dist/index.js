@@ -702,9 +702,9 @@ var require_file_command = __commonJS({
   }
 });
 
-// node_modules/.pnpm/@actions+http-client@2.0.1/node_modules/@actions/http-client/lib/proxy.js
+// node_modules/.pnpm/@actions+http-client@2.1.0/node_modules/@actions/http-client/lib/proxy.js
 var require_proxy = __commonJS({
-  "node_modules/.pnpm/@actions+http-client@2.0.1/node_modules/@actions/http-client/lib/proxy.js"(exports) {
+  "node_modules/.pnpm/@actions+http-client@2.1.0/node_modules/@actions/http-client/lib/proxy.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.checkBypass = exports.getProxyUrl = void 0;
@@ -731,6 +731,10 @@ var require_proxy = __commonJS({
       if (!reqUrl.hostname) {
         return false;
       }
+      const reqHost = reqUrl.hostname;
+      if (isLoopbackAddress(reqHost)) {
+        return true;
+      }
       const noProxy = process.env["no_proxy"] || process.env["NO_PROXY"] || "";
       if (!noProxy) {
         return false;
@@ -748,13 +752,17 @@ var require_proxy = __commonJS({
         upperReqHosts.push(`${upperReqHosts[0]}:${reqPort}`);
       }
       for (const upperNoProxyItem of noProxy.split(",").map((x) => x.trim().toUpperCase()).filter((x) => x)) {
-        if (upperReqHosts.some((x) => x === upperNoProxyItem)) {
+        if (upperNoProxyItem === "*" || upperReqHosts.some((x) => x === upperNoProxyItem || x.endsWith(`.${upperNoProxyItem}`) || upperNoProxyItem.startsWith(".") && x.endsWith(`${upperNoProxyItem}`))) {
           return true;
         }
       }
       return false;
     }
     exports.checkBypass = checkBypass;
+    function isLoopbackAddress(host) {
+      const hostLower = host.toLowerCase();
+      return hostLower === "localhost" || hostLower.startsWith("127.") || hostLower.startsWith("[::1]") || hostLower.startsWith("[0:0:0:0:0:0:0:1]");
+    }
   }
 });
 
@@ -995,9 +1003,9 @@ var require_tunnel2 = __commonJS({
   }
 });
 
-// node_modules/.pnpm/@actions+http-client@2.0.1/node_modules/@actions/http-client/lib/index.js
+// node_modules/.pnpm/@actions+http-client@2.1.0/node_modules/@actions/http-client/lib/index.js
 var require_lib = __commonJS({
-  "node_modules/.pnpm/@actions+http-client@2.0.1/node_modules/@actions/http-client/lib/index.js"(exports) {
+  "node_modules/.pnpm/@actions+http-client@2.1.0/node_modules/@actions/http-client/lib/index.js"(exports) {
     "use strict";
     var __createBinding = exports && exports.__createBinding || (Object.create ? function(o, m, k, k2) {
       if (k2 === void 0)
@@ -1547,9 +1555,9 @@ var require_lib = __commonJS({
   }
 });
 
-// node_modules/.pnpm/@actions+http-client@2.0.1/node_modules/@actions/http-client/lib/auth.js
+// node_modules/.pnpm/@actions+http-client@2.1.0/node_modules/@actions/http-client/lib/auth.js
 var require_auth = __commonJS({
-  "node_modules/.pnpm/@actions+http-client@2.0.1/node_modules/@actions/http-client/lib/auth.js"(exports) {
+  "node_modules/.pnpm/@actions+http-client@2.1.0/node_modules/@actions/http-client/lib/auth.js"(exports) {
     "use strict";
     var __awaiter = exports && exports.__awaiter || function(thisArg, _arguments, P, generator) {
       function adopt(value) {
@@ -4557,9 +4565,9 @@ var require_public_api = __commonJS({
   }
 });
 
-// node_modules/.pnpm/node-fetch@2.6.7/node_modules/node-fetch/lib/index.js
+// node_modules/.pnpm/node-fetch@2.6.12/node_modules/node-fetch/lib/index.js
 var require_lib3 = __commonJS({
-  "node_modules/.pnpm/node-fetch@2.6.7/node_modules/node-fetch/lib/index.js"(exports, module2) {
+  "node_modules/.pnpm/node-fetch@2.6.12/node_modules/node-fetch/lib/index.js"(exports, module2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     function _interopDefault(ex) {
@@ -5441,6 +5449,11 @@ var require_lib3 = __commonJS({
       const dest = new URL$1(destination).hostname;
       return orig === dest || orig[orig.length - dest.length - 1] === "." && orig.endsWith(dest);
     };
+    var isSameProtocol = function isSameProtocol2(destination, original) {
+      const orig = new URL$1(original).protocol;
+      const dest = new URL$1(destination).protocol;
+      return orig === dest;
+    };
     function fetch(url, opts) {
       if (!fetch.Promise) {
         throw new Error("native promise missing, set fetch.Promise to your favorite alternative");
@@ -5456,7 +5469,7 @@ var require_lib3 = __commonJS({
           let error2 = new AbortError("The user aborted a request.");
           reject(error2);
           if (request.body && request.body instanceof Stream.Readable) {
-            request.body.destroy(error2);
+            destroyStream(request.body, error2);
           }
           if (!response || !response.body)
             return;
@@ -5491,8 +5504,31 @@ var require_lib3 = __commonJS({
         }
         req.on("error", function(err) {
           reject(new FetchError(`request to ${request.url} failed, reason: ${err.message}`, "system", err));
+          if (response && response.body) {
+            destroyStream(response.body, err);
+          }
           finalize();
         });
+        fixResponseChunkedTransferBadEnding(req, function(err) {
+          if (signal && signal.aborted) {
+            return;
+          }
+          if (response && response.body) {
+            destroyStream(response.body, err);
+          }
+        });
+        if (parseInt(process.version.substring(1)) < 14) {
+          req.on("socket", function(s) {
+            s.addListener("close", function(hadError) {
+              const hasDataListener = s.listenerCount("data") > 0;
+              if (response && hasDataListener && !hadError && !(signal && signal.aborted)) {
+                const err = new Error("Premature close");
+                err.code = "ERR_STREAM_PREMATURE_CLOSE";
+                response.body.emit("error", err);
+              }
+            });
+          });
+        }
         req.on("response", function(res) {
           clearTimeout(reqTimeout);
           const headers = createHeadersLenient(res.headers);
@@ -5543,7 +5579,7 @@ var require_lib3 = __commonJS({
                   timeout: request.timeout,
                   size: request.size
                 };
-                if (!isDomainOrSubdomain(request.url, locationURL)) {
+                if (!isDomainOrSubdomain(request.url, locationURL) || !isSameProtocol(request.url, locationURL)) {
                   for (const name of ["authorization", "www-authenticate", "cookie", "cookie2"]) {
                     requestOpts.headers.delete(name);
                   }
@@ -5604,6 +5640,12 @@ var require_lib3 = __commonJS({
               response = new Response(body, response_options);
               resolve(response);
             });
+            raw.on("end", function() {
+              if (!response) {
+                response = new Response(body, response_options);
+                resolve(response);
+              }
+            });
             return;
           }
           if (codings == "br" && typeof zlib.createBrotliDecompress === "function") {
@@ -5617,6 +5659,33 @@ var require_lib3 = __commonJS({
         });
         writeToStream(req, request);
       });
+    }
+    function fixResponseChunkedTransferBadEnding(request, errorCallback) {
+      let socket;
+      request.on("socket", function(s) {
+        socket = s;
+      });
+      request.on("response", function(response) {
+        const headers = response.headers;
+        if (headers["transfer-encoding"] === "chunked" && !headers["content-length"]) {
+          response.once("close", function(hadError) {
+            const hasDataListener = socket && socket.listenerCount("data") > 0;
+            if (hasDataListener && !hadError) {
+              const err = new Error("Premature close");
+              err.code = "ERR_STREAM_PREMATURE_CLOSE";
+              errorCallback(err);
+            }
+          });
+        }
+      });
+    }
+    function destroyStream(stream, err) {
+      if (stream.destroy) {
+        stream.destroy(err);
+      } else {
+        stream.emit("error", err);
+        stream.end();
+      }
     }
     fetch.isRedirect = function(code) {
       return code === 301 || code === 302 || code === 303 || code === 307 || code === 308;
@@ -11274,9 +11343,9 @@ var require_lib4 = __commonJS({
   }
 });
 
-// node_modules/.pnpm/zod-validation-error@1.3.0_zod@3.21.4/node_modules/zod-validation-error/dist/cjs/utils/joinPath.js
+// node_modules/.pnpm/zod-validation-error@1.3.1_zod@3.21.4/node_modules/zod-validation-error/dist/cjs/utils/joinPath.js
 var require_joinPath = __commonJS({
-  "node_modules/.pnpm/zod-validation-error@1.3.0_zod@3.21.4/node_modules/zod-validation-error/dist/cjs/utils/joinPath.js"(exports) {
+  "node_modules/.pnpm/zod-validation-error@1.3.1_zod@3.21.4/node_modules/zod-validation-error/dist/cjs/utils/joinPath.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.joinPath = void 0;
@@ -11306,9 +11375,9 @@ var require_joinPath = __commonJS({
   }
 });
 
-// node_modules/.pnpm/zod-validation-error@1.3.0_zod@3.21.4/node_modules/zod-validation-error/dist/cjs/utils/NonEmptyArray.js
+// node_modules/.pnpm/zod-validation-error@1.3.1_zod@3.21.4/node_modules/zod-validation-error/dist/cjs/utils/NonEmptyArray.js
 var require_NonEmptyArray = __commonJS({
-  "node_modules/.pnpm/zod-validation-error@1.3.0_zod@3.21.4/node_modules/zod-validation-error/dist/cjs/utils/NonEmptyArray.js"(exports) {
+  "node_modules/.pnpm/zod-validation-error@1.3.1_zod@3.21.4/node_modules/zod-validation-error/dist/cjs/utils/NonEmptyArray.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.isNonEmptyArray = void 0;
@@ -11319,9 +11388,9 @@ var require_NonEmptyArray = __commonJS({
   }
 });
 
-// node_modules/.pnpm/zod-validation-error@1.3.0_zod@3.21.4/node_modules/zod-validation-error/dist/cjs/ValidationError.js
+// node_modules/.pnpm/zod-validation-error@1.3.1_zod@3.21.4/node_modules/zod-validation-error/dist/cjs/ValidationError.js
 var require_ValidationError = __commonJS({
-  "node_modules/.pnpm/zod-validation-error@1.3.0_zod@3.21.4/node_modules/zod-validation-error/dist/cjs/ValidationError.js"(exports) {
+  "node_modules/.pnpm/zod-validation-error@1.3.1_zod@3.21.4/node_modules/zod-validation-error/dist/cjs/ValidationError.js"(exports) {
     "use strict";
     var __createBinding = exports && exports.__createBinding || (Object.create ? function(o, m, k, k2) {
       if (k2 === void 0)
@@ -11422,9 +11491,9 @@ var require_ValidationError = __commonJS({
   }
 });
 
-// node_modules/.pnpm/zod-validation-error@1.3.0_zod@3.21.4/node_modules/zod-validation-error/dist/cjs/index.js
+// node_modules/.pnpm/zod-validation-error@1.3.1_zod@3.21.4/node_modules/zod-validation-error/dist/cjs/index.js
 var require_cjs = __commonJS({
-  "node_modules/.pnpm/zod-validation-error@1.3.0_zod@3.21.4/node_modules/zod-validation-error/dist/cjs/index.js"(exports) {
+  "node_modules/.pnpm/zod-validation-error@1.3.1_zod@3.21.4/node_modules/zod-validation-error/dist/cjs/index.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.fromZodError = exports.isValidationErrorLike = exports.isValidationError = exports.toValidationError = exports.ValidationError = void 0;
@@ -11483,7 +11552,7 @@ function unixNowSeconds(override) {
 
 // src/context.ts
 var JobFinalizedSleep = 3e3;
-async function fetchContext(githubClient, rawGithubContext, contextOverrides) {
+async function fetchContext(githubClient, rawGithubContext, contextOverrides, additionalInformation) {
   const githubContext = getGithubContext(rawGithubContext, contextOverrides);
   const jobRunContext = await fetchJobRunContext(
     githubClient,
@@ -11509,7 +11578,8 @@ async function fetchContext(githubClient, rawGithubContext, contextOverrides) {
   return {
     event: rest,
     workflowRun: mergedWorkflowRunContext,
-    jobRun: mergedJobRunContext
+    jobRun: mergedJobRunContext,
+    ...additionalInformation && { additionalInformation }
   };
 }
 function getGithubContext(rawGithubContext, contextOverrides) {
@@ -15463,7 +15533,8 @@ async function main() {
     const contextOverrides = {
       jobName: getTypedInput("this-job-name") || void 0
     };
-    const context2 = await fetchContext(githubClient, rawContext, contextOverrides);
+    const additionalInformation = getTypedInput("additional-information") || void 0;
+    const context2 = await fetchContext(githubClient, rawContext, contextOverrides, additionalInformation);
     core4.endGroup();
     core4.startGroup("Load test results into context if present");
     const testResultFile = getTypedInput("test-results-file", false);

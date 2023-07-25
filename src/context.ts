@@ -22,6 +22,7 @@ export async function fetchContext(
   githubClient: types.Octokit,
   rawGithubContext: typeof RawGithubContext,
   contextOverrides?: types.ContextOverrides,
+  additionalInformation? : string,
 ): Promise<types.Context> {
   const githubContext = getGithubContext(rawGithubContext, contextOverrides)
   const jobRunContext = await fetchJobRunContext(
@@ -53,6 +54,7 @@ export async function fetchContext(
     event: rest,
     workflowRun: mergedWorkflowRunContext,
     jobRun: mergedJobRunContext,
+    ...(additionalInformation && { additionalInformation })
   }
 }
 

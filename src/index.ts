@@ -32,8 +32,9 @@ export async function main() {
     const contextOverrides: contextTypes.ContextOverrides = {
       jobName: getTypedInput('this-job-name') || undefined,
     }
+    const additionalInformation = getTypedInput('additional-information') || undefined
 
-    const context = await fetchContext(githubClient, rawContext, contextOverrides)
+    const context = await fetchContext(githubClient, rawContext, contextOverrides, additionalInformation)
     core.endGroup()
 
     core.startGroup('Load test results into context if present')
@@ -99,6 +100,7 @@ function getTypedInput(
       githubToken: never
       thisJobName: never
       testResultsFile: never
+      additionalInformation: never
     }
   >,
   required = true,
