@@ -11744,6 +11744,8 @@ function createLokiLogValueFromTestResult(testResult, context2) {
   testResult.jobName = context2.jobRun.jobName;
   testResult.repo = context2.event.repo.repo;
   testResult.jobRunId = context2.jobRun.id;
+  testResult.statusInt = testResult.status == "pass" ? 1 : 0;
+  testResult.sha = context2.event.sha;
   const log = JSON.stringify(testResult);
   const secondInNanoSeconds = BigInt(1e9);
   const ts = BigInt(context2.jobRun.estimatedEndedAtUnixSeconds) * secondInNanoSeconds;
