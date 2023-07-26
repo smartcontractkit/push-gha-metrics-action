@@ -54,6 +54,11 @@ inputs:
     description: |
       Json test result file to attach to the output logs, available types: go
       example: {"testType":"go","filePath":"./go_test_results_path.json"}
+  additional-information:
+    required: false
+    description: |
+      An optional field if you need to pass an additional string 
+      that can help with filter expressions
 
 runs:
   using: "node16"

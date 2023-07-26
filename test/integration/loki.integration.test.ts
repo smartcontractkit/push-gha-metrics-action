@@ -24,12 +24,6 @@ function generateMockContexts(amount = 100, dateRangeInDays = 1) {
   ] as const
   const fakeCDJobNameArr = ["release", "create-tags", "push-image"] as const
   const fakeWorkflowNameArr = ["CI", "CD"] as const
-  const fakeAdditionalInformation = [
-    "kusama-mainnet-moonriver - 45 - kill:proxies:safe",
-    "mainnet - 1124 - monitoring:setWatchList:safe",
-    "mainnet - 1123 - ownership:accept:offchain:safe",
-    "mainnet - 1122 - raise:flags:safe",
-  ] as const
 
   return Array(amount)
     .fill(null)
@@ -106,7 +100,7 @@ function generateMockContexts(amount = 100, dateRangeInDays = 1) {
 
       const includeAdditionalInformation = faker.datatype.boolean()
       if (includeAdditionalInformation) {
-        ctx["additionalInformation"] = faker.helpers.arrayElement(fakeAdditionalInformation)
+        ctx["additionalInformation"] = faker.lorem.lines(1)
       }
 
       return ctx
