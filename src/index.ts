@@ -5,9 +5,7 @@ import { fetchContext } from './context'
 import * as loki from './loki'
 import * as lokiTypes from './loki.types'
 import * as contextTypes from './context.types'
-import {
-  MappedTestResult,
-} from './testResultSummary/types'
+import { MappedTestResult } from './testResultSummary/types'
 import { getTestResultSummary } from './testResultSummary'
 
 const isPost = 'isPost'
@@ -34,6 +32,12 @@ export async function main() {
     }
 
     const context = await fetchContext(githubClient, rawContext, contextOverrides)
+    // create url from the context for the web view of the job
+    const webUrl = `https://github.com/smartcontractkit/${context.event.repo.repo}/actions/runs/${context.workflowRun.runId}/job/${context.jobRun.id}`
+    context.jobRun.webUrl = webUrl
+    // parse the workflow id from the workflow url
+    const workflowId: string = context.workflowRun.url.split('/').pop() as string
+    context.workflowRun.workflowId = parseInt(workflowId)
     core.endGroup()
 
     core.startGroup('Load test results into context if present')
@@ -41,7 +45,7 @@ export async function main() {
     let testResults: MappedTestResult[] = []
 
     if (testResultFile) {
-        testResults = getTestResultSummary(testResultFile)
+      testResults = getTestResultSummary(testResultFile)
     }
     core.endGroup()
 
