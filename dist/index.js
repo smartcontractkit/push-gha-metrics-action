@@ -11674,6 +11674,10 @@ function createLokiLogValueFromTestResult(testResult, context2) {
   testResult.jobName = context2.jobRun.jobName;
   testResult.repo = context2.event.repo.repo;
   testResult.jobRunId = context2.jobRun.id;
+  testResult.workflowId = context2.workflowRun.workflowId;
+  testResult.statusInt = testResult.status == "pass" ? 1 : 0;
+  testResult.sha = context2.event.sha;
+  testResult.jobRunWebUrl = context2.jobRun.webUrl;
   const log = JSON.stringify(testResult);
   const secondInNanoSeconds = BigInt(1e9);
   const ts = BigInt(context2.jobRun.estimatedEndedAtUnixSeconds) * secondInNanoSeconds;
@@ -15464,6 +15468,10 @@ async function main() {
       jobName: getTypedInput("this-job-name") || void 0
     };
     const context2 = await fetchContext(githubClient, rawContext, contextOverrides);
+    const webUrl = `https://github.com/smartcontractkit/${context2.event.repo.repo}/actions/runs/${context2.workflowRun.runId}/job/${context2.jobRun.id}`;
+    context2.jobRun.webUrl = webUrl;
+    const workflowId = context2.workflowRun.url.split("/").pop();
+    context2.workflowRun.workflowId = parseInt(workflowId);
     core4.endGroup();
     core4.startGroup("Load test results into context if present");
     const testResultFile = getTypedInput("test-results-file", false);

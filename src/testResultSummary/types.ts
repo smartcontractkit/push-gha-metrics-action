@@ -78,4 +78,6 @@ export interface MappedTestResult {
   jobRunId?: number
   jobName?: string
   repo?: string
+  workflowId?: number
+  jobRunWebUrl?: string
 }

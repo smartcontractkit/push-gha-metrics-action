@@ -67,6 +67,11 @@ export interface JobRunContext {
   url: JobRun["url"]
 
   /**
+   * The web url link of the job run
+   */
+  webUrl?: string
+
+  /**
    * When the current job was started, in ISO-8061 format
    */
   startedAt: JobRun["started_at"]
@@ -128,6 +133,11 @@ export interface WorkflowRunContext {
    * The start time of the latest run in unix time format in seconds. Resets on re-run.
    */
   runStartedAtUnixSeconds: number
+
+  /**
+   * The id of the workflow
+   */
+  workflowId?: number
 }
 
 /**
