@@ -15472,6 +15472,7 @@ async function main() {
     context2.jobRun.webUrl = webUrl;
     const workflowId = context2.workflowRun.url.split("/").pop();
     context2.workflowRun.workflowId = parseInt(workflowId);
+    context2.jobRun.statusInt = context2.jobRun.hasFailed === 0 ? 1 : 0;
     core4.endGroup();
     core4.startGroup("Load test results into context if present");
     const testResultFile = getTypedInput("test-results-file", false);

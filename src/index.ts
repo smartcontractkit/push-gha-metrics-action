@@ -38,6 +38,8 @@ export async function main() {
     // parse the workflow id from the workflow url
     const workflowId: string = context.workflowRun.url.split('/').pop() as string
     context.workflowRun.workflowId = parseInt(workflowId)
+    // add the statusInt to the jobRun
+    context.jobRun.statusInt = context.jobRun.hasFailed === 0 ? 1 : 0
     core.endGroup()
 
     core.startGroup('Load test results into context if present')
