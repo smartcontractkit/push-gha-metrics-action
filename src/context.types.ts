@@ -78,9 +78,13 @@ export interface JobRunContext {
 
   /**
    * Is true if the job has failed, note that this is in context of a currently
-   * executing job, future steps may fail.
+   * executing job, future steps may fail. 0 pass 1 fail
    */
   hasFailed: number
+  /**
+   * Copy of hasFailed but in the form of 0 fail 1 pass
+   */
+  statusInt?: number
 
   /**
    * When the current job was started, in unix time in seconds format
