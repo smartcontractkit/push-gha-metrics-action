@@ -128,6 +128,7 @@ export async function fetchJobRunContext(
     attempt_number: githubContext.runAttempt,
     run_id: githubContext.runId,
     ...githubContext.repo,
+    per_page: 100,
   })
   const { jobs } = jobRuns.data
   const relevantJobs = jobs.filter(
