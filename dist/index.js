@@ -11554,7 +11554,8 @@ async function fetchJobRunContext(client, githubContext, contextOverrides) {
   const jobRuns = await client.rest.actions.listJobsForWorkflowRunAttempt({
     attempt_number: githubContext.runAttempt,
     run_id: githubContext.runId,
-    ...githubContext.repo
+    ...githubContext.repo,
+    per_page: 100
   });
   const { jobs } = jobRuns.data;
   const relevantJobs = jobs.filter(
