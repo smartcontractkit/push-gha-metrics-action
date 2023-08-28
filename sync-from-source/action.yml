@@ -1,4 +1,4 @@
-name: github-token-issuer-action
+name: sync-from-source
 runs:
   using: node16
   main: dist/index.js

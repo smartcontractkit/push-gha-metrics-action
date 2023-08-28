@@ -1,7 +1,7 @@
 {
-    "name": "@smartcontractkit/github-app-token-issuer-action",
+    "name": "@smartcontractkit/push-gha-metrics-action",
     "version": "0.1.2",
-    "description": "The github action for interfacing with the token issuer service",
+    "description": "The github action for interfacing with the push metrics sync action",
     "main": "dist/index.js",
     "files": [
         "dist/index.js",
