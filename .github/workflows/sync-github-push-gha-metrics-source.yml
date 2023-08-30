@@ -30,15 +30,9 @@ jobs:
       - name: Checkout the repo
         uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
 
-      - name: Get Github Token
-        id: get-gh-token
-        uses: smartcontractkit/push-gha-metrics-action/sync-from-source@main
-        with:
-          url: ${{ secrets.GHA_ACTIONS_SOURCE_PULL_TOKEN }}
-
       - name: Update version
         env:
-          GH_TOKEN: ${{ steps.get-gh-token.outputs.access-token }}
+          GH_TOKEN: ${{ secrets.GHA_ACTIONS_SOURCE_PULL_TOKEN }}
         run: ./sync-from-source/sync.sh
 
       - name: Open PR
