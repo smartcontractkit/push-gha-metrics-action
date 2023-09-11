@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Dummy step 1
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Collect Metrics
         uses: ./
         with:
@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Dummy step 1
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Dummy step 2
         id: dummy-step-2
@@ -59,7 +59,7 @@ jobs:
         github.event_name }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Collect Metrics
         uses: ./
