@@ -20,7 +20,6 @@ fail() {
   err "$1"
   exit 1
 }
-cd "$gitRoot/push-gha-metrics-action-source"
 
 echo "Getting latest release for tag for $repo"
 action_releases=$(gh release list -R $repo | grep action | grep -v buggy | head -1 | awk '{ print $1 }')
