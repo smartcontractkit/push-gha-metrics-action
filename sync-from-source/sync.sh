@@ -40,10 +40,9 @@ asset_name=$asset_dir_name.tar.gz
 echo "Unpacking assets $asset_name"
 tar -xvzf $asset_name
 
-# msg ""
-# cp -rf package/. "." || true
+cp -rf $asset_dir_name/dist "." || true
+cp -rf $asset_dir_name/action.yml "." || true
 
 msg "Cleaning up"
-# rm -r package
 rm -rf $asset_dir_name
 rm -rf $asset_name
