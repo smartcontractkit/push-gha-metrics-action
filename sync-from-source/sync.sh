@@ -5,7 +5,8 @@ set -e
 # gh cli ^2.15.0 https://github.com/cli/cli/releases/tag/v2.15.0
 # jq ^1.6 https://stedolan.github.io/jq/
 
-repo=smartcontractkit/push-gha-metrics-action-source
+repo_name=push-gha-metrics-action-source
+repo_location=smartcontractkit/$repo_name
 gitRoot=$(git rev-parse --show-toplevel)
 
 msg() {
@@ -21,25 +22,28 @@ fail() {
   exit 1
 }
 
-echo "Getting latest release for tag for $repo"
-action_releases=$(gh release list -R $repo | grep action | grep -v buggy | head -1 | awk '{ print $1 }')
-release=$(gh release view -R $repo --json 'tagName,body' "$action_releases")
+echo "Getting latest release for tag for $repo_name"
+release=$(gh release view -R $repo_location --json 'tagName,body')
 tag=$(echo "$release" | jq -r '.tagName')
 
-echo "Getting release $tag for $repo"
-release=$(gh release view "$tag" -R $repo --json 'assets')
-asset_name=$(echo "$release" | jq -r '.assets | map(select(.contentType == "application/x-gtar"))[0].name')
+echo "Getting release $tag for $repo_name"
 
-echo "Downloading ${repo}:${tag} asset: $asset_name..."
+echo "Downloading ${repo_location}:${tag}..."
 echo ""
-gh release download "$tag" -R "$repo" -p "$asset_name"
+gh release download "$tag" -R "$repo_location" -A tar.gz
 
-echo "Unpacking asset $asset_name"
-tar -xvzf "$asset_name"
+# Remove v from the version number
+stripped_tag=${tag//v}
 
-msg ""
-cp -rf package/. "." || true
+asset_dir_name=$repo_name-$stripped_tag
+asset_name=$asset_dir_name.tar.gz
+echo "Unpacking assets $asset_name"
+tar -xvzf $asset_name
+
+# msg ""
+# cp -rf package/. "." || true
 
 msg "Cleaning up"
-rm -r package
-rm "$asset_name"
+# rm -r package
+rm -rf $asset_dir_name
+rm -rf $asset_name
