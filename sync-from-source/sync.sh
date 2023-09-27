@@ -28,21 +28,30 @@ tag=$(echo "$release" | jq -r '.tagName')
 
 echo "Getting release $tag for $repo_name"
 
-echo "Downloading ${repo_location}:${tag}..."
-echo ""
-gh release download "$tag" -R "$repo_location" -A tar.gz
-
 # Remove v from the version number
 stripped_tag=${tag//v}
 
 asset_dir_name=$repo_name-$stripped_tag
-asset_name=$asset_dir_name.tar.gz
-echo "Unpacking assets $asset_name"
-tar -xvzf $asset_name
+mkdir -p $asset_dir_name/dist
+
+download_url_dist_index=$(gh api \
+  -H "Accept: application/vnd.github+json" \
+  -H "X-GitHub-Api-Version: 2022-11-28" \
+  /repos/smartcontractkit/push-gha-metrics-action-source/contents/dist | jq -r '.[0].download_url')
+
+echo "Downloading dist/index.js"
+curl --silent $download_url_dist_index --output $asset_dir_name/dist/index.js
+
+download_url_action=$(gh api \
+  -H "Accept: application/vnd.github+json" \
+  -H "X-GitHub-Api-Version: 2022-11-28" \
+  /repos/smartcontractkit/push-gha-metrics-action-source/contents/ | jq -r '.[] | select(.name | contains("action.yml")).download_url')
+
+echo "Downloading action.yml"
+curl --silent $download_url_action --output $asset_dir_name/action.yml
 
 cp -rf $asset_dir_name/dist "." || true
 cp -rf $asset_dir_name/action.yml "." || true
 
 msg "Cleaning up"
 rm -rf $asset_dir_name
-rm -rf $asset_name
