@@ -34,24 +34,33 @@ stripped_tag=${tag//v}
 asset_dir_name=$repo_name-$stripped_tag
 mkdir -p $asset_dir_name/dist
 
-download_url_dist_index=$(gh api \
+download_url_dist_index=$(gh api -XGET \
   -H "Accept: application/vnd.github+json" \
   -H "X-GitHub-Api-Version: 2022-11-28" \
-  /repos/smartcontractkit/push-gha-metrics-action-source/contents/dist | jq -r '.[0].download_url')
+  /repos/smartcontractkit/push-gha-metrics-action-source/contents/dist -F ref=$tag | jq -r '.[0].download_url')
 
 echo "Downloading dist/index.js"
 curl --silent $download_url_dist_index --output $asset_dir_name/dist/index.js
 
-download_url_action=$(gh api \
+download_url_action=$(gh api -XGET \
   -H "Accept: application/vnd.github+json" \
   -H "X-GitHub-Api-Version: 2022-11-28" \
-  /repos/smartcontractkit/push-gha-metrics-action-source/contents/ | jq -r '.[] | select(.name | contains("action.yml")).download_url')
+  /repos/smartcontractkit/push-gha-metrics-action-source/contents/ -F ref=$tag | jq -r '.[] | select(.name | contains("action.yml")).download_url')
 
 echo "Downloading action.yml"
 curl --silent $download_url_action --output $asset_dir_name/action.yml
 
+download_url_action=$(gh api -XGET \
+  -H "Accept: application/vnd.github+json" \
+  -H "X-GitHub-Api-Version: 2022-11-28" \
+  /repos/smartcontractkit/push-gha-metrics-action-source/contents/ -F ref=$tag | jq -r '.[] | select(.name | contains("package.json")).download_url')
+
+echo "Downloading package.json"
+curl --silent $download_url_action --output $asset_dir_name/package.json
+
 cp -rf $asset_dir_name/dist "." || true
 cp -rf $asset_dir_name/action.yml "." || true
+cp -rf $asset_dir_name/package.json "." || true
 
 msg "Cleaning up"
 rm -rf $asset_dir_name
