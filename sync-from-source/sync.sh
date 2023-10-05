@@ -13,54 +13,29 @@ msg() {
   echo -e "\033[32m$1\033[39m" >&2
 }
 
-err() {
-  echo -e "\033[31m$1\033[39m" >&2
-}
-
-fail() {
-  err "$1"
-  exit 1
-}
-
 echo "Getting latest release for tag for $repo_name"
 release=$(gh release view -R $repo_location --json 'tagName,body')
 tag=$(echo "$release" | jq -r '.tagName')
 
 echo "Getting release $tag for $repo_name"
 
-# Remove v from the version number
-stripped_tag=${tag//v}
+# Function to download a file from GitHub API
+download_file() {
+  local path="$1"
 
-asset_dir_name=$repo_name-$stripped_tag
-mkdir -p $asset_dir_name/dist
+  msg "Downloading $path"
+  gh api -XGET \
+    -H "Accept: application/vnd.github.raw" \
+    -H "X-GitHub-Api-Version: 2022-11-28" \
+    /repos/smartcontractkit/push-gha-metrics-action-source/contents/"$path" -F ref="$tag" >"$path"
+}
 
-download_url_dist_index=$(gh api -XGET \
-  -H "Accept: application/vnd.github+json" \
-  -H "X-GitHub-Api-Version: 2022-11-28" \
-  /repos/smartcontractkit/push-gha-metrics-action-source/contents/dist -F ref=$tag | jq -r '.[0].download_url')
+pushd "$gitRoot" >/dev/null
 
-echo "Downloading dist/index.js"
-curl --silent $download_url_dist_index --output $asset_dir_name/dist/index.js
+download_file "dist/index.js"
+download_file "action.yml"
+download_file "package.json"
 
-download_url_action=$(gh api -XGET \
-  -H "Accept: application/vnd.github+json" \
-  -H "X-GitHub-Api-Version: 2022-11-28" \
-  /repos/smartcontractkit/push-gha-metrics-action-source/contents/ -F ref=$tag | jq -r '.[] | select(.name | contains("action.yml")).download_url')
+echo "Sync complete"
 
-echo "Downloading action.yml"
-curl --silent $download_url_action --output $asset_dir_name/action.yml
-
-download_url_action=$(gh api -XGET \
-  -H "Accept: application/vnd.github+json" \
-  -H "X-GitHub-Api-Version: 2022-11-28" \
-  /repos/smartcontractkit/push-gha-metrics-action-source/contents/ -F ref=$tag | jq -r '.[] | select(.name | contains("package.json")).download_url')
-
-echo "Downloading package.json"
-curl --silent $download_url_action --output $asset_dir_name/package.json
-
-cp -rf $asset_dir_name/dist "." || true
-cp -rf $asset_dir_name/action.yml "." || true
-cp -rf $asset_dir_name/package.json "." || true
-
-msg "Cleaning up"
-rm -rf $asset_dir_name
+popd >/dev/null
