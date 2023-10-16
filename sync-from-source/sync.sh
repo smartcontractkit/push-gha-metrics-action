@@ -5,41 +5,37 @@ set -e
 # gh cli ^2.15.0 https://github.com/cli/cli/releases/tag/v2.15.0
 # jq ^1.6 https://stedolan.github.io/jq/
 
-repo=smartcontractkit/push-gha-metrics-action-source
+repo_name=push-gha-metrics-action-source
+repo_location=smartcontractkit/$repo_name
 gitRoot=$(git rev-parse --show-toplevel)
 
 msg() {
   echo -e "\033[32m$1\033[39m" >&2
 }
 
-err() {
-  echo -e "\033[31m$1\033[39m" >&2
-}
-
-fail() {
-  err "$1"
-  exit 1
-}
-
-echo "Getting latest release for tag for $repo"
-action_releases=$(gh release list -R $repo | grep action | grep -v buggy | head -1 | awk '{ print $1 }')
-release=$(gh release view -R $repo --json 'tagName,body' "$action_releases")
+echo "Getting latest release for tag for $repo_name"
+release=$(gh release view -R $repo_location --json 'tagName,body')
 tag=$(echo "$release" | jq -r '.tagName')
 
-echo "Getting release $tag for $repo"
-release=$(gh release view "$tag" -R $repo --json 'assets')
-asset_name=$(echo "$release" | jq -r '.assets | map(select(.contentType == "application/x-gtar"))[0].name')
+echo "Getting release $tag for $repo_name"
 
-echo "Downloading ${repo}:${tag} asset: $asset_name..."
-echo ""
-gh release download "$tag" -R "$repo" -p "$asset_name"
+# Function to download a file from GitHub API
+download_file() {
+  local path="$1"
 
-echo "Unpacking asset $asset_name"
-tar -xvzf "$asset_name"
+  msg "Downloading $path"
+  gh api -XGET \
+    -H "Accept: application/vnd.github.raw" \
+    -H "X-GitHub-Api-Version: 2022-11-28" \
+    /repos/smartcontractkit/push-gha-metrics-action-source/contents/"$path" -F ref="$tag" >"$path"
+}
 
-msg ""
-cp -rf package/. "." || true
+pushd "$gitRoot" >/dev/null
 
-msg "Cleaning up"
-rm -r package
-rm "$asset_name"
+download_file "dist/index.js"
+download_file "action.yml"
+download_file "package.json"
+
+echo "Sync complete"
+
+popd >/dev/null
