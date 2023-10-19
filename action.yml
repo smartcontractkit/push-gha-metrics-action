@@ -54,8 +54,18 @@ inputs:
     description: |
       Json test result file to attach to the output logs, available types: go
       example: {"testType":"go","filePath":"./go_test_results_path.json"}
+  additional-information:
+    required: false
+    description: |
+      JSON field to pass an additional information about msig proposals
+      example: {"source": "msig proposal", "data": {"network": "mainnet", "command": "command 1"}}
+  matrix-aggregator-status:
+    required: false
+    description: |
+      Used to collect the status of an aggregation job. Mostly useful to know whether it was
+      a normal success or a cancelled job
 
 runs:
-  using: "node16"
+  using: "node20"
   main: "dist/index.js"
   post: "dist/index.js"
