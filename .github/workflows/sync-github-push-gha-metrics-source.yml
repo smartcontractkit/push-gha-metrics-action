@@ -20,7 +20,7 @@ jobs:
     steps:
       - name: Collect Metrics
         id: collect-gha-metrics
-        uses: smartcontractkit/push-gha-metrics-action@v1
+        uses: smartcontractkit/push-gha-metrics-action@v2
         with:
           basic-auth: ${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: ${{ secrets.GRAFANA_CLOUD_HOST }}
@@ -33,7 +33,7 @@ jobs:
       - name: Update version
         env:
           GH_TOKEN: ${{ secrets.GHA_ACTIONS_SOURCE_PULL_TOKEN }}
-        run: ./sync-from-source/sync.sh
+        run: ./sync-from-source/sync-release.sh
 
       - name: Open PR
         uses: peter-evans/create-pull-request@2b011faafdcbc9ceb11414d64d0573f37c774b04 # v4.2.3
@@ -41,3 +41,43 @@ jobs:
           title: Update push-gha-metrics-action
           branch: chore/update-push-gha-metrics-action
           commit-message: Update push-gha-metrics-action
+
+  update-snapshot:
+    permissions:
+      id-token: write
+      contents: write
+      pull-requests: write
+
+    name: Update snapshot version
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action@v2
+        with:
+          basic-auth: ${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: ${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: Update Version
+        continue-on-error: true
+
+      - name: Checkout the repo
+        uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4.1.0
+        with:
+          ref: snapshot
+
+      - name: Pull changes
+        env:
+          GH_TOKEN: ${{ secrets.GHA_ACTIONS_SOURCE_PULL_TOKEN }}
+        run: ./sync-from-source/sync-snapshot.sh
+
+      - name: Commit and push files
+        run: |
+          if [[ `git status --porcelain` ]]; then
+            echo "Changes detected - committing and pushing."
+            git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git config --local user.name "github-actions[bot]"
+            git commit -a -m "Sync with push-gha-metrics-action-source@main"
+            git push --force-with-lease -u origin snapshot
+          else
+            echo "No changes detected - exiting."
+          fi
