@@ -16,9 +16,8 @@ on:
 
 jobs:
   update-version:
-    # Stop from automatically running on non-main branch when workflow was dispatched manually
-    # which would create an erroneous PR to merge.
-    if: ${{ github.event.inputs.force-update-versions }} || ${{ github.head_ref || github.ref_name }} == 'main'
+    # Stop from automatically running on non-main branch when workflow was dispatched manually.
+    if: ${{ ((github.event.inputs.force-update-versions == 'true') || (github.head_ref == 'main') || (github.ref_name == 'main')) }}
 
     # TODO: Use GATI so workflows can run automatically
     permissions:
@@ -82,17 +81,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GHA_ACTIONS_SOURCE_PULL_TOKEN }}
         run: ./sync-from-source/sync.sh --snapshot
 
-      - name: check for changes
-        id: check_for_changes
-        run: |
-          if [ -n "$(git status --porcelain)" ]; then
-            echo "changes_exist=true" >> $GITHUB_ENV
-          else
-            echo "changes_exist=false" >> $GITHUB_ENV
-          fi
-
       - name: Commit and push files
-        if: env.changes_exist == 'true'
         uses: planetscale/ghcommit-action@0e97298607962b704612dd4b7677600fdc363a21 # v0.1.17
         with:
           commit_message: "Sync with push-gha-metrics-action-source@main"
