@@ -17,4 +17,3 @@ Support boolean input list: \`true | True | TRUE | false | False | FALSE\``)}b.g
  * Copyright (c) 2014-2017, Jon Schlinkert.
  * Released under the MIT License.
  */
-//testing
