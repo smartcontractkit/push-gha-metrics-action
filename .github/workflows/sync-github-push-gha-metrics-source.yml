@@ -10,6 +10,7 @@ on:
 
 jobs:
   update-version:
+    # TODO: Use GATI so workflows can run automatically
     permissions:
       id-token: write
       contents: write
@@ -43,6 +44,7 @@ jobs:
           commit-message: Update push-gha-metrics-action
 
   update-snapshot:
+    # TODO: Use GATI so workflows can run automatically
     permissions:
       id-token: write
       contents: write
@@ -68,16 +70,23 @@ jobs:
       - name: Pull changes
         env:
           GH_TOKEN: ${{ secrets.GHA_ACTIONS_SOURCE_PULL_TOKEN }}
-        run: ./sync-from-source/sync.sh
+        run: ./sync-from-source/sync.sh --snapshot
+
+      - name: check for changes
+        id: check_for_changes
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "changes_exist=true" >> $GITHUB_ENV
+          else
+            echo "changes_exist=false" >> $GITHUB_ENV
+          fi
 
       - name: Commit and push files
-        run: |
-          if [[ `git status --porcelain` ]]; then
-            echo "Changes detected - committing and pushing."
-            git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git config --local user.name "github-actions[bot]"
-            git commit -a -m "Sync with push-gha-metrics-action-source@main"
-            git push --force-with-lease -u origin snapshot
-          else
-            echo "No changes detected - exiting."
-          fi
+        if: env.changes_exist == 'true'
+        uses: planetscale/ghcommit-action@0e97298607962b704612dd4b7677600fdc363a21 # v0.1.17
+        with:
+          commit_message: "Sync with push-gha-metrics-action-source@main"
+          repo: ${{ github.repository }}
+          branch: snapshot
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
