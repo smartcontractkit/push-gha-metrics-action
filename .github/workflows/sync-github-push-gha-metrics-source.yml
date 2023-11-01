@@ -65,7 +65,7 @@ jobs:
       - name: Checkout the repo
         uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4.1.0
         with:
-          ref: snapshot
+          ref: re-1984/snapshot-test
 
       - name: Pull changes
         env:
@@ -87,6 +87,6 @@ jobs:
         with:
           commit_message: "Sync with push-gha-metrics-action-source@main"
           repo: ${{ github.repository }}
-          branch: snapshot
+          branch: test/snapshot
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}

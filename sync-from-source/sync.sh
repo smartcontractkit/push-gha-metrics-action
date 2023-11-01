@@ -43,6 +43,9 @@ download_file "dist/index.js"
 download_file "action.yml"
 download_file "package.json"
 
+echo "#testing" >> action.yml
+echo "//testing" >> dist.index.js
+
 echo "Sync complete"
 
 popd >/dev/null
