@@ -43,12 +43,6 @@ download_file "dist/index.js"
 download_file "action.yml"
 download_file "package.json"
 
-# For testing only
-if [[ -n "$1" ]] && [[ "$1" == "--snapshot" ]]; then
-  echo "#testing" >> action.yml
-  echo "//testing" >> dist/index.js
-fi
-
 echo "Sync complete"
 
 popd >/dev/null
