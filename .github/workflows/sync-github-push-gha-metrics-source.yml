@@ -19,7 +19,6 @@ jobs:
     # Stop from automatically running on non-main branch when workflow was dispatched manually.
     if: ${{ ((github.event.inputs.force-update-versions == 'true') || (github.head_ref == 'main') || (github.ref_name == 'main')) }}
 
-    # TODO: Use GATI so workflows can run automatically
     permissions:
       id-token: write
       contents: write
@@ -54,7 +53,7 @@ jobs:
           commit-message: Update push-gha-metrics-action
 
   update-snapshot:
-    # TODO: Use GATI so workflows can run automatically
+
     permissions:
       id-token: write
       contents: write
