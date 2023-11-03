@@ -5,22 +5,32 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      force-update-versions:
+        type: boolean
+        description: Force update-version job to run on non-main branch
+        required: true
+        default: false
   schedule:
     - cron: "0 */1 * * *" # Runs every hour
 
 jobs:
   update-version:
+    # Stop from automatically running on non-main branch when workflow was dispatched manually.
+    if: ${{ ((github.event.inputs.force-update-versions == 'true') || (github.head_ref == 'main') || (github.ref_name == 'main')) }}
+
     permissions:
       id-token: write
       contents: write
       pull-requests: write
+      actions: read
 
     name: Update Version
     runs-on: ubuntu-latest
     steps:
       - name: Collect Metrics
         id: collect-gha-metrics
-        uses: smartcontractkit/push-gha-metrics-action@v1
+        uses: smartcontractkit/push-gha-metrics-action@v2
         with:
           basic-auth: ${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
           hostname: ${{ secrets.GRAFANA_CLOUD_HOST }}
@@ -41,3 +51,42 @@ jobs:
           title: Update push-gha-metrics-action
           branch: chore/update-push-gha-metrics-action
           commit-message: Update push-gha-metrics-action
+
+  update-snapshot:
+
+    permissions:
+      id-token: write
+      contents: write
+      pull-requests: write
+      actions: read # For push-gha-metrics-action
+
+    name: Update snapshot version
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect Metrics
+        id: collect-gha-metrics
+        uses: smartcontractkit/push-gha-metrics-action@v2
+        with:
+          basic-auth: ${{ secrets.GRAFANA_CLOUD_BASIC_AUTH }}
+          hostname: ${{ secrets.GRAFANA_CLOUD_HOST }}
+          this-job-name: Update Version
+        continue-on-error: true
+
+      - name: Checkout the repo
+        uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4.1.0
+        with:
+          ref: snapshot
+
+      - name: Pull changes
+        env:
+          GH_TOKEN: ${{ secrets.GHA_ACTIONS_SOURCE_PULL_TOKEN }}
+        run: ./sync-from-source/sync.sh --snapshot
+
+      - name: Commit and push files
+        uses: planetscale/ghcommit-action@0e97298607962b704612dd4b7677600fdc363a21 # v0.1.17
+        with:
+          commit_message: "Sync with push-gha-metrics-action-source@main"
+          repo: ${{ github.repository }}
+          branch: snapshot
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
