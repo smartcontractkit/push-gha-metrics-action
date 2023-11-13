@@ -83,7 +83,7 @@ jobs:
         run: ./sync-from-source/sync.sh --snapshot
 
       - name: Commit and push files
-        uses: planetscale/ghcommit-action@0e97298607962b704612dd4b7677600fdc363a21 # v0.1.17
+        uses: planetscale/ghcommit-action@5cd5ba8c2ef5c6e6d90f856d36e700fb79183e68 # v0.1.19
         with:
           commit_message: "Sync with push-gha-metrics-action-source@main"
           repo: ${{ github.repository }}
