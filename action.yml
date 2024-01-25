@@ -18,6 +18,10 @@ inputs:
     required: false
     description:
       Basic auth to use to sending requests to loki, such as "bobsmith:hunter2"
+  org-id:
+    required: false
+    description:
+      The organization/tenant id to use when sending requests to loki
   hostname:
     required: true
     description:
@@ -28,11 +32,13 @@ inputs:
     default: https
     description:
       The protocol to use when sending requests to loki such as "http" or
-      "https"
+      "https". Defaults to "https"
   port:
     required: true
     default: "443"
-    description: The port to use when sending requests to loki such as "443"
+    description:
+      The port to use when sending requests to loki such as "443".
+      Defaults to "443"
   path:
     required: true
     default: "/loki/api/v1/push"
