@@ -2,6 +2,9 @@ name: push-gha-metrics-action
 description:
   Push metrics collected from the currently executing job to as loki logs
 inputs:
+  id:
+    required: true
+    description: A unique ID to use for this workflow, helps to keep metrics together when workflow names change
   # See https://github.com/actions/github-script/blob/00e1b58cd9e040d944127e75b3d9df586e4b0479/action.yml#L13
   # You can access github action context within default values
   github-token:
